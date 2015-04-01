@@ -26,10 +26,12 @@ When an agent gets a new query, it's executed and then sent back to the server f
 # Usage
 
   * Server
+
     `envdb --debug server`
 
   * Agent
-    `envdb agent --name SomeBox --server <ip addr to server>`
+
+    `sudo envdb agent --name SomeBox --server <ip addr to server>`
 
   * That's it - it's really that simple.
 
