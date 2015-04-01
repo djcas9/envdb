@@ -37,6 +37,6 @@ When an agent gets a new query, it's executed and then sent back to the server f
 
 # TODO
 
-  * Agent/Server auth, verification and validation.
   * TLS for the agent/server communications (top of list)
+  * Agent/Server auth, verification and validation.
   * Code cleanup.
