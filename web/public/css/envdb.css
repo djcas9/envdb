@@ -1,0 +1,109 @@
+/* @group Reset */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+*, *:after, *:before {
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+}
+
+/* @end */
+
+/* @group Fonts */
+
+@font-face {
+    font-family: 'Lato';
+    src: url('fonts/lato/hr/Lato-hr.eot');
+    src: url('fonts/lato/hr/Lato-hr.eot?#iefix') format('embedded-opentype'),
+         url('fonts/lato/hr/Lato-hr.woff') format('woff'),
+         url('fonts/lato/hr/Lato-hr.ttf') format('truetype'),
+         url('fonts/lato/hr/Lato-hr.svg#latohairline') format('svg');
+    font-weight: 100;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Lato';
+    src: url('fonts/lato/light/Lato-Light.eot');
+    src: url('fonts/lato/light/Lato-Light.eot?#iefix') format('embedded-opentype'),
+         url('fonts/lato/light/Lato-Light.woff') format('woff'),
+         url('fonts/lato/light/Lato-Light.ttf') format('truetype'),
+         url('fonts/lato/light/Lato-Light.svg#latoregular') format('svg');
+    font-weight: 300;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Lato';
+    src: url('fonts/lato/reg/Lato-Regular.eot');
+    src: url('fonts/lato/reg/Lato-Regular.eot?#iefix') format('embedded-opentype'),
+         url('fonts/lato/reg/Lato-Regular.woff') format('woff'),
+         url('fonts/lato/reg/Lato-Regular.ttf') format('truetype'),
+         url('fonts/lato/reg/Lato-Regular.svg#latoregular') format('svg');
+    font-weight: 400;
+    font-style: normal;
+
+}
+
+code, pre {
+	font-family: "Courier New", Courier, mono;
+}
+
+/* @end */
+
+html, body {
+  background: #fff;
+
+   /* -webkit-touch-callout: none; */
+    /* -webkit-user-select: none; */
+    /* -khtml-user-select: none; */
+    /* -moz-user-select: none; */
+    /* -ms-user-select: none; */
+    /* user-select: none; */
+}
+

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{{.Name}} {{.Version}}</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+
+    <script type="text/javascript" src="/gotalk/gotalk.js"></script>
+    <script type="text/javascript" src="/public/js/jquery.js"></script>
+    <script type="text/javascript" src="/public/js/handlebars.js"></script>
+    <script type="text/javascript" src="/public/js/{{.Name}}.js"></script>
+
+    <link rel="stylesheet" href="/public/css/grid.css">
+    <link rel="stylesheet" href="/public/css/font-awesome.css">
+    <link rel="stylesheet" href="/public/css/{{.Name}}.css">
+
+    <link rel="shortcut icon" href="/public/favicon.png" />
+  </head>
+  <body>
+
+    <div id="wrapper">
+      <div id="sidebar"></div>
+      <div id="header"></div>
+      <div id="content"></div>
+    </div>
+
+    <input style="width:600px;" type="text" name="search" id="search" value="SELECT uid, name, port FROM listening_ports l, processes p WHERE l.pid=p.pid;">
+    <input style="width:600px;" type="text" name="search2" id="search2" value="agent id">
+    <input style="width:600px;" type="text" name="search3" id="search3" value="table name - needs id in agent id input">
+
+    <div class="results">DATA</div>
+
+
+    <h1>Agents</h1>
+    <ul>
+      {{range .Agents}}
+      <li>{{.AgentId}} -- {{.Name}} ({{.OsQueryVersion}}) (online: {{.Online}})</li>
+      {{end}}
+    </ul>
+
+
+  </body>
+</html>
