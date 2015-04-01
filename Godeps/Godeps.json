@@ -1,0 +1,45 @@
+{
+	"ImportPath": "github.com/mephux/envdb",
+	"GoVersion": "go1.4.1",
+	"Deps": [
+		{
+			"ImportPath": "github.com/BurntSushi/toml",
+			"Comment": "v0.1.0-18-g443a628",
+			"Rev": "443a628bc233f634a75bcbdd71fe5350789f1afa"
+		},
+		{
+			"ImportPath": "github.com/alecthomas/units",
+			"Rev": "6b4e7dc5e3143b85ea77909c72caf89416fc2915"
+		},
+		{
+			"ImportPath": "github.com/go-xorm/core",
+			"Rev": "be6e7ac47dc57bd0ada25322fa526944f66ccaa6"
+		},
+		{
+			"ImportPath": "github.com/go-xorm/xorm",
+			"Comment": "v0.4.2-56-g1f0dd9b",
+			"Rev": "1f0dd9bef2d9549229146dbbdd207c9e623f3ac6"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-sqlite3",
+			"Rev": "5253daf8561a6ca5015fd5ce79e4367912146be9"
+		},
+		{
+			"ImportPath": "github.com/nu7hatch/gouuid",
+			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
+		},
+		{
+			"ImportPath": "github.com/rsms/gotalk",
+			"Rev": "8424c387046410d50ce7bb3d3125fa89fadf7ac8"
+		},
+		{
+			"ImportPath": "golang.org/x/net/websocket",
+			"Rev": "b6fdb7d8a4ccefede406f8fe0f017fb58265054c"
+		},
+		{
+			"ImportPath": "gopkg.in/alecthomas/kingpin.v1",
+			"Comment": "v1.3.6",
+			"Rev": "55a69a226d28a43b913720f5d765706d49c8fa9e"
+		}
+	]
+}

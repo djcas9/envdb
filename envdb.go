@@ -4,7 +4,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/mephux/oswrap/log"
+	"github.com/mephux/envdb/log"
 	"gopkg.in/alecthomas/kingpin.v1"
 )
 
