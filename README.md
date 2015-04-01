@@ -1,6 +1,6 @@
 # Envdb
 
-Envdb turns your production, dev, etc environments into a database cluster you can search across using osquery.
+Envdb turns your production, dev, etc environments into a database cluster you can search across using [osquery](https://github.com/facebook/osquery).
 
 Envdb allows you to register each computer, server or asset as a node in your cluster. Once a new
 node is connected it because available for search.
