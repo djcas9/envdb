@@ -19,9 +19,9 @@ When an agent gets a new query, it's executed and then sent back to the server f
 
 # Building
 
-  `git clone https://github.com/mephux/envdb.git`
-  `cd envdb`
-  `make`
+  * `git clone https://github.com/mephux/envdb.git`
+  * `cd envdb`
+  * `make`
 
 # Usage
 
