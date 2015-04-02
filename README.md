@@ -35,6 +35,14 @@ When an agent gets a new query, it's executed and then sent back to the server f
 
   * That's it - it's really that simple.
 
+## Self-Promotion
+
+Like Komanda? Follow the repository on
+[GitHub](https://github.com/mephux/komanda) and if
+you would like to stalk me, follow [mephux](http://dweb.io/) on
+[Twitter](http://twitter.com/mephux) and
+[GitHub](https://github.com/mephux).
+
 # TODO
 
   * TLS for the agent/server communications (top of list)
