@@ -138,13 +138,14 @@ func NewWebServer(webPort int, server *Server) {
 	// ),
 	// )
 
-	http.Handle("/gotalk/", ws)
 	http.Handle("/public/", http.FileServer(http.Dir("./web/")))
 
 	http.HandleFunc("/", RouteIndex)
 
 	// API - Version 1
 	http.HandleFunc("/api/v1/agents", RouteAgents)
+
+	http.Handle("/gotalk/", ws)
 
 	var port string = fmt.Sprintf(":%d", webPort)
 

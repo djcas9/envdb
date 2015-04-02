@@ -33,7 +33,6 @@ func AgentUpdateOrCreate(agent *AgentData) (*DbAgent, error) {
 	find, err := GetAgentByAgentId(agent.Id)
 
 	if find != nil {
-
 		find.Name = agent.Name
 		find.Ip = agent.Ip
 		find.Hostname = agent.Hostname
@@ -41,7 +40,9 @@ func AgentUpdateOrCreate(agent *AgentData) (*DbAgent, error) {
 		find.OsQueryVersion = agent.OsQueryVersion
 		find.Online = agent.Online
 
-		_, err := x.Id(find.Id).Update(find)
+		Log.Debug("Found Agent: ", find.Online, agent.Online)
+
+		_, err := x.Id(find.Id).AllCols().Update(find)
 
 		if err != nil {
 			return find, err

@@ -10,6 +10,7 @@ import (
 )
 
 type Context struct {
+	Name    string
 	Version string
 	Agents  []*DbAgent
 }
@@ -22,6 +23,7 @@ func renderFile(w http.ResponseWriter, filename string) error {
 	agents, _ := AllAgents()
 
 	context := Context{
+		Name:    Name,
 		Version: Version,
 		Agents:  agents,
 	}
@@ -30,11 +32,14 @@ func renderFile(w http.ResponseWriter, filename string) error {
 		filename = "/index.html"
 	}
 
+	Log.Debug("TEST:::", filename)
+
 	file, err = ioutil.ReadFile("web" + filename)
 
 	if err != nil {
 		return err
 	}
+
 	ext = filepath.Ext("web" + filename)
 
 	if ext != "" {
@@ -42,8 +47,7 @@ func renderFile(w http.ResponseWriter, filename string) error {
 	}
 	if file != nil {
 		// w.Write(file)
-		t, _ := template.New("index").
-			Parse(string(file))
+		t, _ := template.New("index").Delims("<%", "%>").Parse(string(file))
 
 		Log.Debug("HTTP Rendering file: ", filename)
 		t.Execute(w, context)
@@ -56,6 +60,7 @@ func RouteIndex(w http.ResponseWriter, r *http.Request) {
 	err := renderFile(w, r.URL.Path)
 
 	if err != nil {
+		Log.Error(err)
 	}
 }
 

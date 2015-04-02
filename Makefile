@@ -1,5 +1,4 @@
-NAME="oswrap"
-DESCRIPTION="distributed osquery"
+NAME="envdb"
 
 # VERSION=$(shell cat $(NAME).go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
 CWD=$(shell pwd)

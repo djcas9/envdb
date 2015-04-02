@@ -83,17 +83,13 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			Log.Error("Error: ", err)
 		}
 
-		if err != nil {
-			Log.Error("unable to create or update agent record")
-			Log.Error("Error: ", err)
-		}
-
 		s.CloseHandler = func(s *gotalk.Sock, _ int) {
 			self.mu.Lock()
 			defer self.mu.Unlock()
 
 			agent := self.Agents[s]
 			agent.Online = false
+
 			Log.Infof("Agent disconnected. (%s / %s)", agent.Name, agent.Id)
 
 			if _, err := AgentUpdateOrCreate(agent); err != nil {

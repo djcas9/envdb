@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>{{.Name}} {{.Version}}</title>
+    <title><%.Name%> <% .Version %></title>
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -10,35 +10,117 @@
     <script type="text/javascript" src="/gotalk/gotalk.js"></script>
     <script type="text/javascript" src="/public/js/jquery.js"></script>
     <script type="text/javascript" src="/public/js/handlebars.js"></script>
-    <script type="text/javascript" src="/public/js/{{.Name}}.js"></script>
+    <script type="text/javascript" src="/public/js/ace.js"></script>
+    <script type="text/javascript" src="/public/js/ace-sql.js"></script>
+    <script type="text/javascript" src="/public/js/ace-theme.js"></script>
+    <script type="text/javascript" src="/public/js/ace-tools.js"></script>
+    <script type="text/javascript" src="/public/js/pace.js"></script>
+    <script type="text/javascript" src="/public/js/list.js"></script>
+    <script type="text/javascript" src="/public/js/<% .Name %>.js"></script>
 
     <link rel="stylesheet" href="/public/css/grid.css">
     <link rel="stylesheet" href="/public/css/font-awesome.css">
-    <link rel="stylesheet" href="/public/css/{{.Name}}.css">
+    <link rel="stylesheet" href="/public/css/fonts.css">
+    <link rel="stylesheet" href="/public/css/<% .Name %>.css">
 
     <link rel="shortcut icon" href="/public/favicon.png" />
   </head>
   <body>
 
     <div id="wrapper">
-      <div id="sidebar"></div>
-      <div id="header"></div>
-      <div id="content"></div>
+
+      <div id="sidebar">
+        <div class="logo">
+          <i class="fa fa-cogs settings-icon"></i>
+
+          <a href="/">
+            <span class="name">Env<strong>DB</strong></span>
+            <span class="version">v<% .Version %></span>
+          </a>
+        </div>
+
+        <div class="agents-filter">
+          <i class="fa fa-search search-icon"></i>
+          <input placeholder="Filter agents" id="agents-filter" class="search" type="text">
+        </div>
+
+      <ul id="agents" class="list">
+        <% range .Agents %>
+        <li class="agent <% if .Online %>online<% else %>offline<% end %>" data-id="<% .Id %>" data-agent-id="<% .AgentId %>">
+
+          <i class="fa fa-circle status-icon"></i>
+
+          <div class="agent-header">
+            <span class="agent-name"><% .Name %></span>
+          </div>
+
+          <div class="agent-metadata">
+            <span class="agent-agent-id"><% .AgentId %></span>
+          </div>
+
+
+        </li>
+        <% end %>
+      </ul>
+
+      </div>
+
+      <div id="envdb-query">
+        <div id="editor"></div>
+
+        <div class="envdb-control">
+          <a href="#" class="button action run-query">Run Query</a>
+          <a href="#" class="button">Export Results</a>
+
+          <a href="#" class="button right save">Save Query</a>
+        </div>
+      </div>
+
+      <div id="content">
+        <div id="loading">Loading...</div>
+        <div class="wrapper"></div>
+      </div>
+
     </div>
 
-    <input style="width:600px;" type="text" name="search" id="search" value="SELECT uid, name, port FROM listening_ports l, processes p WHERE l.pid=p.pid;">
-    <input style="width:600px;" type="text" name="search2" id="search2" value="agent id">
-    <input style="width:600px;" type="text" name="search3" id="search3" value="table name - needs id in agent id input">
+    <script id="query-results-table" type="text/x-handlebars-template">
+      <table class="query-results">
+        <thead>
+        <tr>
+          <th data-name="agent-name">
+          Agent
+          </th>
+          {{#each results}}
+          <th data-name="{{@key}}">
+            {{@key}}
+          </th>
+          {{/each}}
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </script>
 
-    <div class="results">DATA</div>
+    <script id="query-results-row" type="text/x-handlebars-template">
 
-
-    <h1>Agents</h1>
-    <ul>
-      {{range .Agents}}
-      <li>{{.AgentId}} -- {{.Name}} ({{.OsQueryVersion}}) (online: {{.Online}})</li>
-      {{end}}
-    </ul>
+      {{#each results}}
+      <tr class="row">
+      <td data-name="agent-name">
+      {{../name}}
+      </td>
+      {{#each this}}
+      <td data-name="{{@key}}">
+      {{#if this}}
+      {{this}}
+        {{else}}
+          --
+          {{/if}}
+      </td>
+      {{/each}}
+      </tr>
+      {{/each}}
+    </script>
 
 
   </body>
