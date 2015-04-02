@@ -37,8 +37,8 @@ When an agent gets a new query, it's executed and then sent back to the server f
 
 ## Self-Promotion
 
-Like Komanda? Follow the repository on
-[GitHub](https://github.com/mephux/komanda) and if
+Like envdb? Follow the repository on
+[GitHub](https://github.com/mephux/envdb) and if
 you would like to stalk me, follow [mephux](http://dweb.io/) on
 [Twitter](http://twitter.com/mephux) and
 [GitHub](https://github.com/mephux).
