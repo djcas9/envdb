@@ -1,6 +1,6 @@
 # Envdb
 
-Envdb turns your production, dev, etc environments into a database cluster you can search across using osquery.
+Envdb turns your production, dev, etc environments into a database cluster you can search across using [osquery](https://github.com/facebook/osquery).
 
 Envdb allows you to register each computer, server or asset as a node in your cluster. Once a new
 node is connected it because available for search.
@@ -34,6 +34,14 @@ When an agent gets a new query, it's executed and then sent back to the server f
     `sudo envdb agent --name SomeBox --server <ip addr to server>`
 
   * That's it - it's really that simple.
+
+## Self-Promotion
+
+Like envdb? Follow the repository on
+[GitHub](https://github.com/mephux/envdb) and if
+you would like to stalk me, follow [mephux](http://dweb.io/) on
+[Twitter](http://twitter.com/mephux) and
+[GitHub](https://github.com/mephux).
 
 # TODO
 
