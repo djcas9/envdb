@@ -1,6 +1,6 @@
 NAME="envdb"
 
-# VERSION=$(shell cat $(NAME).go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
+VERSION=$(shell cat $(NAME).go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
 CWD=$(shell pwd)
 
 NO_COLOR=\033[0m
@@ -18,13 +18,13 @@ endif
 
 all: deps
 	@mkdir -p bin/
-	@$(ECHO) "$(OK_COLOR)==> Building $(NAME) $(NO_COLOR)"
+	@$(ECHO) "$(OK_COLOR)==> Building $(NAME) $(VERSION) $(NO_COLOR)"
 	@godep go build -o bin/$(NAME)
 	@chmod +x bin/$(NAME)
 	@$(ECHO) "$(OK_COLOR)==> Done$(NO_COLOR)"
 
 
-deps:
+deps: bindata
 	@$(ECHO) "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
 	@godep get
 
@@ -36,7 +36,7 @@ updatedeps:
 
 bindata:
 	@$(ECHO) "$(OK_COLOR)==> Embedding Assets$(NO_COLOR)"
-	@go-bindata -debug web/...
+	@go-bindata web/...
 
 test: deps
 	@$(ECHO) "$(OK_COLOR)==> Testing $(NAME)...$(NO_COLOR)"
@@ -46,10 +46,11 @@ goxBuild:
 	gox -build-toolchain
 
 gox: 
-	@$(ECHO) "$(OK_COLOR)==> GOX BroTop...$(NO_COLOR)"
-	gox output="pkg/{{.OS}}-{{.Arch}}/brotop"
+	@$(ECHO) "$(OK_COLOR)==> GOX $(NAME)...$(NO_COLOR)"
+	gox output="pkg/{{.OS}}-{{.Arch}}/$(NAME)"
 
 clean:
+	rm -rf bindata.go
 	rm -rf bin/
 	rm -rf pkg/
 

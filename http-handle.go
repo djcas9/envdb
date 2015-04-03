@@ -30,11 +30,16 @@ func renderFile(w http.ResponseWriter, filename string) error {
 
 	if filename == "/" {
 		filename = "/index.html"
+	} else {
+		return nil
 	}
 
-	Log.Debug("TEST:::", filename)
-
-	file, err = ioutil.ReadFile("web" + filename)
+	if DEV_MODE {
+		// dev
+		file, err = ioutil.ReadFile("web" + filename)
+	} else {
+		file, err = Asset("web" + filename)
+	}
 
 	if err != nil {
 		return err

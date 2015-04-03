@@ -18,6 +18,7 @@
     <script type="text/javascript" src="/public/js/list.js"></script>
     <script type="text/javascript" src="/public/js/dataTables.js"></script>
     <script type="text/javascript" src="/public/js/dataTables-fixedheader.js"></script>
+    <script type="text/javascript" src="/public/js/csv.js"></script>
     <script type="text/javascript" src="/public/js/<% .Name %>.js"></script>
 
     <link rel="stylesheet" href="/public/css/grid.css">
@@ -36,7 +37,10 @@
           <i class="fa fa-cogs settings-icon"></i>
 
           <a href="/">
-            <span class="name">Env<strong>DB</strong></span>
+            <span class="name">
+              <i style="font-size:0.9em;margin-right:5px;" class="fa fa-database"></i>
+              Env<strong>DB</strong>
+            </span>
             <span class="version">v<% .Version %></span>
           </a>
         </div>
@@ -65,33 +69,50 @@
         <% end %>
       </ul>
 
+      <div class="sidebar-footer">
+        <% .Name %> v<% .Version %> by Dustin Willis Webber
+      </div>
+      </div>
+
+      <div id="header">
+        <div class="title">Query All Nodes</div>
       </div>
 
       <div id="envdb-query">
         <div id="editor"></div>
 
         <div class="envdb-control">
-          <a href="#" class="button action run-query">Run Query</a>
-          <a href="#" class="button">Export</a>
 
-          <a href="#" class="button right save">Save Query</a>
+          <div id="flash-message" class="error">
+            <span class="success">Query successfully saved.</span>
+          </div>
+
+          <a href="#" class="button action run-query">Run Query</a>
+          <a href="#" class="button export-results">Export</a>
+
+          <a href="#" class="button right save">Load</a>
+          <a href="#" class="button right save">Save</a>
         </div>
       </div>
 
       <div id="content">
-        <div id="loading">Loading...</div>
-        <div class="wrapper"></div>
+        <div id="tables"></div>
+        <div class="wrapper">
+        
+        </div>
       </div>
-
     </div>
 
     <script id="query-results-table" type="text/x-handlebars-template">
       <table class="query-results">
         <thead>
         <tr>
+          {{#unless hideNode}}
           <th data-name="agent-name">
           node
           </th>
+          {{/unless}}
+
           {{#each results}}
           <th data-name="{{@key}}">
             {{@key}}
@@ -121,13 +142,35 @@
         </li>
     </script>
 
+    <script id="tables-template" type="text/x-handlebars-template">
+      <div id="node-tables">
+        
+        <div class="title">
+          Tables
+        </div>
+
+        <ul class="tables">
+          {{#each this}}
+            <li data-table-name="{{this}}">
+            {{this}}
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+    </script>
+
+
     <script id="query-results-row" type="text/x-handlebars-template">
 
       {{#each results}}
       <tr class="row">
+
+      {{#unless ../hideNode}}
       <td data-name="agent-name">
-      <strong>{{../name}}</strong> ({{../hostname}})
-      </td>
+      <strong>{{../../name}}</strong> ({{../../hostname}})
+        </td>
+      {{/unless}}
+
       {{#each this}}
       <td data-name="{{@key}}" title="{{this}}">
       {{#if this}}

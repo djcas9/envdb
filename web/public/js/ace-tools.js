@@ -1546,13 +1546,13 @@ var Autocomplete = function() {
     };
 
     this.cancelContextMenu = function() {
-      // if (this.hasOwnPropery("editor")) {
-        // var blah = this.editor.hasOwnProperty("$mouseHandler");
-        // console.log(blah)
-        // if (blah) {
-          // this.editor.$mouseHandler.cancelContextMenu();
-        // }
-      // }
+      if (this.hasOwnPropery("editor")) {
+        var blah = this.editor.hasOwnProperty("$mouseHandler");
+        console.log(blah)
+        if (blah) {
+          this.editor.$mouseHandler.cancelContextMenu();
+        }
+      }
     };
 
     this.updateDocTooltip = function() {

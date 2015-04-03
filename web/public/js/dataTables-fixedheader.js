@@ -1,4 +1,4 @@
-/*! FixedHeader 2.1.2
+/*! FixedHeader 2.1.3-dev
  * ©2010-2014 SpryMedia Ltd - datatables.net/license
  */
 
@@ -6,7 +6,7 @@
  * @summary     FixedHeader
  * @description Fix a table's header or footer, so it is always visible while
  *              Scrolling
- * @version     2.1.2
+ * @version     2.1.3-dev
  * @file        dataTables.fixedHeader.js
  * @author      SpryMedia Ltd (www.sprymedia.co.uk)
  * @contact     www.sprymedia.co.uk/contact
@@ -65,6 +65,7 @@ FixedHeader = function ( mTable, oInit ) {
 
 	var that = this;
 	var oSettings = {
+		"enable": true,
 		"aoCache": [],
 		"oSides": {
 			"top": true,
@@ -131,12 +132,47 @@ FixedHeader = function ( mTable, oInit ) {
 		this._fnUpdatePositions();
 	};
 
+	/*
+	 * Function: fnEnable
+	 * Purpose:  Enable the fixed header elements
+	 * Returns:  -
+	 * Inputs:   -
+	 */
+	this.fnEnable = function () {
+		oSettings.enable = true;
+
+		var cache = oSettings.aoCache;
+		for ( var i=0, ien=cache.length ; i<ien ; i++ ) {
+			cache[i].nWrapper.style.display = 'block';
+		}
+
+		this._fnUpdatePositions();
+	};
+
+	/*
+	 * Function: fnDisable
+	 * Purpose:  Disable the fixed header elements
+	 * Returns:  -
+	 * Inputs:   -
+	 */
+	this.fnDisable = function () {
+		oSettings.enable = false;
+
+		var cache = oSettings.aoCache;
+		for ( var i=0, ien=cache.length ; i<ien ; i++ ) {
+			cache[i].nWrapper.style.display = 'none';
+		}
+	};
+
 
 	var dt = $.fn.dataTable.Api ?
 		new $.fn.dataTable.Api( mTable ).settings()[0] :
 		mTable.fnSettings();
 
 	dt._oPluginFixedHeader = this;
+
+	/* Register our destructor with parent DataTable */
+	dt.oApi._fnCallbackReg(dt, 'aoDestroyCallback', $.proxy(this._fnDestroy, this), 'FixedHeader');
 
 	/* Let's do it */
 	this.fnInit( dt, oInit );
@@ -204,24 +240,34 @@ FixedHeader.prototype = {
 			s.aoCache.push( that._fnCloneTable( "fixedRight", "FixedHeader_Right", that._fnCloneTRight, s.oSides.right ) );
 		}
 
-		/* Event listeners for window movement */
-		FixedHeader.afnScroll.push( function () {
-			that._fnUpdatePositions.call(that);
-		} );
+		var counter = ++FixedHeader.counter;
+		this._eventNamespace = '.fh-' + counter;
 
-		$(window).resize( function () {
+		var scrollHandler = function () {
+			that._fnUpdatePositions.call(that);
+		};
+		
+		var resizeHandler = function () {
 			FixedHeader.fnMeasure();
 			that._fnUpdateClones.call(that);
 			that._fnUpdatePositions.call(that);
-		} );
+		};
+
+		/* Keep track of event handler for possible removal later */
+		this.scrollHandler = scrollHandler;
+
+		/* Event listeners for window movement */
+		FixedHeader.afnScroll.push( scrollHandler );
+
+		$(window).on('resize' + this._eventNamespace, resizeHandler);
 
 		$(s.nTable)
-			.on('column-reorder.dt', function () {
+			.on('column-reorder.dt' + this._eventNamespace, function () {
 				FixedHeader.fnMeasure();
 				that._fnUpdateClones( true );
 				that._fnUpdatePositions();
 			} )
-			.on('column-visibility.dt', function () {
+			.on('column-visibility.dt' + this._eventNamespace, function () {
 				FixedHeader.fnMeasure();
 				that._fnUpdateClones( true );
 				that._fnUpdatePositions();
@@ -234,7 +280,6 @@ FixedHeader.prototype = {
 
 		s.bInitComplete = true;
 	},
-
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * Support functions
@@ -354,7 +399,7 @@ FixedHeader.prototype = {
 
 		/* Insert the newly cloned table into the DOM, on top of the "real" header */
 		nDiv.appendChild( nCTable );
-		document.body.appendChild( nDiv );
+    document.body.appendChild( nDiv );
 
 		return {
 			"nNode": nCTable,
@@ -423,6 +468,11 @@ FixedHeader.prototype = {
 	_fnUpdatePositions: function ()
 	{
 		var s = this.fnGetSettings();
+
+		if ( ! s.enable ) {
+			return;
+		}
+
 		this._fnMeasure();
 
 		for ( var i=0, iLen=s.aoCache.length ; i<iLen ; i++ )
@@ -697,16 +747,16 @@ FixedHeader.prototype = {
 		var s = this.fnGetSettings();
 		var nTable = oCache.nNode;
 
+		/* Set the wrapper width to match that of the cloned table */
+		var iDtWidth = $(s.nTable).outerWidth();
+		oCache.nWrapper.style.width = iDtWidth+"px";
+		nTable.style.width = iDtWidth+"px";
+
 		if ( s.bInitComplete && !s.oCloneOnDraw.top )
 		{
 			this._fnClassUpdate( $('thead', s.nTable)[0], $('thead', nTable)[0] );
 			return;
 		}
-
-		/* Set the wrapper width to match that of the cloned table */
-		var iDtWidth = $(s.nTable).outerWidth();
-		oCache.nWrapper.style.width = iDtWidth+"px";
-		nTable.style.width = iDtWidth+"px";
 
 		/* Remove any children the cloned table has */
 		while ( nTable.childNodes.length > 0 )
@@ -879,7 +929,36 @@ FixedHeader.prototype = {
 		nTable.style.width = iWidth+"px";
 		oCache.nWrapper.style.width = iWidth+"px";
 	},
+	
+	_fnRemoveEventHandlers: function () {
+		var settings = this.fnGetSettings();
+		var $dt = $(settings.nTable);
 
+		$dt.off(this._eventNamespace);
+		$(window).off( 'resize' + this._eventNamespace );
+
+		if (this.scrollHandler) {
+			var idx = jQuery.inArray(this.scrollHandler, FixedHeader.afnScroll);
+			if (idx >= 0) {
+				FixedHeader.afnScroll.splice( idx );
+			}
+		}
+	},
+	
+	_fnRemoveElements: function () {
+		var settings = this.fnGetSettings();
+		var aoCache = settings.aoCache;
+		
+		for (var i = 0; i < aoCache.length; i++) {
+			$(aoCache[i].nWrapper).remove();
+			$(aoCache[i].nNode).remove();
+		}
+	},
+
+	_fnDestroy: function () {
+		this._fnRemoveEventHandlers();
+		this._fnRemoveElements();
+	},
 
 	/**
 	 * Equalise the heights of the rows in a given table node in a cross browser way. Note that this
@@ -981,8 +1060,14 @@ FixedHeader.fnMeasure = function ()
 	oWin.iScrollBottom = oDoc.iHeight - oWin.iScrollTop - oWin.iHeight;
 };
 
+/*
+ * Variable: counter
+ * Purpose:  Global counter for FixedHeader instances, used for namespacing events
+ * Scope:    FixedHeader
+ */
+FixedHeader.counter = 0;
 
-FixedHeader.version = "2.1.2";
+FixedHeader.version = "2.1.3-dev";
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

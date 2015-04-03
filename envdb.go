@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
@@ -10,33 +11,35 @@ import (
 
 const (
 	Name    = "envdb"
-	Version = "0.1.0"
+	Version = "0.1.0.beta"
+
+	DefaultServerPort    = 3636
+	DefaultWebServerPort = 8080
 )
 
 var (
 	TimeFormat = "15:04:05"
 
-	app   = kingpin.New(Name, "Distributed osquery.")
-	debug = app.Flag("debug", "Enable debug mode.").Bool()
+	app   = kingpin.New(Name, "Environment Database")
+	debug = app.Flag("debug", "Enable debug logging.").Bool()
+	dev   = app.Flag("dev", "Enable dev mode. (read assets from disk, enable debug output)").Bool()
 	quiet = app.Flag("quiet", "Remove all output logging.").Short('q').Bool()
 
-	server = app.Command("server", "Start the tcp server for agent connections.")
+	server = app.Command("server", "Start the tcp server for node connections.")
 	// serverConfig = server.Flag("config", "Server configuration file.").File()
-	serverPort    = server.Flag("port", "Port for the server to listen on.").Int()
-	serverWebPort = server.Flag("http-port", "Port for the web server to listen on.").Int()
+	serverPort = server.Flag("port", "Port for the server to listen on.").PlaceHolder(fmt.Sprintf("%d", DefaultServerPort)).Int()
 
-	agent = app.Command("agent", "Register a new agent.")
+	serverWebPort = server.Flag("http-port", "Port for the web server to listen on.").PlaceHolder(fmt.Sprintf("%d", DefaultWebServerPort)).Int()
+
+	agent = app.Command("node", "Register a new node.")
 	// clientConfig = client.Flag("config", "Client configuration file.").File()
-	agentName   = agent.Flag("name", "Agent name.").Required().String()
-	agentServer = agent.Flag("server", "Address for server to connect to.").Required().String()
+	agentName   = agent.Arg("node-name", "A name used to uniquely identify this node.").Required().String()
+	agentServer = agent.Flag("server", "Address for server to connect to.").PlaceHolder("127.0.0.1").Required().String()
 	agentPort   = agent.Flag("port", "Port to use for connection.").Int()
 
 	Log *log.Logger
-)
 
-const (
-	DefaultServerPort    = 3636
-	DefaultWebServerPort = 8080
+	DEV_MODE bool
 )
 
 func main() {
@@ -48,6 +51,13 @@ func main() {
 	Log = log.New()
 
 	Log.Prefix = "envdb"
+
+	if *dev {
+		DEV_MODE = true
+		Log.Info("DEBUG MODE ENABLED.")
+	} else {
+		DEV_MODE = false
+	}
 
 	if *debug {
 		Log.SetLevel(log.DebugLevel)

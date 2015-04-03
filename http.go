@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/rsms/gotalk"
 )
 
@@ -119,7 +120,7 @@ func NewWebServer(webPort int, server *Server) {
 	})
 
 	gotalk.Handle("query", func(sql SqlRequest) ([]QueryResults, error) {
-		data := server.Send("all", Query{
+		data := server.Send(sql.Id, Query{
 			Sql:    sql.Sql,
 			Format: "json",
 		})
@@ -130,17 +131,20 @@ func NewWebServer(webPort int, server *Server) {
 	ws := gotalk.WebSocketHandler()
 	ws.OnAccept = onAccept
 
-	// http.Handle("/",
-	// http.FileServer(
-	// &assetfs.AssetFS{
-	// Asset:    Asset,
-	// AssetDir: AssetDir,
-	// Prefix:   "web",
-	// },
-	// ),
-	// )
-
-	http.Handle("/public/", http.FileServer(http.Dir("./web/")))
+	if DEV_MODE {
+		// dev
+		http.Handle("/public/", http.FileServer(http.Dir("./web/")))
+	} else {
+		http.Handle("/public/",
+			http.FileServer(
+				&assetfs.AssetFS{
+					Asset:    Asset,
+					AssetDir: AssetDir,
+					Prefix:   "web",
+				},
+			),
+		)
+	}
 
 	http.HandleFunc("/", RouteIndex)
 
