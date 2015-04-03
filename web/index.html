@@ -16,6 +16,8 @@
     <script type="text/javascript" src="/public/js/ace-tools.js"></script>
     <script type="text/javascript" src="/public/js/pace.js"></script>
     <script type="text/javascript" src="/public/js/list.js"></script>
+    <script type="text/javascript" src="/public/js/dataTables.js"></script>
+    <script type="text/javascript" src="/public/js/dataTables-fixedheader.js"></script>
     <script type="text/javascript" src="/public/js/<% .Name %>.js"></script>
 
     <link rel="stylesheet" href="/public/css/grid.css">
@@ -100,6 +102,23 @@
         <tbody>
         </tbody>
       </table>
+    </script>
+
+    <script id="agent-template" type="text/x-handlebars-template">
+      <li class="agent {{#if online}}online{{else}}offline{{/if}}" data-agent-id="{{id}}">
+
+          <i class="fa fa-circle status-icon"></i>
+
+          <div class="agent-header">
+          <span class="agent-name">{{name}}</span>
+          </div>
+
+          <div class="agent-metadata">
+          <span class="agent-agent-id">{{ip}}/ {{hostname}}</span>
+          </div>
+
+
+        </li>
     </script>
 
     <script id="query-results-row" type="text/x-handlebars-template">

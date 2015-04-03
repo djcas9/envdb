@@ -29,10 +29,17 @@ func AllAgents() ([]*DbAgent, error) {
 	return agents, err
 }
 
+func (self *DbAgent) Update() error {
+	_, err := x.Id(self.Id).AllCols().Update(self)
+	return err
+}
+
 func AgentUpdateOrCreate(agent *AgentData) (*DbAgent, error) {
 	find, err := GetAgentByAgentId(agent.Id)
 
 	if find != nil {
+		Log.Debug("Found existing node record.")
+
 		find.Name = agent.Name
 		find.Ip = agent.Ip
 		find.Hostname = agent.Hostname
@@ -50,6 +57,9 @@ func AgentUpdateOrCreate(agent *AgentData) (*DbAgent, error) {
 
 		return find, nil
 	}
+
+	Log.Debugf("Couldn't find record for node (%s).", agent.Id)
+	Log.Debugf("Creating a new record.")
 
 	a := &DbAgent{
 		AgentId:        agent.Id,

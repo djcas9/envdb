@@ -37,6 +37,8 @@ func WebSocketSend(name string, in interface{}) {
 	socksmu.RLock()
 	defer socksmu.RUnlock()
 
+	Log.Debug("WebSocketSend: ", name, in)
+
 	for s, _ := range Clients {
 		s.Notify(name, in)
 	}

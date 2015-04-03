@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
+	"os/signal"
 	"sync"
 	"time"
 
@@ -10,14 +12,14 @@ import (
 )
 
 type AgentData struct {
-	Id             string
-	Name           string
-	Ip             string
-	Hostname       string
-	Socket         *gotalk.Sock
+	Id             string       `json:"id"`
+	Name           string       `json:"name"`
+	Ip             string       `json:"ip"`
+	Hostname       string       `json:"hostname"`
+	Socket         *gotalk.Sock `json:"-"`
 	OsQuery        bool
 	OsQueryVersion string
-	Online         bool
+	Online         bool `json:"online"`
 }
 
 type Server struct {
@@ -48,6 +50,32 @@ func NewServer(port int) (Server, error) {
 		Log.Fatal("Unable to setup sqlite database.")
 		Log.Fatalf("Error: %s", err)
 	}
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+
+	go func() {
+		for {
+			select {
+			case sig := <-sigChan:
+				if sig.String() == "interrupt" {
+					Log.Info("Received Interrupt. Exiting.")
+					agents, _ := AllAgents()
+
+					for _, agent := range agents {
+						agent.Online = false
+
+						if err := agent.Update(); err != nil {
+							Log.Error("unable to update agent record")
+							Log.Error("Error: ", err)
+						}
+					}
+
+					os.Exit(1)
+				}
+			}
+		}
+	}()
 
 	return server, nil
 }
@@ -85,6 +113,8 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			Log.Error("Error: ", err)
 		}
 
+		WebSocketSend("agent-update", agent)
+
 		s.CloseHandler = func(s *gotalk.Sock, _ int) {
 			self.mu.Lock()
 			defer self.mu.Unlock()
@@ -93,6 +123,7 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			agent.Online = false
 
 			Log.Infof("Agent disconnected. (%s / %s)", agent.Name, agent.Id)
+			WebSocketSend("agent-update", agent)
 
 			if _, err := AgentUpdateOrCreate(agent); err != nil {
 				Log.Error("unable update agent record")

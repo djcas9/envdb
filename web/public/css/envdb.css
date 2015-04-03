@@ -109,6 +109,9 @@ html, body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 #wrapper{
@@ -363,6 +366,7 @@ table.query-results{
 }
 
 table.query-results th{
+  cursor: pointer;
   background: #F7F7F7;
   text-align: left;
   padding: 10px;
