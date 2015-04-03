@@ -16,10 +16,11 @@ type Query struct {
 }
 
 type QueryResults struct {
-	Id      string      `json:"id"`
-	Name    string      `json:"name"`
-	Results interface{} `json:"results"`
-	Error   string      `json:"error"`
+	Id       string      `json:"id"`
+	Name     string      `json:"name"`
+	Hostname string      `json:"hostname"`
+	Results  interface{} `json:"results"`
+	Error    string      `json:"error"`
 }
 
 func CheckOsQueryVersion(version string) bool {

@@ -41,7 +41,7 @@
 
         <div class="agents-filter">
           <i class="fa fa-search search-icon"></i>
-          <input placeholder="Filter agents" id="agents-filter" class="search" type="text">
+          <input placeholder="Filter Nodes" id="agents-filter" class="search" type="text">
         </div>
 
       <ul id="agents" class="list">
@@ -55,7 +55,7 @@
           </div>
 
           <div class="agent-metadata">
-            <span class="agent-agent-id"><% .AgentId %></span>
+            <span class="agent-agent-id"><% .Ip %> / <% .Hostname %></span>
           </div>
 
 
@@ -70,7 +70,7 @@
 
         <div class="envdb-control">
           <a href="#" class="button action run-query">Run Query</a>
-          <a href="#" class="button">Export Results</a>
+          <a href="#" class="button">Export</a>
 
           <a href="#" class="button right save">Save Query</a>
         </div>
@@ -88,7 +88,7 @@
         <thead>
         <tr>
           <th data-name="agent-name">
-          Agent
+          node
           </th>
           {{#each results}}
           <th data-name="{{@key}}">
@@ -107,10 +107,10 @@
       {{#each results}}
       <tr class="row">
       <td data-name="agent-name">
-      {{../name}}
+      <strong>{{../name}}</strong> ({{../hostname}})
       </td>
       {{#each this}}
-      <td data-name="{{@key}}">
+      <td data-name="{{@key}}" title="{{this}}">
       {{#if this}}
       {{this}}
         {{else}}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/nu7hatch/gouuid"
@@ -85,6 +86,12 @@ func (self *Agent) Handlers() {
 			has = false
 		}
 
+		var hostname string = "n/a"
+
+		if os, err := os.Hostname(); err == nil {
+			hostname = os
+		}
+
 		rmsg := Message{
 			Error: err,
 			Data: map[string]interface{}{
@@ -92,6 +99,8 @@ func (self *Agent) Handlers() {
 				"id":              self.Id,
 				"osquery":         has,
 				"osquery-version": version,
+				"ip":              self.Socket.Addr(),
+				"hostname":        hostname,
 			},
 		}
 

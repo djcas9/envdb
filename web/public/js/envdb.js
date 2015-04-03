@@ -8,12 +8,12 @@ var Envdb = {
     },
     start: function() {
       this.self = Pace.start(this.options);
-      $("#content").css("opacity", 0.5);
+      $("#envdb-query, #content").css("opacity", 0.5);
       // $("#loading").show();
     },
     stop: function() {
       Pace.stop();
-      $("#content").css("opacity", 1);
+      $("#envdb-query, #content").css("opacity", 1);
       // $("#loading").hide();
     },
     restart: function() {
@@ -21,7 +21,7 @@ var Envdb = {
     },
     done: function() {
       Pace.stop();
-      $("#content").css("opacity", 1);
+      $("#envdb-query, #content").css("opacity", 1);
       // $("#loading").hide();
     }
   },
@@ -41,7 +41,7 @@ var Envdb = {
 
       Envdb.Loading.start()
 
-      Envdb.Query.Run("query", value, function(results, err) {
+      Envdb.Query.Run("query", value.replace(/(\r\n|\n|\r)/gm," "), function(results, err) {
 
         var table = null;
 
@@ -51,13 +51,12 @@ var Envdb = {
 
             var agent = results[record];
 
-            console.log("AGENT:::::", agent)
             agent.results = JSON.parse(agent.results)
 
             if (!table) {
-              console.log("build table");
               var data = {
                 name: agent.name,
+                hostname: agent.hostname,
                 results: agent.results[0]
               }
               table = Envdb.Templates.table(data);
@@ -66,6 +65,7 @@ var Envdb = {
 
             var data = {
               name: agent.name,
+              hostname: agent.hostname,
               results: agent.results
             }
             var row = Envdb.Templates.row(data)
@@ -77,7 +77,7 @@ var Envdb = {
           // error - no data
         }
 
-        console.log("wtf???")
+        Envdb.Editor.self.focus();
         Envdb.Loading.done()
       });
 
@@ -145,8 +145,6 @@ var Envdb = {
   Init: function() {
     gotalk.handleNotification('results', function(data) {
 
-      console.log(data)
-
       for (var i = 0, len = data.length; i < len; i++) {
         var agent = data[i];
         agent.results = JSON.parse(agent.results)
@@ -154,7 +152,6 @@ var Envdb = {
     });
 
     Envdb.Socket = gotalk.connection().on('open', function() {
-      console.log("connect");
     });
 
     Envdb.Templates.Init()

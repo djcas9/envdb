@@ -74,6 +74,8 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			Socket:         s,
 			OsQuery:        resp.Data["osquery"].(bool),
 			OsQueryVersion: resp.Data["osquery-version"].(string),
+			Ip:             resp.Data["ip"].(string),
+			Hostname:       resp.Data["hostname"].(string),
 		}
 
 		self.Agents[s] = agent
@@ -125,9 +127,10 @@ func (self *Server) sendAll(in interface{}) []QueryResults {
 		err := s.Request("query", in, &data)
 
 		qr := QueryResults{
-			Id:      agent.Id,
-			Name:    agent.Name,
-			Results: string(data),
+			Id:       agent.Id,
+			Name:     agent.Name,
+			Hostname: agent.Hostname,
+			Results:  string(data),
 		}
 
 		if err != nil {
@@ -157,9 +160,10 @@ func (self *Server) sendTo(id string, in interface{}) []QueryResults {
 	err = agent.Socket.Request("query", in, &data)
 
 	qr := QueryResults{
-		Id:      agent.Id,
-		Name:    agent.Name,
-		Results: string(data),
+		Id:       agent.Id,
+		Name:     agent.Name,
+		Hostname: agent.Hostname,
+		Results:  string(data),
 	}
 
 	if err != nil {
