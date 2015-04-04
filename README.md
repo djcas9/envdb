@@ -14,11 +14,11 @@ This makes it really easy to deploy and get working in seconds.
 
 # Envdb UI
 
-<img style="float:left;" height="150px" width="150px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-1.png?token=AABXAWJKIKgF-jy_wKmaxnhuD2snsbO0ks5VKH-fwA%3D%3D">
+<img style="float:left;" height="350px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-1.png?token=AABXAWJKIKgF-jy_wKmaxnhuD2snsbO0ks5VKH-fwA%3D%3D">
 
-https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-2.png?token=AABXAcgvqnqiFViMFULsVUrfC2FWRjhwks5VKH_AwA%3D%3D
+<img style="float:left;" height="350px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-2.png?token=AABXAcgvqnqiFViMFULsVUrfC2FWRjhwks5VKH_AwA%3D%3D">
 
-https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-3.png?token=AABXAQeDVrKIbzu08PHKroPiltQJ6z3cks5VKH_KwA%3D%3D
+<img style="float:left;" height="350px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-3.png?token=AABXAQeDVrKIbzu08PHKroPiltQJ6z3cks5VKH_KwA%3D%3D">
 
 # How it works.
 
