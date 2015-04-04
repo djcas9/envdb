@@ -76,6 +76,7 @@ clean:
 	@rm -rf bindata.go
 	@rm -rf bin/
 	@rm -rf pkg/
+	@rm -rf release/
 
 install: clean all
 
