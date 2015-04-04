@@ -1,6 +1,6 @@
-<img height="150px" width="150px" src="https://raw.githubusercontent.com/mephux/envdb/master/web/favicon.png?token=AABXASoBcBs5d1Il3UAJ9AO_B44fugr1ks5VKH7lwA%3D%3D">
-
 # Envdb
+
+<img height="150px" width="150px" src="https://raw.githubusercontent.com/mephux/envdb/master/web/favicon.png?token=AABXASoBcBs5d1Il3UAJ9AO_B44fugr1ks5VKH7lwA%3D%3D">
 
 Envdb turns your production, dev, etc environments into a database 
 cluster you can search using [osquery](https://github.com/facebook/osquery).
