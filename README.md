@@ -45,7 +45,7 @@ ui --websockets--> server --tcp--> node client.
 
   * That's it - it's really that simple.
 
-# Envdb UI
+# More UI
 
 <img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-1.png?token=AABXAWJKIKgF-jy_wKmaxnhuD2snsbO0ks5VKH-fwA%3D%3D">
 
