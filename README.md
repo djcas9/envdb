@@ -25,6 +25,12 @@ Envdb has an embedded sqlite database for node storage and saved searches.
 
 ui --websockets--> server --tcp--> node client.
 
+## Moving Forward
+
+I plan to add support and a plugin interface for extending what Envdb can request from a node. Currently that list of planned extentions includes: [yara](http://plusvic.github.io/yara/), [bro](https://www.bro.org/) and [memory](Volatility). The hope is to wrap these processes and query them using sql like osquery and allowing you to join on similar data points. 
+
+Example: `select * from listening_ports a join bro_conn b on a.port = b.source_port;`
+
 # Download
 
 Pre-built versions of envdb are avaliable for linux 386/amd64. 
