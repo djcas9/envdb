@@ -1,4 +1,4 @@
-<img height="150px" width="150px" src="https://raw.githubusercontent.com/mephux/envdb/master/web/public/images/envdb.png">
+<img height="150px" width="150px" src="https://raw.githubusercontent.com/mephux/envdb/master/web/favicon.png?token=AABXASoBcBs5d1Il3UAJ9AO_B44fugr1ks5VKH7lwA%3D%3D">
 
 # Envdb
 
