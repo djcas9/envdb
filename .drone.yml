@@ -1,0 +1,22 @@
+image: mephux/docker-golang
+git:
+  path: github.com/mephux/envdb
+  branches:
+    - master
+script:
+  - make test
+notify:
+  email:
+    recipients:
+      - dustin.webber@gmail.com
+publish:
+  github:
+    branch: master
+    script:
+      - make release
+    artifacts:
+      - release
+    tag: v$(cat .Version)
+    token: $$github_token
+    user: mephux
+    repo: envdb

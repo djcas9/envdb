@@ -73,6 +73,7 @@ release: clean all gox
 clean:
 	@$(ECHO) "$(OK_COLOR)==> Cleaning$(NO_COLOR)"
 	@rm -rf Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
+	@rm -rf .Version
 	@rm -rf bindata.go
 	@rm -rf bin/
 	@rm -rf pkg/
