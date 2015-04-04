@@ -6,8 +6,8 @@
 
 <img style="float:left;" height="244px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb.gif?token=AABXAYgKkzBNt0LlqD4LsRb9kpvnzp1aks5VKIX0wA%3D%3D">
 
-Envdb turns your production, dev, etc environments into a database 
-cluster you can search using [osquery](https://github.com/facebook/osquery).
+Envdb turns your production, dev, cloud, etc environments into a database 
+cluster you can search using [osquery](https://github.com/facebook/osquery) as the foundation.
 
 Envdb allows you to register each computer, server or asset as a node in a cluster. Once a new
 node is connected it becomes available for search from the Envdb ui.
@@ -25,6 +25,18 @@ Envdb has an embedded sqlite database for node storage and saved searches.
 
 ui --websockets--> server --tcp--> node client.
 
+## Moving Forward
+
+I plan to add support and a plugin interface for extending what Envdb can request from a node. Currently that list of planned extentions includes: [yara](http://plusvic.github.io/yara/), [bro](https://www.bro.org/) and [memory](Volatility). The hope is to wrap these processes and query them using sql like osquery and allowing you to join on similar data points. 
+
+Example: `select * from listening_ports a join bro_conn b on a.port = b.source_port;`
+
+# Download
+
+Pre-built versions of envdb are avaliable for linux 386/amd64. 
+[linux downloads](https://github.com/mephux/envdb/releases)
+
+Building on macosx is easy tho, checkout the section below.
 
 # Building
 
