@@ -25,6 +25,12 @@ Envdb has an embedded sqlite database for node storage and saved searches.
 
 ui --websockets--> server --tcp--> node client.
 
+# Download
+
+Pre-built versions of envdb are avaliable for linux 386/amd64. 
+[linux downloads](https://github.com/mephux/envdb/releases)
+
+Building on macosx is easy tho, checkout the section below.
 
 # Building
 
