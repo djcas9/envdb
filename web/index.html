@@ -19,6 +19,7 @@
     <script type="text/javascript" src="/public/js/dataTables.js"></script>
     <script type="text/javascript" src="/public/js/dataTables-fixedheader.js"></script>
     <script type="text/javascript" src="/public/js/csv.js"></script>
+    <script type="text/javascript" src="/public/js/limp.js"></script>
     <script type="text/javascript" src="/public/js/<% .Name %>.js"></script>
 
     <link rel="stylesheet" href="/public/css/grid.css">
@@ -90,8 +91,8 @@
           <a href="#" class="button action run-query">Run Query</a>
           <a href="#" class="button export-results">Export</a>
 
-          <a href="#" class="button right save">Load</a>
-          <a href="#" class="button right save">Save</a>
+          <a href="#" class="load-query button right save">Load</a>
+          <a href="#" class="save-query button right save">Save</a>
         </div>
       </div>
 
@@ -161,7 +162,6 @@
 
 
     <script id="query-results-row" type="text/x-handlebars-template">
-
       {{#each results}}
       <tr class="row">
 
@@ -182,6 +182,74 @@
       {{/each}}
       </tr>
       {{/each}}
+    </script>
+
+    <script id="save-query-template" type="text/x-handlebars-template">
+      <div class="lbox">
+
+        <div class='lbox-title'>
+          <div class='fa fa-edit'></div>
+          Save Query
+        </div>
+
+        <div class="panel-content">
+          <div class="field">
+            <label class="req" for="save-query-name">Query Name</label>
+            <input placeholder="My Query" id="save-query-name" type="text" name="save-query-name" required>
+          </div>
+          <div class="field last">
+            <label class="left" for="description">Query</label>
+              <div id="save-query-editor"></div>
+          </div>
+        </div>
+
+        <div class="lbox-footer">
+
+          <div class='form-actions'>
+            <a class='button action add limp-action'>Save Query</a>
+            <a class='button save' onClick='$.limpClose();return false;'>Cancel</a>
+          </div>
+
+        </div>
+      </div>
+    </script>
+
+    <script id="load-query-template" type="text/x-handlebars-template">
+      <div id="load-query-select" class="lbox">
+
+        <div class='lbox-title'>
+          <div class='fa fa-edit'></div>
+          Load Query
+        </div>
+
+        <div class="panel-content">
+          <div class="field">
+            <label class="req" for="search">Filter</label>
+            <input class="search" placeholder="Filter Queries" type="text" name="search">
+          </div>
+          <div class="field last queries">
+            <ul id="queries" class="list">
+            {{#each this}}
+              <li data-query-id="{{id}}" data-query-type="{{Type}}">
+                <div class="name">{{Name}}</div>
+                <div class="query">{{Query}}</div>
+
+                <a class="load-saved-query button action" href="#">Load</a>
+                <a class="delete-saved-query button warning" href="#">
+                  <i class="fa fa-trash"></i>
+                </a>
+              </li>
+              {{/each}}
+            </ul>
+          </div>
+        </div>
+
+        <div class="lbox-footer">
+          <div class='form-actions'>
+            <a class='button save' onClick='$.limpClose();return false;'>Cancel</a>
+          </div>
+        </div>
+      </div>
     </script>
 
   </body>

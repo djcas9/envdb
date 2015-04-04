@@ -1,6 +1,75 @@
 var Envdb = {
+
+  Request: {},
+
   table: false,
   fixedTable: false,
+
+  lbox: {
+    open: function(template, data, args) {
+      var self = this;
+
+      if (args && args.hasOwnProperty('width')) {
+        if (args.width) {
+          Envdb.lbox.options.style.width = args.width;
+        }
+      }
+
+      var options = $.extend({}, Envdb.lbox.options, args);
+      options.template = template;
+      options.templateData = data;
+
+      var box = $.limp(options);
+
+      return box;
+    },
+    options: {
+      cache: false,
+      adjustmentSize: 0,
+      loading: true,
+      alwaysCenter: true,
+      animation: "pop",
+      shadow: "none",
+      round: 0,
+      distance: 10,
+      overlayClick: true,
+      enableEscapeButton: true,
+      dataType: 'html',
+      centerOnResize: true,
+      closeButton: false,
+      style: {
+        '-webkit-outline': 0,
+        color: '#000',
+        position: 'fixed',
+        border: '1px solid #ededed',
+        outline: 0,
+        zIndex: 10000001,
+        opacity: 0,
+        // overflow: 'auto',
+        background: '#fff'
+      },
+      inside: {
+        background: '#fff',
+        padding: '0',
+        display: 'block',
+        border: 'none',
+        overflow: 'visible'
+      },
+      overlay: {
+        background: '#000',
+        opacity: 0.7
+      },
+      onOpen: function() {
+      },
+      afterOpen: function() {
+      },
+      afterDestroy: function() {
+      },
+      onTemplate: function(template, data, limp) {
+        return template;
+      }
+    }
+  },
 
   Node: {
     current: null,
@@ -13,12 +82,12 @@ var Envdb = {
         id: self.current
       }, function(err, data) {
 
-        self.tables = data;
+          self.tables = data;
 
-        if (typeof callback === "function") {
-          return callback(data, err);
-        }
-      });
+          if (typeof callback === "function") {
+            return callback(data, err);
+          }
+        });
     },
 
     fetchTableInfo: function(table, callback) {
@@ -41,18 +110,18 @@ var Envdb = {
         sql: "pragma table_info(" + table + ");",
       }, function(err, data) {
 
-        if (typeof callback === "function") {
-          data.hideNode = true;
-          Envdb.Query.Render([data], err, function() {
-            return callback(data, err);
-          });
-        }
+          if (typeof callback === "function") {
+            data.hideNode = true;
+            Envdb.Query.Render([data], err, function() {
+              return callback(data, err);
+            });
+          }
 
-      });
+        });
     },
 
     clean: function() {
-      this.current = null; 
+      this.current = null;
       this.tables = [];
 
       if (Envdb.fixedTable) {
@@ -68,11 +137,14 @@ var Envdb = {
 
       $("#content").removeClass("node-view");
       $("#node-tables").remove();
+      $(".save-query, .load-query").addClass("disabled");
     },
 
     close: function() {
       this.clean();
       $("#header .title").text("Query All Nodes");
+      $("a.run-query").text("Run Query");
+      $(".save-query, .load-query").removeClass("disabled");
     },
 
     open: function(name, id) {
@@ -85,7 +157,8 @@ var Envdb = {
       this.fetchTables(function(data, err) {
         Envdb.Loading.done();
 
-        $("#header .title").text("Query Node: " + data.name + " ("+data.hostname+" / "+data.id+")");
+        $("a.run-query").text("Query Node");
+        $("#header .title").text("Query Node: " + data.name + " (" + data.hostname + " / " + data.id + ")");
         $("#content").addClass("node-view");
         $("#wrapper").append(Envdb.Templates.tables(data.results));
 
@@ -96,8 +169,7 @@ var Envdb = {
           $(this).addClass("selected");
 
           var table = $(this).attr("data-table-name");
-          self.fetchTableInfo(table, function() {
-          })
+          self.fetchTableInfo(table, function() {})
         });
 
         $("ul.tables li:first-child").click();
@@ -141,8 +213,8 @@ var Envdb = {
 
   Loading: {
     options: {
-      ajax: true,
-      document: true,
+      ajax: false,
+      document: false,
       eventLag: true
     },
     start: function() {
@@ -172,11 +244,172 @@ var Envdb = {
       this.row = Handlebars.compile($("#query-results-row").html());
       this.node = Handlebars.compile($("#node-template").html());
       this.tables = Handlebars.compile($("#tables-template").html());
+      this.saveQuery = Handlebars.compile($("#save-query-template").html());
+      this.loadQuery = Handlebars.compile($("#load-query-template").html());
     }
 
   },
 
   Query: {
+
+    RunSavedQuery: function(name, query, callback) {
+      $("#content").scrollTop(0);
+
+      $("#header .title").text("Saved Query: " + name);
+      Envdb.Editor.self.setValue(query);
+
+      if (Envdb.fixedTable) {
+        Envdb.fixedTable._fnDestroy();
+        Envdb.fixedTable = false;
+      }
+
+      if (Envdb.table) {
+        Envdb.table.destroy();
+        Envdb.table = false;
+      }
+
+      Envdb.Loading.start()
+
+      Envdb.Query.Run("query", query.replace(/(\r\n|\n|\r)/gm, " "), function(results, err) {
+        Envdb.Query.Render(results, err);
+        if (typeof callback === "function") {
+          callback();
+        }
+      });
+    },
+
+    Save: function(params) {
+      var editor;
+
+      params.query = Envdb.Editor.self.getValue();
+
+      var box = Envdb.lbox.open(Envdb.Templates.saveQuery(params), {}, {
+        width: "760px",
+        disableDefaultAction: true,
+        afterClose: function() {
+          editor.destroy();
+        },
+        afterOpen: function() {
+          editor = Envdb.Editor._build("save-query-editor");
+          editor.setValue(params.query);
+          $("#save-query-name").focus()
+        },
+        onAction: function() {
+
+          if (Envdb.Request.save) {
+            Envdb.Request.save.abort()
+          }
+
+          var saveParams = {
+            name: $("#save-query-name").val(),
+            query: editor.getValue(),
+            type: "all"
+          }
+
+          if (saveParams.name.length <= 0) {
+            $("#save-query-name").addClass("error");
+            return
+          } else {
+            $("#save-query-name").removeClass("error");
+          }
+
+          if (saveParams.query.length <= 0) {
+            $("#save-query-editor").addClass("error");
+            return;
+          } else {
+            $("#save-query-editor").removeClass("error");
+          }
+
+          Envdb.Request.save = $.ajax({
+            url: "/query/save",
+            type: "post",
+            dataType: "json",
+            data: saveParams,
+            success: function(data) {
+              $.limpClose();
+
+              if (data.error && data.error.length > 0) {
+                Envdb.Flash.error(data.error);
+              } else {
+                Envdb.Flash.success("Query saved successfully.");
+              }
+
+            },
+            error: function(a,b,c) {
+              // console.log(a,b,c)
+            }
+          })
+        }
+      });
+
+      box.open();
+    },
+
+    Load: function(params) {
+
+      if (Envdb.Request.load) {
+        Envdb.Request.load.abort();
+      }
+
+      Envdb.Request.load = $.ajax({
+        url: "/api/v1/queries",
+        dataType: "json",
+        error: function(a,b,c) {
+          // console.log(a,b,c)
+        },
+        success: function(data) {
+          Envdb.Request.load = null;
+
+          var box = Envdb.lbox.open(Envdb.Templates.loadQuery(data), {}, {
+            width: "800px",
+            disableDefaultAction: true,
+            afterClose: function() {},
+            afterOpen: function() {
+              var queryList = new List('load-query-select', {
+                valueNames: ['name', 'query']
+              });
+
+              $("a.load-saved-query").on("click", function(e) {
+                e.preventDefault();
+                var item = $(this).parents("li");
+                var query = item.find(".query").text();
+                var name = item.find(".name").text();
+
+                Envdb.Query.RunSavedQuery(name, query);
+                $.limpClose();
+              });
+
+              $("a.delete-saved-query").on("click", function(e) {
+                e.preventDefault();
+
+                var item = $(this).parents("li");
+                var id = item.attr("data-query-id");
+
+                console.log(id)
+
+                $.ajax({
+                  url: "/query/delete",
+                  type: "POST",
+                  dataType: "json",
+                  data: {
+                    id: id
+                  },
+                  success: function(data) {
+                    console.log(data)
+                    item.fadeOut("fast");
+                  }
+                });
+              });
+            },
+            onAction: function() {}
+          });
+
+          box.open();
+        }
+      });
+
+    },
+
     Execute: function() {
       $("#content").scrollTop(0);
 
@@ -254,12 +487,12 @@ var Envdb = {
         }
 
         Envdb.table = $("table.query-results")
-        .on('order.dt', function() {
-          if (Envdb.fixedTable) {
-            Envdb.fixedTable.fnUpdate()
-            $("#content").scrollTop(0);
-          }
-        }).DataTable({
+          .on('order.dt', function() {
+            if (Envdb.fixedTable) {
+              Envdb.fixedTable.fnUpdate()
+              $("#content").scrollTop(0);
+            }
+          }).DataTable({
           searching: false,
           paging: false,
           info: false
@@ -302,45 +535,55 @@ var Envdb = {
         sql: sql,
       }, function(err, data) {
 
-          for (var i = 0, len = data.length; i < len; i++) {
-            if (id !== "all" && data[i]) {
-              data[i].hideNode = true
-            }
-          }
+        if (!data || data.length <= 0) {
+          return callback(null, "No data");
+        }
 
-          if (typeof callback === "function") {
-            return callback(data, err);
+        for (var i = 0, len = data.length; i < len; i++) {
+          if (id !== "all" && data[i]) {
+            data[i].hideNode = true
           }
+        }
 
-        });
+        if (typeof callback === "function") {
+          return callback(data, err);
+        }
+
+      });
     }
   },
 
   Editor: {
     self: null,
 
-    Build: function() {
+    _build: function(div) {
       ace.require("ace/ext/language_tools");
 
-      this.self = ace.edit("editor");
+      var editor = ace.edit(div);
 
-      this.self.setOptions({
+      editor.setOptions({
         enableBasicAutocompletion: true,
         enableSnippets: true,
         enableLiveAutocompletion: true
       });
 
-      this.self.getSession().setMode("ace/mode/sql");
+      editor.getSession().setMode("ace/mode/sql");
+      editor.getSession().setTabSize(2);
+      editor.getSession().setUseSoftTabs(true);
+      editor.getSession().setUseWrapMode(true);
+      editor.setHighlightActiveLine(false);
+      editor.setShowPrintMargin(false);
+      // document.getElementById('editor').style.fontSize='13px';
 
-      this.self.getSession().setTabSize(2);
-      this.self.getSession().setUseSoftTabs(true);
-      this.self.getSession().setUseWrapMode(true);
-      this.self.setValue("select * from listening_ports a join processes b on a.pid = b.pid;");
+      return editor;
+    },
+
+    Build: function() {
+
+      this.self = this._build("editor");
 
       this.self.focus();
-      this.self.setHighlightActiveLine(false);
-      this.self.setShowPrintMargin(false);
-      // document.getElementById('editor').style.fontSize='13px';
+      this.self.setValue("select * from listening_ports a join processes b on a.pid = b.pid;");
 
       this.self.commands.addCommands([
         {
@@ -365,7 +608,7 @@ var Envdb = {
         var csv = $("table.query-results").table2CSV({
           delivery: 'value'
         });
-        window.location.href = 'data:text/csv;charset=UTF-8,' 
+        window.location.href = 'data:text/csv;charset=UTF-8,'
         + encodeURIComponent(csv);
       });
     }
@@ -412,7 +655,7 @@ jQuery(document).ready(function($) {
 
     var name = $(this).find("span.node-name").text();
     var id = $(this).attr("data-node-id");
-  
+
 
     if ($(this).hasClass("online")) {
       if ($(this).hasClass("current")) {
@@ -425,7 +668,7 @@ jQuery(document).ready(function($) {
       }
 
     } else {
-      Envdb.Flash.error("Node ("+name+") is current offline.");
+      Envdb.Flash.error("Node (" + name + ") is current offline.");
     }
   });
 
@@ -433,5 +676,15 @@ jQuery(document).ready(function($) {
   var nodeList = new List('sidebar', {
     valueNames: ['node-name', 'node-node-id']
   });
+
+  $(document).on("click", ".envdb-control a.save-query", function(e) {
+    e.preventDefault();
+    Envdb.Query.Save({});
+  });
+
+  $(document).on("click", ".envdb-control a.load-query", function(e) {
+    e.preventDefault();
+    Envdb.Query.Load({});
+  })
 
 });

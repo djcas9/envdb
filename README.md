@@ -87,6 +87,7 @@ you would like to stalk me, follow [mephux](http://dweb.io/) on
 
 # TODO
 
+  * Tests. Sorry :(
   * TLS for the agent/server communications (top of list)
   * Node/Server auth, verification and validation.
   * Code cleanup (will continue forever).

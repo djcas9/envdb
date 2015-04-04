@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"runtime"
+	"strings"
 
 	"gopkg.in/alecthomas/kingpin.v1"
 )
@@ -95,6 +97,18 @@ func main() {
 		}
 
 	case node.FullCommand():
+
+		output, err := exec.Command("whoami").Output()
+
+		if err != nil {
+			Log.Fatalf("Error: %s", err)
+			os.Exit(-1)
+		}
+
+		if strings.Trim(string(output), "\n") != "root" {
+			Log.Fatal("You must run the node client as root.")
+			os.Exit(-1)
+		}
 
 		var clntPort int = DefaultServerPort
 

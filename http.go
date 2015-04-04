@@ -148,8 +148,12 @@ func NewWebServer(webPort int, server *Server) {
 
 	http.HandleFunc("/", RouteIndex)
 
+	http.HandleFunc("/query/save", RouteSaveQuery)
+	http.HandleFunc("/query/delete", RouteDeleteQuery)
+
 	// API - Version 1
 	http.HandleFunc("/api/v1/nodes", RouteNodes)
+	http.HandleFunc("/api/v1/queries", RouteSavedQueries)
 
 	http.Handle("/gotalk/", ws)
 

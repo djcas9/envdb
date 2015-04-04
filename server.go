@@ -30,8 +30,8 @@ type Server struct {
 	mu     sync.RWMutex
 }
 
-func NewServer(port int) (Server, error) {
-	server := Server{
+func NewServer(port int) (*Server, error) {
+	server := &Server{
 		Port: port,
 	}
 

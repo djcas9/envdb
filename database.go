@@ -16,10 +16,32 @@ var (
 )
 
 func DBInit(storePath, logPath string) error {
-	tables = append(tables, new(NodeDb))
+	tables = append(tables, new(NodeDb), new(QueryDb), new(SettingsDb))
 
 	if err := SetEngine(storePath, logPath); err != nil {
 		return err
+	}
+
+	s, err := DbSettings()
+
+	if err != nil {
+		Log.Error("Unable to create database settings.")
+		return err
+	}
+
+	Log.Debug(s)
+
+	if !s.LoadSavedQueries {
+		if err := LoadDefaultSavedQueries(); err != nil {
+			Log.Error("Unable to load default saved queries.")
+			Log.Errorf("Error: %s", err)
+		}
+
+		s.LoadSavedQueries = true
+
+		if err := s.Update(); err != nil {
+			Log.Errorf("Unable to update settings: %s", err)
+		}
 	}
 
 	return nil

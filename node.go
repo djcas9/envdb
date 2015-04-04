@@ -64,7 +64,7 @@ func (self *Node) Handlers() {
 			err = uuerr
 
 			if err != nil {
-				Log.Fatalf("Error creating id: ", err)
+				Log.Fatalf("Error creating id: %s", err)
 			}
 
 			Log.Infof("Connection successful. Id: %s", id.String())

@@ -6,6 +6,7 @@ import (
 	"mime"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"text/template"
 )
 
@@ -69,6 +70,100 @@ func RouteIndex(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		Log.Error(err)
 	}
+}
+
+func RouteDeleteQuery(w http.ResponseWriter, r *http.Request) {
+	var errorMsg string = ""
+
+	r.ParseForm()
+
+	if r.Method == "POST" {
+		id, err := strconv.ParseInt(r.PostFormValue("id"), 10, 64)
+
+		Log.Debug("got id: ", id)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		query, err := FindSavedQueryById(id)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := query.Delete(); err != nil {
+			errorMsg = err.Error()
+		}
+
+		data := map[string]interface{}{
+			"error": errorMsg,
+			"query": query,
+		}
+
+		js, err := json.Marshal(data)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(js)
+	}
+}
+
+func RouteSavedQueries(w http.ResponseWriter, r *http.Request) {
+	data, _ := AllSavedQueries()
+
+	js, err := json.Marshal(data)
+
+	if err != nil {
+		Log.Error("Error: ", err)
+
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
+}
+
+func RouteSaveQuery(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	if r.Method == "POST" {
+		query := QueryDb{
+			Name:  r.PostFormValue("name"),
+			Query: r.PostFormValue("query"),
+			Type:  r.PostFormValue("type"),
+		}
+
+		err := NewSavedQuery(query)
+		var errorMsg string = ""
+
+		if err != nil {
+			errorMsg = err.Error()
+		}
+
+		data := map[string]interface{}{
+			"error": errorMsg,
+			"query": query,
+		}
+
+		js, err := json.Marshal(data)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(js)
+	}
+
 }
 
 func RouteNodes(w http.ResponseWriter, r *http.Request) {

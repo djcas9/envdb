@@ -83,7 +83,7 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 }
 
 func GetNodeByNodeId(nodeId string) (*NodeDb, error) {
-	Log.Debug("Looking for node with id: %s", nodeId)
+	Log.Debugf("Looking for node with id: %s", nodeId)
 
 	node := &NodeDb{NodeId: nodeId}
 
