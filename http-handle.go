@@ -30,6 +30,8 @@ func renderFile(w http.ResponseWriter, filename string) error {
 
 	if filename == "/" {
 		filename = "/index.html"
+	} else if filename == "/favicon.ico" || filename == "/favicon.png" {
+		//..
 	} else {
 		return nil
 	}

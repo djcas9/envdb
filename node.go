@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"time"
 
@@ -87,9 +88,18 @@ func (self *Node) Handlers() {
 		}
 
 		var hostname string = "n/a"
+		var ip string = self.Socket.Addr()
 
 		if os, err := os.Hostname(); err == nil {
 			hostname = os
+		}
+
+		addrs, _ := net.LookupIP(hostname)
+
+		for _, addr := range addrs {
+			if ipv4 := addr.To4(); ipv4 != nil {
+				ip = ipv4.String()
+			}
 		}
 
 		rmsg := Message{
@@ -99,7 +109,7 @@ func (self *Node) Handlers() {
 				"id":              self.Id,
 				"osquery":         has,
 				"osquery-version": version,
-				"ip":              self.Socket.Addr(),
+				"ip":              ip,
 				"hostname":        hostname,
 			},
 		}

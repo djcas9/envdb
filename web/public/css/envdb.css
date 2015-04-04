@@ -439,6 +439,7 @@ border-radius: 100px;
   right: 0;
   bottom: 0;
   background: rgba(245, 248, 249, 0.62);
+  /* background: rgba(245, 248, 249, 0.62) url(../images/envdb.png) no-repeat center; */
 
   overflow: auto;
 }

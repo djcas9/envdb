@@ -59,6 +59,8 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 	}
 
 	Log.Debugf("Couldn't find record for node (%s).", node.Id)
+	Log.Debugf("Error: %s", err)
+
 	Log.Debugf("Creating a new record.")
 
 	a := &NodeDb{
@@ -81,6 +83,8 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 }
 
 func GetNodeByNodeId(nodeId string) (*NodeDb, error) {
+	Log.Debug("Looking for node with id: %s", nodeId)
+
 	node := &NodeDb{NodeId: nodeId}
 
 	has, err := x.Get(node)

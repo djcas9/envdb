@@ -339,8 +339,7 @@ var Envdb = {
 
       this.self.focus();
       this.self.setHighlightActiveLine(false);
-      this.self.setShowPrintMargin(true);
-
+      this.self.setShowPrintMargin(false);
       // document.getElementById('editor').style.fontSize='13px';
 
       this.self.commands.addCommands([
