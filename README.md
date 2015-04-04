@@ -1,6 +1,4 @@
 
-<img style="float:left;" height="90px" width="90px" src="https://raw.githubusercontent.com/mephux/envdb/master/web/favicon.png?token=AABXASoBcBs5d1Il3UAJ9AO_B44fugr1ks5VKH7lwA%3D%3D">
-
 ## Envdb - Environment Database
 
 <img style="float:left;" height="400px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb.gif?token=AABXAYgKkzBNt0LlqD4LsRb9kpvnzp1aks5VKIX0wA%3D%3D">
