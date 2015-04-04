@@ -1,5 +1,8 @@
+[![Build Status](http://komanda.io:8080/api/badge/github.com/mephux/envdb/status.svg?branch=master)](http://komanda.io:8080/github.com/mephux/envdb)
 
-## Envdb - Environment Database
+# Envdb - Environment Database
+
+* NOTE: envdb is still beta software.
 
 <img style="float:left;" height="244px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb.gif?token=AABXAYgKkzBNt0LlqD4LsRb9kpvnzp1aks5VKIX0wA%3D%3D">
 
