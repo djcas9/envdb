@@ -47,7 +47,7 @@ ui --websockets--> server --tcp--> node client.
 
   * Node Client
 
-    `sudo envdb node --server <ip to server> SomeBoxName
+    `sudo envdb node --server <ip to server> SomeBoxName`
 
   * That's it - it's really that simple.
 
