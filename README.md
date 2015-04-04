@@ -31,6 +31,29 @@ ui --websockets--> server --tcp--> node client.
 
 # Usage
 
+  ```
+usage: envdb [<flags>] <command> [<flags>] [<args> ...]
+
+The Environment Database - SELECT * FROM awesome;
+
+Flags:
+  --help       Show help.
+  --debug      Enable debug logging.
+  --dev        Enable dev mode. (read assets from disk and enable debug
+               output)
+  -q, --quiet  Remove all output logging.
+
+Commands:
+  help [<command>]
+    Show help for a command.
+
+  server [<flags>]
+    Start the tcp server for node connections.
+
+  node --server=127.0.0.1 [<flags>] <node-name>
+    Register a new node.
+  ```
+
   * Server
 
     `envdb server`
