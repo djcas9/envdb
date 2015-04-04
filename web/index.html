@@ -45,33 +45,33 @@
           </a>
         </div>
 
-        <div class="agents-filter">
+        <div class="nodes-filter">
           <i class="fa fa-search search-icon"></i>
-          <input placeholder="Filter Nodes" id="agents-filter" class="search" type="text">
+          <input placeholder="Filter Nodes" id="nodes-filter" class="search" type="text">
         </div>
 
-      <ul id="agents" class="list">
-        <% range .Agents %>
-        <li class="agent <% if .Online %>online<% else %>offline<% end %>" data-id="<% .Id %>" data-agent-id="<% .AgentId %>">
+        <ul id="nodes" class="list">
+          <% range .Nodes %>
+          <li class="node <% if .Online %>online<% else %>offline<% end %>" data-id="<% .Id %>" data-node-id="<% .NodeId %>">
 
-          <i class="fa fa-circle status-icon"></i>
+            <i class="fa fa-circle status-icon"></i>
 
-          <div class="agent-header">
-            <span class="agent-name"><% .Name %></span>
-          </div>
+            <div class="node-header">
+              <span class="node-name"><% .Name %></span>
+            </div>
 
-          <div class="agent-metadata">
-            <span class="agent-agent-id"><% .Ip %> / <% .Hostname %></span>
-          </div>
+            <div class="node-metadata">
+              <span class="node-node-id"><% .Ip %> / <% .Hostname %></span>
+            </div>
 
 
-        </li>
-        <% end %>
-      </ul>
+          </li>
+          <% end %>
+        </ul>
 
-      <div class="sidebar-footer">
-        <% .Name %> v<% .Version %> by Dustin Willis Webber
-      </div>
+        <div class="sidebar-footer">
+          <% .Name %> v<% .Version %> by Dustin Willis Webber
+        </div>
       </div>
 
       <div id="header">
@@ -98,64 +98,64 @@
       <div id="content">
         <div id="tables"></div>
         <div class="wrapper">
-        
+
         </div>
       </div>
     </div>
 
     <script id="query-results-table" type="text/x-handlebars-template">
       <table class="query-results">
-        <thead>
-        <tr>
-          {{#unless hideNode}}
-          <th data-name="agent-name">
-          node
-          </th>
-          {{/unless}}
+      <thead>
+      <tr>
+      {{#unless hideNode}}
+      <th data-name="node-name">
+      node
+      </th>
+      {{/unless}}
 
-          {{#each results}}
-          <th data-name="{{@key}}">
-            {{@key}}
-          </th>
-          {{/each}}
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
+      {{#each results}}
+      <th data-name="{{@key}}">
+      {{@key}}
+      </th>
+      {{/each}}
+      </tr>
+      </thead>
+      <tbody>
+      </tbody>
       </table>
     </script>
 
-    <script id="agent-template" type="text/x-handlebars-template">
-      <li class="agent {{#if online}}online{{else}}offline{{/if}}" data-agent-id="{{id}}">
+    <script id="node-template" type="text/x-handlebars-template">
+      <li class="node {{#if online}}online{{else}}offline{{/if}}" data-node-id="{{id}}">
 
-          <i class="fa fa-circle status-icon"></i>
+      <i class="fa fa-circle status-icon"></i>
 
-          <div class="agent-header">
-          <span class="agent-name">{{name}}</span>
-          </div>
+      <div class="node-header">
+      <span class="node-name">{{name}}</span>
+      </div>
 
-          <div class="agent-metadata">
-          <span class="agent-agent-id">{{ip}}/ {{hostname}}</span>
-          </div>
+      <div class="node-metadata">
+      <span class="node-node-id">{{ip}}/ {{hostname}}</span>
+      </div>
 
 
-        </li>
+      </li>
     </script>
 
     <script id="tables-template" type="text/x-handlebars-template">
       <div id="node-tables">
-        
-        <div class="title">
-          Tables
-        </div>
 
-        <ul class="tables">
-          {{#each this}}
-            <li data-table-name="{{this}}">
-            {{this}}
-            </li>
-          {{/each}}
-        </ul>
+      <div class="title">
+      Tables
+      </div>
+
+      <ul class="tables">
+      {{#each this}}
+      <li data-table-name="{{this}}">
+      {{this}}
+      </li>
+      {{/each}}
+      </ul>
       </div>
     </script>
 
@@ -166,24 +166,23 @@
       <tr class="row">
 
       {{#unless ../hideNode}}
-      <td data-name="agent-name">
+      <td data-name="node-name">
       <strong>{{../../name}}</strong> ({{../../hostname}})
-        </td>
+      </td>
       {{/unless}}
 
       {{#each this}}
       <td data-name="{{@key}}" title="{{this}}">
       {{#if this}}
-      {{this}}
-        {{else}}
-          --
-          {{/if}}
+        {{this}}
+      {{else}}
+        --
+        {{/if}}
       </td>
       {{/each}}
       </tr>
       {{/each}}
     </script>
-
 
   </body>
 </html>

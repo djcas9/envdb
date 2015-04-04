@@ -5,7 +5,6 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/mephux/envdb/log"
 	"gopkg.in/alecthomas/kingpin.v1"
 )
 
@@ -20,9 +19,9 @@ const (
 var (
 	TimeFormat = "15:04:05"
 
-	app   = kingpin.New(Name, "Environment Database")
+	app   = kingpin.New(Name, "The Environment Database - SELECT * FROM awesome;")
 	debug = app.Flag("debug", "Enable debug logging.").Bool()
-	dev   = app.Flag("dev", "Enable dev mode. (read assets from disk, enable debug output)").Bool()
+	dev   = app.Flag("dev", "Enable dev mode. (read assets from disk and enable debug output)").Bool()
 	quiet = app.Flag("quiet", "Remove all output logging.").Short('q').Bool()
 
 	server = app.Command("server", "Start the tcp server for node connections.")
@@ -31,13 +30,13 @@ var (
 
 	serverWebPort = server.Flag("http-port", "Port for the web server to listen on.").PlaceHolder(fmt.Sprintf("%d", DefaultWebServerPort)).Int()
 
-	agent = app.Command("node", "Register a new node.")
+	node = app.Command("node", "Register a new node.")
 	// clientConfig = client.Flag("config", "Client configuration file.").File()
-	agentName   = agent.Arg("node-name", "A name used to uniquely identify this node.").Required().String()
-	agentServer = agent.Flag("server", "Address for server to connect to.").PlaceHolder("127.0.0.1").Required().String()
-	agentPort   = agent.Flag("port", "Port to use for connection.").Int()
+	nodeName   = node.Arg("node-name", "A name used to uniquely identify this node.").Required().String()
+	nodeServer = node.Flag("server", "Address for server to connect to.").PlaceHolder("127.0.0.1").Required().String()
+	nodePort   = node.Flag("port", "Port to use for connection.").Int()
 
-	Log *log.Logger
+	Log *Logger
 
 	DEV_MODE bool
 )
@@ -48,25 +47,26 @@ func main() {
 	kingpin.Version(Version)
 	args, err := app.Parse(os.Args[1:])
 
-	Log = log.New()
+	Log = NewLogger()
 
-	Log.Prefix = "envdb"
+	Log.Prefix = Name
+
+	if *debug {
+		Log.SetLevel(DebugLevel)
+	} else {
+		Log.SetLevel(InfoLevel)
+	}
 
 	if *dev {
 		DEV_MODE = true
+		Log.SetLevel(DebugLevel)
 		Log.Info("DEBUG MODE ENABLED.")
 	} else {
 		DEV_MODE = false
 	}
 
-	if *debug {
-		Log.SetLevel(log.DebugLevel)
-	} else {
-		Log.SetLevel(log.InfoLevel)
-	}
-
 	if *quiet {
-		Log.SetLevel(log.FatalLevel)
+		Log.SetLevel(FatalLevel)
 	}
 
 	switch kingpin.MustParse(args, err) {
@@ -94,22 +94,22 @@ func main() {
 			Log.Error(err)
 		}
 
-	case agent.FullCommand():
+	case node.FullCommand():
 
 		var clntPort int = DefaultServerPort
 
-		if *agentPort != 0 {
-			clntPort = *agentPort
+		if *nodePort != 0 {
+			clntPort = *nodePort
 		}
 
-		var c = Agent{
-			Name:       *agentName,
-			Host:       *agentServer,
+		var c = Node{
+			Name:       *nodeName,
+			Host:       *nodeServer,
 			Port:       clntPort,
 			RetryCount: 50,
 		}
 
-		config, err := NewAgentConfig()
+		config, err := NewNodeConfig()
 
 		if err != nil {
 			Log.Fatal(err)
@@ -122,7 +122,7 @@ func main() {
 		}
 
 	default:
-		kingpin.Usage()
+		app.Usage(os.Stdout)
 	}
 
 }

@@ -85,7 +85,7 @@ var Envdb = {
       this.fetchTables(function(data, err) {
         Envdb.Loading.done();
 
-        $("#header .title").text("Query Node: " + data.name + " ("+data.hostname+")");
+        $("#header .title").text("Query Node: " + data.name + " ("+data.hostname+" / "+data.id+")");
         $("#content").addClass("node-view");
         $("#wrapper").append(Envdb.Templates.tables(data.results));
 
@@ -170,7 +170,7 @@ var Envdb = {
     Init: function() {
       this.table = Handlebars.compile($("#query-results-table").html());
       this.row = Handlebars.compile($("#query-results-row").html());
-      this.agent = Handlebars.compile($("#agent-template").html());
+      this.node = Handlebars.compile($("#node-template").html());
       this.tables = Handlebars.compile($("#tables-template").html());
     }
 
@@ -201,6 +201,7 @@ var Envdb = {
     },
 
     Render: function(results, err, callback) {
+
       if (results && results.length > 0) {
         if (results[0].error.length > 0) {
           var er = results[0].error;
@@ -226,26 +227,26 @@ var Envdb = {
 
         for (record in results) {
 
-          var agent = results[record];
+          var node = results[record];
 
-          agent.results = JSON.parse(agent.results)
+          node.results = JSON.parse(node.results)
 
           if (!table) {
             var data = {
-              hideNode: agent.hideNode || false,
-              name: agent.name,
-              hostname: agent.hostname,
-              results: agent.results[0]
+              hideNode: node.hideNode || false,
+              name: node.name,
+              hostname: node.hostname,
+              results: node.results[0]
             }
             table = Envdb.Templates.table(data);
             $("#content .wrapper").html(table);
           }
 
           var data = {
-            hideNode: agent.hideNode || false,
-            name: agent.name,
-            hostname: agent.hostname,
-            results: agent.results
+            hideNode: node.hideNode || false,
+            name: node.name,
+            hostname: node.hostname,
+            results: node.results
           }
           var row = Envdb.Templates.row(data)
           $("table.query-results tbody").append(row);
@@ -300,6 +301,12 @@ var Envdb = {
         id: id,
         sql: sql,
       }, function(err, data) {
+
+          for (var i = 0, len = data.length; i < len; i++) {
+            if (id !== "all" && data[i]) {
+              data[i].hideNode = true
+            }
+          }
 
           if (typeof callback === "function") {
             return callback(data, err);
@@ -368,12 +375,12 @@ var Envdb = {
   Socket: null,
   Init: function() {
 
-    gotalk.handleNotification('agent-update', function(agent) {
-      var item = $("li[data-agent-id='" + agent.id + "']");
+    gotalk.handleNotification('node-update', function(node) {
+      var item = $("li[data-node-id='" + node.id + "']");
       if (item.length > 0) {
-        item.replaceWith(Envdb.Templates.agent(agent))
+        item.replaceWith(Envdb.Templates.node(node))
       } else {
-        $("ul#agents").append(Envdb.Templates.agent(agent))
+        $("ul#nodes").append(Envdb.Templates.node(node))
       }
     });
 
@@ -401,20 +408,20 @@ jQuery(document).ready(function($) {
     }
   });
 
-  $(document).on("click", "li.agent", function(e) {
+  $(document).on("click", "li.node", function(e) {
     e.preventDefault();
 
-    var name = $(this).find("span.agent-name").text();
-    var id = $(this).attr("data-agent-id");
+    var name = $(this).find("span.node-name").text();
+    var id = $(this).attr("data-node-id");
   
 
     if ($(this).hasClass("online")) {
       if ($(this).hasClass("current")) {
-        $("li.agent").removeClass("current");
+        $("li.node").removeClass("current");
         Envdb.Node.close();
       } else {
         Envdb.Node.open(name, id);
-        $("li.agent").removeClass("current");
+        $("li.node").removeClass("current");
         $(this).addClass("current");
       }
 
@@ -424,8 +431,8 @@ jQuery(document).ready(function($) {
   });
 
 
-  var agentList = new List('sidebar', {
-    valueNames: ['agent-name', 'agent-agent-id']
+  var nodeList = new List('sidebar', {
+    valueNames: ['node-name', 'node-node-id']
   });
 
 });

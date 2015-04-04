@@ -12,6 +12,10 @@
 			"Rev": "6b4e7dc5e3143b85ea77909c72caf89416fc2915"
 		},
 		{
+			"ImportPath": "github.com/elazarl/go-bindata-assetfs",
+			"Rev": "09ba9c6a7e9a5ee35586127fdf88bb20bb4990b7"
+		},
+		{
 			"ImportPath": "github.com/go-xorm/core",
 			"Rev": "be6e7ac47dc57bd0ada25322fa526944f66ccaa6"
 		},

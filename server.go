@@ -11,7 +11,7 @@ import (
 	"github.com/rsms/gotalk"
 )
 
-type AgentData struct {
+type NodeData struct {
 	Id             string       `json:"id"`
 	Name           string       `json:"name"`
 	Ip             string       `json:"ip"`
@@ -26,7 +26,7 @@ type Server struct {
 	Config *ServerConfig
 	Port   int
 	Socket *gotalk.Server
-	Agents map[*gotalk.Sock]*AgentData
+	Nodes  map[*gotalk.Sock]*NodeData
 	mu     sync.RWMutex
 }
 
@@ -60,13 +60,13 @@ func NewServer(port int) (Server, error) {
 			case sig := <-sigChan:
 				if sig.String() == "interrupt" {
 					Log.Info("Received Interrupt. Exiting.")
-					agents, _ := AllAgents()
+					nodes, _ := AllNodes()
 
-					for _, agent := range agents {
-						agent.Online = false
+					for _, node := range nodes {
+						node.Online = false
 
-						if err := agent.Update(); err != nil {
-							Log.Error("unable to update agent record")
+						if err := node.Update(); err != nil {
+							Log.Error("unable to update node record")
 							Log.Error("Error: ", err)
 						}
 					}
@@ -93,9 +93,9 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			Log.Fatalf("ERROR: %s", err)
 		}
 
-		Log.Infof("New agent connected. (%s / %s)", resp.Data["name"], resp.Data["id"])
+		Log.Infof("New node connected. (%s / %s)", resp.Data["name"], resp.Data["id"])
 
-		agent := &AgentData{
+		node := &NodeData{
 			Id:             resp.Data["id"].(string),
 			Name:           resp.Data["name"].(string),
 			Online:         true,
@@ -106,31 +106,31 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			Hostname:       resp.Data["hostname"].(string),
 		}
 
-		self.Agents[s] = agent
+		self.Nodes[s] = node
 
-		if _, err := AgentUpdateOrCreate(agent); err != nil {
-			Log.Error("unable to create or update agent record")
+		if _, err := NodeUpdateOrCreate(node); err != nil {
+			Log.Error("unable to create or update node record")
 			Log.Error("Error: ", err)
 		}
 
-		WebSocketSend("agent-update", agent)
+		WebSocketSend("node-update", node)
 
 		s.CloseHandler = func(s *gotalk.Sock, _ int) {
 			self.mu.Lock()
 			defer self.mu.Unlock()
 
-			agent := self.Agents[s]
-			agent.Online = false
+			node := self.Nodes[s]
+			node.Online = false
 
-			Log.Infof("Agent disconnected. (%s / %s)", agent.Name, agent.Id)
-			WebSocketSend("agent-update", agent)
+			Log.Infof("Node disconnected. (%s / %s)", node.Name, node.Id)
+			WebSocketSend("node-update", node)
 
-			if _, err := AgentUpdateOrCreate(agent); err != nil {
-				Log.Error("unable update agent record")
+			if _, err := NodeUpdateOrCreate(node); err != nil {
+				Log.Error("unable update node record")
 				Log.Error("Error: ", err)
 			}
 
-			delete(self.Agents, s)
+			delete(self.Nodes, s)
 		}
 	}()
 
@@ -140,7 +140,7 @@ func (self *Server) Broadcast(name string, in interface{}) {
 	self.mu.RLock()
 	defer self.mu.RUnlock()
 
-	for s, _ := range self.Agents {
+	for s, _ := range self.Nodes {
 		s.Notify(name, in)
 	}
 }
@@ -152,15 +152,15 @@ func (self *Server) sendAll(in interface{}) []QueryResults {
 
 	var results []QueryResults
 
-	for s, agent := range self.Agents {
+	for s, node := range self.Nodes {
 
 		var data []byte
 		err := s.Request("query", in, &data)
 
 		qr := QueryResults{
-			Id:       agent.Id,
-			Name:     agent.Name,
-			Hostname: agent.Hostname,
+			Id:       node.Id,
+			Name:     node.Name,
+			Hostname: node.Hostname,
 			Results:  string(data),
 		}
 
@@ -181,19 +181,19 @@ func (self *Server) sendTo(id string, in interface{}) []QueryResults {
 
 	var results []QueryResults
 
-	agent, err := self.GetAgentById(id)
+	node, err := self.GetNodeById(id)
 
 	if err != nil {
 		return results
 	}
 
 	var data []byte
-	err = agent.Socket.Request("query", in, &data)
+	err = node.Socket.Request("query", in, &data)
 
 	qr := QueryResults{
-		Id:       agent.Id,
-		Name:     agent.Name,
-		Hostname: agent.Hostname,
+		Id:       node.Id,
+		Name:     node.Name,
+		Hostname: node.Hostname,
 		Results:  string(data),
 	}
 
@@ -215,21 +215,21 @@ func (self *Server) Send(id string, in interface{}) []QueryResults {
 	return self.sendTo(id, in)
 }
 
-func (self *Server) GetAgentById(id string) (*AgentData, error) {
+func (self *Server) GetNodeById(id string) (*NodeData, error) {
 
-	for _, agent := range self.Agents {
-		if agent.Id == id {
-			return agent, nil
+	for _, node := range self.Nodes {
+		if node.Id == id {
+			return node, nil
 		}
 	}
 
-	return nil, errors.New("no agent found for that id.")
+	return nil, errors.New("no node found for that id.")
 }
 
 func (self *Server) Run(webPort int) error {
 	Log.Infof("Starting Server on port %d.", self.Port)
 
-	self.Agents = make(map[*gotalk.Sock]*AgentData)
+	self.Nodes = make(map[*gotalk.Sock]*NodeData)
 
 	handlers := gotalk.NewHandlers()
 

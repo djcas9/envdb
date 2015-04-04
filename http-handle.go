@@ -12,7 +12,7 @@ import (
 type Context struct {
 	Name    string
 	Version string
-	Agents  []*DbAgent
+	Nodes   []*NodeDb
 }
 
 func renderFile(w http.ResponseWriter, filename string) error {
@@ -20,12 +20,12 @@ func renderFile(w http.ResponseWriter, filename string) error {
 	var ext string
 	var err error
 
-	agents, _ := AllAgents()
+	nodes, _ := AllNodes()
 
 	context := Context{
 		Name:    Name,
 		Version: Version,
-		Agents:  agents,
+		Nodes:   nodes,
 	}
 
 	if filename == "/" {
@@ -69,11 +69,11 @@ func RouteIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func RouteAgents(w http.ResponseWriter, r *http.Request) {
+func RouteNodes(w http.ResponseWriter, r *http.Request) {
 
-	agents, _ := AllAgents()
+	nodes, _ := AllNodes()
 
-	js, err := json.Marshal(agents)
+	js, err := json.Marshal(nodes)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

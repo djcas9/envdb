@@ -16,7 +16,7 @@ var (
 )
 
 func DBInit(storePath, logPath string) error {
-	tables = append(tables, new(DbAgent))
+	tables = append(tables, new(NodeDb))
 
 	if err := SetEngine(storePath, logPath); err != nil {
 		return err

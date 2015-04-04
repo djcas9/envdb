@@ -204,14 +204,14 @@ html, body {
   font-weight: 300;
 }
 
-#sidebar .agents-filter{
+#sidebar .nodes-filter{
   display: block;
   position: relative;
   height: 40px;
   background: #32393E;
 }
 
-#sidebar .agents-filter i.search-icon{
+#sidebar .nodes-filter i.search-icon{
   color: #545C62;
   display: block;
   position: absolute;
@@ -220,7 +220,7 @@ html, body {
   z-index:9999;
 }
 
-#sidebar .agents-filter input{
+#sidebar .nodes-filter input{
   color: #fff;
   margin-top: 6px;
   margin-left: 4px;
@@ -238,12 +238,12 @@ border-radius: 100px;
   
 }
 
-#agents{
+#nodes{
   margin: 7px;
   color: #fff;
 }
 
-#agents li{
+#nodes li{
   cursor: pointer;
   height: 45px;
   display: block;
@@ -261,20 +261,20 @@ border-radius: 100px;
   -webkit-border-radius: 3px; 
 }
 
-#agents li:hover{
+#nodes li:hover{
   background: rgba(123, 139, 152, 0.29);
   border: 1px solid rgba(32, 35, 39, 1);
 }
 
-#agents li.current{
+#nodes li.current{
   background-color: #6E4FC5;
 }
 
-#agents li.current .agent-metadata{
+#nodes li.current .node-metadata{
   font-weight: 300;
 }
 
-#agents li i.status-icon{
+#nodes li i.status-icon{
   font-size: 0.8em;
   display: block;
   position: absolute;
@@ -283,25 +283,25 @@ border-radius: 100px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-#agents li.online i.status-icon{
+#nodes li.online i.status-icon{
   color: #51BA3A;
 }
 
-#agents li.offline i.status-icon{
+#nodes li.offline i.status-icon{
   color: #BD0000;
 }
 
-#agents li .agent-header {
+#nodes li .node-header {
   margin-left: 20px;
   margin-top: -2px;
 }
 
-#agents li .agent-header span.agent-name{
+#nodes li .node-header span.node-name{
   font-size: 1.0em;
   font-weight: 400;
 }
 
-#agents li .agent-metadata{
+#nodes li .node-metadata{
   margin-top: 3px;
   font-weight: 100;
   font-size: 0.65em;
@@ -438,7 +438,7 @@ border-radius: 100px;
   left: 230px;
   right: 0;
   bottom: 0;
-  background: #fff;
+  background: rgba(245, 248, 249, 0.62);
 
   overflow: auto;
 }
@@ -540,7 +540,7 @@ table.query-results tr.row:hover{
 
 table.query-results td{
   text-align: left;
-  padding: 10px;
+  padding: 13px;
   white-space: nowrap; 
   overflow: hidden;
   max-width: 500px;

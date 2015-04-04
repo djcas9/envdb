@@ -3,10 +3,16 @@ NAME="envdb"
 VERSION=$(shell cat $(NAME).go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
 CWD=$(shell pwd)
 
+GITHUB_USER=mephux
+CCOS=linux
+CCARCH=386 amd64
+CCOUTPUT="pkg/{{.OS}}-{{.Arch}}/$(NAME)"
+
 NO_COLOR=\033[0m
 OK_COLOR=\033[32;01m
 ERROR_COLOR=\033[31;01m
 WARN_COLOR=\033[33;01m
+
 DEPS = $(go list -f '{{range .TestImports}}{{.}} {{end}}' ./...)
 UNAME := $(shell uname -s)
 
@@ -19,7 +25,7 @@ endif
 all: deps
 	@mkdir -p bin/
 	@$(ECHO) "$(OK_COLOR)==> Building $(NAME) $(VERSION) $(NO_COLOR)"
-	@godep go build -o bin/$(NAME)
+	@godep go build -ldflags "-s" -o bin/$(NAME)
 	@chmod +x bin/$(NAME)
 	@$(ECHO) "$(OK_COLOR)==> Done$(NO_COLOR)"
 
@@ -43,16 +49,33 @@ test: deps
 	go test ./...
 
 goxBuild:
-	gox -build-toolchain
+	@CGO_ENABLED=1 GOOS=linux GOARCH=amd64 gox -os="$(CCOS)" -arch="$(CCARCH)" -build-toolchain
 
 gox: 
-	@$(ECHO) "$(OK_COLOR)==> GOX $(NAME)...$(NO_COLOR)"
-	gox output="pkg/{{.OS}}-{{.Arch}}/$(NAME)"
+	@$(ECHO) "$(OK_COLOR)==> Cross Compiling $(NAME)$(NO_COLOR)"
+	@mkdir -p Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
+	@cp -R *.go Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
+	@CGO_ENABLED=1 GOOS=linux GOARCH=amd64 GOPATH=$(shell godep path) gox -ldflags "-s" -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
+	@rm -rf Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
+
+release: clean all gox
+	@mkdir -p release/
+	@echo $(VERSION) > .Version
+	@for os in $(CCOS); do \
+		for arch in $(CCARCH); do \
+			cd pkg/$$os-$$arch/; \
+			tar -zcvf ../../release/$(NAME)-$$os-$$arch.tar.gz $(NAME)* > /dev/null 2>&1; \
+			cd ../../; \
+		done \
+	done
+	@$(ECHO) "$(OK_COLOR)==> Done Cross Compiling $(NAME)$(NO_COLOR)"
 
 clean:
-	rm -rf bindata.go
-	rm -rf bin/
-	rm -rf pkg/
+	@$(ECHO) "$(OK_COLOR)==> Cleaning$(NO_COLOR)"
+	@rm -rf Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
+	@rm -rf bindata.go
+	@rm -rf bin/
+	@rm -rf pkg/
 
 install: clean all
 
