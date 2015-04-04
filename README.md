@@ -1,21 +1,30 @@
+<img height="150px" width="150px" src="https://raw.githubusercontent.com/mephux/envdb/master/web/public/images/envdb.png">
+
 # Envdb
 
-Envdb turns your production, dev, etc environments into a database cluster you can search across using [osquery](https://github.com/facebook/osquery).
+Envdb turns your production, dev, etc environments into a database 
+cluster you can search using [osquery](https://github.com/facebook/osquery).
 
-Envdb allows you to register each computer, server or asset as a node in your cluster. Once a new
-node is connected it because available for search.
+Envdb allows you to register each computer, server or asset as a node in a cluster. Once a new
+node is connected it becomes available for search from the Envdb ui.
 
-Envdb was built using golang so the whole application, agent and server comes as one single binary.
+Envdb was built using golang so the whole application, node client and server comes as one single binary.
+This makes it really easy to deploy and get working in seconds.
+
+# Envdb UI
+
+
 
 # How it works.
 
-Envdb wraps the osquery process with an agent that can communicate back to a central location using websockets.
-When an agent gets a new query, it's executed and then sent back to the server for rendering.
+Envdb wraps the osquery process with an agent that can communicate back to a central location.
+When an agent gets a new query, it's executed and then sent back to the tcp server for rendering. Once the
+request is processed it's then sent to any avaliable web clients using websockets.
 
-  * transport - websockets.
-  * includes an http server for rendering the UI. This also uses websockets to send data from the tcp
-  server to the browser.
-  * sqlite3 for storage, auth etc.
+Envdb has an embedded sqlite database for node storage and saved searches.
+
+ui --websockets--> server --tcp--> node client.
+
 
 # Building
 
@@ -27,11 +36,13 @@ When an agent gets a new query, it's executed and then sent back to the server f
 
   * Server
 
-    `envdb --debug server`
+    `envdb server`
 
-  * Agent
+    * Note: By default this will start the tcp server on port 3636 and the web server on port 8080.
 
-    `sudo envdb agent --name SomeBox --server <ip addr to server>`
+  * Node Client
+
+    `sudo envdb node --server <ip to server> SomeBoxName
 
   * That's it - it's really that simple.
 
@@ -46,5 +57,5 @@ you would like to stalk me, follow [mephux](http://dweb.io/) on
 # TODO
 
   * TLS for the agent/server communications (top of list)
-  * Agent/Server auth, verification and validation.
-  * Code cleanup.
+  * Node/Server auth, verification and validation.
+  * Code cleanup (will continue forever).
