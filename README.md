@@ -1,7 +1,7 @@
 
 ## Envdb - Environment Database
 
-<img style="float:left;" height="444px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb.gif?token=AABXAYgKkzBNt0LlqD4LsRb9kpvnzp1aks5VKIX0wA%3D%3D">
+<img style="float:left;" height="244px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb.gif?token=AABXAYgKkzBNt0LlqD4LsRb9kpvnzp1aks5VKIX0wA%3D%3D">
 
 Envdb turns your production, dev, etc environments into a database 
 cluster you can search using [osquery](https://github.com/facebook/osquery).
