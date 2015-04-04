@@ -12,14 +12,6 @@ node is connected it becomes available for search from the Envdb ui.
 Envdb was built using golang so the whole application, node client and server comes as one single binary.
 This makes it really easy to deploy and get working in seconds.
 
-# Envdb UI
-
-<img style="float:left;" height="350px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-1.png?token=AABXAWJKIKgF-jy_wKmaxnhuD2snsbO0ks5VKH-fwA%3D%3D">
-
-<img style="float:left;" height="350px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-2.png?token=AABXAcgvqnqiFViMFULsVUrfC2FWRjhwks5VKH_AwA%3D%3D">
-
-<img style="float:left;" height="350px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-3.png?token=AABXAQeDVrKIbzu08PHKroPiltQJ6z3cks5VKH_KwA%3D%3D">
-
 # How it works.
 
 Envdb wraps the osquery process with an agent that can communicate back to a central location.
@@ -50,6 +42,14 @@ ui --websockets--> server --tcp--> node client.
     `sudo envdb node --server <ip to server> SomeBoxName`
 
   * That's it - it's really that simple.
+
+# Envdb UI
+
+<img style="float:left;" height="350px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-1.png?token=AABXAWJKIKgF-jy_wKmaxnhuD2snsbO0ks5VKH-fwA%3D%3D">
+
+<img style="float:left;" height="350px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-2.png?token=AABXAcgvqnqiFViMFULsVUrfC2FWRjhwks5VKH_AwA%3D%3D">
+
+<img style="float:left;" height="350px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-3.png?token=AABXAQeDVrKIbzu08PHKroPiltQJ6z3cks5VKH_KwA%3D%3D">
 
 ## Self-Promotion
 
