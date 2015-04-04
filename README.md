@@ -7,7 +7,7 @@
 <img style="float:left;" height="244px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb.gif?token=AABXAYgKkzBNt0LlqD4LsRb9kpvnzp1aks5VKIX0wA%3D%3D">
 
 Envdb turns your production, dev, cloud, etc environments into a database 
-cluster you can search using [osquery](https://github.com/facebook/osquery).
+cluster you can search using [osquery](https://github.com/facebook/osquery) as the foundation.
 
 Envdb allows you to register each computer, server or asset as a node in a cluster. Once a new
 node is connected it becomes available for search from the Envdb ui.
