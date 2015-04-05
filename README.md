@@ -42,7 +42,7 @@ Building on macosx is easy tho, checkout the section below.
 
 # Building
 
-  Make sure you have go installed. I usde go version 1.4.1
+  Make sure you have Go installed. I used Go version 1.4.1.
 
   * `go get github.com/tools/godep`
   * `go get github.com/jteeuwen/go-bindata/...`
