@@ -15,6 +15,8 @@ node is connected it becomes available for search from the Envdb ui.
 Envdb was built using golang so the whole application, node client and server comes as one single binary.
 This makes it really easy to deploy and get working in seconds.
 
+Video Intro: [https://youtu.be/ydYr7Ykwzy8](https://youtu.be/ydYr7Ykwzy8)
+
 # How it works.
 
 Envdb wraps the osquery process with an agent that can communicate back to a central location.
