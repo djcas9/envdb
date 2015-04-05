@@ -12,7 +12,7 @@ import (
 
 const (
 	Name    = "envdb"
-	Version = "0.1.0.beta"
+	Version = "0.1.1"
 
 	DefaultServerPort    = 3636
 	DefaultWebServerPort = 8080
@@ -21,7 +21,7 @@ const (
 var (
 	TimeFormat = "15:04:05"
 
-	app   = kingpin.New(Name, "The Environment Database - SELECT * FROM awesome;")
+	app   = kingpin.New(Name, "The Environment Database - Ask your environment questions")
 	debug = app.Flag("debug", "Enable debug logging.").Bool()
 	dev   = app.Flag("dev", "Enable dev mode. (read assets from disk and enable debug output)").Bool()
 	quiet = app.Flag("quiet", "Remove all output logging.").Short('q').Bool()
