@@ -150,26 +150,40 @@ func (self *Server) sendAll(in interface{}) []QueryResults {
 	self.mu.RLock()
 	defer self.mu.RUnlock()
 
+	var wg sync.WaitGroup
+
 	var results []QueryResults
 
+	Log.Debug("Sending request to nodes.")
+
 	for s, node := range self.Nodes {
+		wg.Add(1)
 
-		var data []byte
-		err := s.Request("query", in, &data)
+		go func(s *gotalk.Sock, node *NodeData) {
+			defer wg.Done()
 
-		qr := QueryResults{
-			Id:       node.Id,
-			Name:     node.Name,
-			Hostname: node.Hostname,
-			Results:  string(data),
-		}
+			var data []byte
+			err := s.Request("query", in, &data)
 
-		if err != nil {
-			qr.Error = err.Error()
-		}
+			qr := QueryResults{
+				Id:       node.Id,
+				Name:     node.Name,
+				Hostname: node.Hostname,
+				Results:  string(data),
+			}
 
-		results = append(results, qr)
+			if err != nil {
+				qr.Error = err.Error()
+			}
+
+			Log.Debugf("%s done", node.Name)
+			results = append(results, qr)
+		}(s, node)
 	}
+
+	Log.Debug("Waiting for all requests to return.")
+
+	wg.Wait()
 
 	return results
 	// }()
