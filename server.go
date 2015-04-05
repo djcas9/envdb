@@ -20,6 +20,7 @@ type NodeData struct {
 	OsQuery        bool
 	OsQueryVersion string
 	Online         bool `json:"online"`
+	PendingDelete  bool `json:"-"`
 }
 
 type Server struct {
@@ -104,6 +105,7 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			OsQueryVersion: resp.Data["osquery-version"].(string),
 			Ip:             resp.Data["ip"].(string),
 			Hostname:       resp.Data["hostname"].(string),
+			PendingDelete:  false,
 		}
 
 		self.Nodes[s] = node
@@ -123,11 +125,18 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			node.Online = false
 
 			Log.Infof("Node disconnected. (%s / %s)", node.Name, node.Id)
-			WebSocketSend("node-update", node)
 
-			if _, err := NodeUpdateOrCreate(node); err != nil {
+			dbNode, err := NodeUpdateOrCreate(node)
+
+			if err != nil {
 				Log.Error("unable update node record")
 				Log.Error("Error: ", err)
+			}
+
+			if dbNode.PendingDelete {
+				dbNode.Delete()
+			} else {
+				WebSocketSend("node-update", node)
 			}
 
 			delete(self.Nodes, s)
@@ -143,6 +152,48 @@ func (self *Server) Broadcast(name string, in interface{}) {
 	for s, _ := range self.Nodes {
 		s.Notify(name, in)
 	}
+}
+
+func (self *Server) Disconnect(id string) error {
+	node, err := self.GetNodeById(id)
+
+	if err != nil {
+		return err
+	}
+
+	Log.Debugf("Disconnect node: %s (%s)", node.Name, node.Id)
+
+	node.Socket.BufferNotify("die", []byte("good-bye!"))
+
+	return nil
+}
+
+// this is hacky because xorm has an issue with
+// sqlite and table locking. Need to move this to a
+// channel for node db writes and queue them.
+func (self *Server) Delete(id string) error {
+
+	Log.Debugf("Deleting node: %s", id)
+
+	node, err := self.GetNodeById(id)
+
+	if err != nil {
+		return err
+	}
+
+	node.PendingDelete = true
+
+	if _, err := NodeUpdateOrCreate(node); err != nil {
+		return err
+	}
+
+	err = self.Disconnect(id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (self *Server) sendAll(in interface{}) []QueryResults {
@@ -245,7 +296,7 @@ func (self *Server) GetNodeById(id string) (*NodeData, error) {
 		}
 	}
 
-	return nil, errors.New("no node found for that id.")
+	return nil, errors.New("No node found for that id.")
 }
 
 func (self *Server) Run(webPort int) error {

@@ -62,6 +62,10 @@ func (self *Node) Handlers() {
 			self.Id = self.Config.Cache.Id
 		} else {
 
+			// dev - remove
+			// TODO: test for cache file remove
+			// Log.Fatalf("no cache file - exit for debug.")
+
 			id, uuerr := uuid.NewV4()
 			err = uuerr
 

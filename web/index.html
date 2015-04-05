@@ -257,5 +257,39 @@
       </div>
     </script>
 
+
+    <script id="node-context-menu-template" type="text/x-handlebars-template">
+      <ul class="custom-menu">
+        <li>
+          <a href="#" class="disconnect-node">Disconnect Node</a>
+        </li>
+        <li>
+          <a href="#" class="delete-node">Delete Node</a>
+        </li>
+      </ul>
+    </script>
+
+    <script id="confirm-template" type="text/x-handlebars-template">
+      <div class="lbox">
+
+        <div class='lbox-title'>
+          <div class='fa {{icon}}'></div>
+          {{title}}
+        </div>
+
+        <div class="lbox-content">
+          {{message}}
+        </div>
+
+        <div class="lbox-footer">
+          <div class='form-actions'>
+            <a class='button warning warning limp-action'>{{buttonTitle}}</a>
+            <a class='button' onClick='$.limpClose();return false;'>Cancel</a>
+          </div>
+        </div>
+
+      </div>
+    </script>
+
   </body>
 </html>

@@ -17,16 +17,16 @@
 		},
 		{
 			"ImportPath": "github.com/go-xorm/core",
-			"Rev": "be6e7ac47dc57bd0ada25322fa526944f66ccaa6"
+			"Rev": "8cc025cd8e89196cf8932ef7e3b102e71772b8aa"
 		},
 		{
 			"ImportPath": "github.com/go-xorm/xorm",
-			"Comment": "v0.4.2-56-g1f0dd9b",
-			"Rev": "1f0dd9bef2d9549229146dbbdd207c9e623f3ac6"
+			"Comment": "v0.4.3-2-g7fd31fc",
+			"Rev": "7fd31fc7e76529b64cba7c91ff8ad0d48bf2b1c1"
 		},
 		{
 			"ImportPath": "github.com/mattn/go-sqlite3",
-			"Rev": "5253daf8561a6ca5015fd5ce79e4367912146be9"
+			"Rev": "e28cd440fabdd39b9520344bc26829f61db40ece"
 		},
 		{
 			"ImportPath": "github.com/nu7hatch/gouuid",

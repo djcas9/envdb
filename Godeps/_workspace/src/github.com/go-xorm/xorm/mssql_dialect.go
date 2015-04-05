@@ -238,7 +238,7 @@ func (db *mssql) SqlType(c *core.Column) string {
 		c.Length = 7
 	case core.MediumInt:
 		res = core.Int
-	case core.MediumText, core.TinyText, core.LongText:
+	case core.MediumText, core.TinyText, core.LongText, core.Json:
 		res = core.Text
 	case core.Double:
 		res = core.Real
@@ -270,7 +270,7 @@ func (db *mssql) IsReserved(name string) bool {
 }
 
 func (db *mssql) Quote(name string) string {
-	return "[" + name + "]"
+	return "\"" + name + "\""
 }
 
 func (db *mssql) QuoteStr() string {

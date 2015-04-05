@@ -128,6 +128,14 @@ func NewWebServer(webPort int, server *Server) {
 		return data, nil
 	})
 
+	gotalk.Handle("disconnect", func(id string) error {
+		return server.Disconnect(id)
+	})
+
+	gotalk.Handle("delete", func(id string) error {
+		return server.Delete(id)
+	})
+
 	ws := gotalk.WebSocketHandler()
 	ws.OnAccept = onAccept
 

@@ -1241,3 +1241,40 @@ ul#queries li div.query{
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);		
 }
 
+.custom-menu {
+  width: 200px;
+  z-index:999999999;
+  position: absolute;
+  background-color:#fff;
+  border: 1px solid rgb(215, 212, 212);
+}
+
+.custom-menu li{
+  height: 35px;
+  line-height: 35px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-bottom: 1px solid #E2DEDE;
+}
+
+.custom-menu li:hover{
+  background-color: #ededed;
+}
+
+.custom-menu li:last-child:hover{
+}
+
+/* .custom-menu li:hover a{ */
+  /* color: #fff; */
+/* } */
+
+.custom-menu li:last-child{
+  border: none;
+}
+
+.custom-menu li a{
+  display: block;
+  text-decoration: none;
+  color: #000;
+  font-size: 0.9em;
+}

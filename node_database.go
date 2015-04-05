@@ -18,6 +18,8 @@ type NodeDb struct {
 	OsQuery        bool
 	OsQueryVersion string
 
+	PendingDelete bool
+
 	Created time.Time `xorm:"CREATED"`
 	Updated time.Time `xorm:"UPDATED"`
 }
@@ -53,6 +55,7 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 		find.OsQuery = node.OsQuery
 		find.OsQueryVersion = node.OsQueryVersion
 		find.Online = node.Online
+		find.PendingDelete = node.PendingDelete
 
 		if _, err := sess.Id(find.Id).AllCols().Update(find); err != nil {
 			sess.Rollback()
@@ -80,6 +83,7 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 		Online:         node.Online,
 		OsQuery:        node.OsQuery,
 		OsQueryVersion: node.OsQueryVersion,
+		PendingDelete:  false,
 	}
 
 	if _, err := sess.Insert(a); err != nil {
@@ -110,4 +114,26 @@ func GetNodeByNodeId(nodeId string) (*NodeDb, error) {
 	}
 
 	return node, nil
+}
+
+func (self *NodeDb) Delete() error {
+	sess := x.NewSession()
+	defer sess.Close()
+
+	if err := sess.Begin(); err != nil {
+		return err
+	}
+
+	if _, err := sess.Id(self.Id).Delete(self); err != nil {
+		sess.Rollback()
+		return err
+	}
+
+	err := sess.Commit()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
