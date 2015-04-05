@@ -46,7 +46,7 @@ var (
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	kingpin.Version(Version)
+	app.Version(Version)
 	args, err := app.Parse(os.Args[1:])
 
 	Log = NewLogger()

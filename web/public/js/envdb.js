@@ -464,6 +464,10 @@ var Envdb = {
 
           node.results = JSON.parse(node.results)
 
+          if (node.results.length <= 0) {
+            continue;
+          }
+
           if (!table) {
             var data = {
               hideNode: node.hideNode || false,
