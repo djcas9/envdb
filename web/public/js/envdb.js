@@ -138,6 +138,8 @@ var Envdb = {
       $("#content").removeClass("node-view");
       $("#node-tables").remove();
       $(".save-query, .load-query").addClass("disabled");
+      $('.table-filter').addClass("node-view");
+      $(".table-filter").show().find("input").val("");
     },
 
     close: function() {
@@ -145,6 +147,8 @@ var Envdb = {
       $("#header .title").text("Query All Nodes");
       $("a.run-query").text("Run Query");
       $(".save-query, .load-query").removeClass("disabled");
+      $('.table-filter').removeClass("node-view");
+      $(".table-filter").hide().find("input").val("");
     },
 
     open: function(name, id) {
@@ -412,6 +416,7 @@ var Envdb = {
 
     Execute: function() {
       $("#content").scrollTop(0);
+      $(".table-filter").show().find("input").val("");
 
       if (Envdb.fixedTable) {
         Envdb.fixedTable._fnDestroy();
@@ -497,10 +502,11 @@ var Envdb = {
               $("#content").scrollTop(0);
             }
           }).DataTable({
-          searching: false,
+          searching: true,
           paging: false,
           info: false
         });
+
 
         Envdb.fixedTable = new $.fn.dataTable.FixedHeader(Envdb.table, {
         });
@@ -689,6 +695,16 @@ jQuery(document).ready(function($) {
   $(document).on("click", ".envdb-control a.load-query", function(e) {
     e.preventDefault();
     Envdb.Query.Load({});
-  })
+  });
+
+  $(document).on("input", ".table-filter input", function(e) {
+    var value = $(this).val();
+    // search
+    if (Envdb.table) {
+      Envdb.table.search(value);
+      Envdb.table.draw();
+      Envdb.fixedTable.fnUpdate();
+    }
+  });
 
 });

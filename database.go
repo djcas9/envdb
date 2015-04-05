@@ -29,8 +29,6 @@ func DBInit(storePath, logPath string) error {
 		return err
 	}
 
-	Log.Debug(s)
-
 	if !s.LoadSavedQueries {
 		if err := LoadDefaultSavedQueries(); err != nil {
 			Log.Error("Unable to load default saved queries.")

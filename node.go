@@ -56,6 +56,8 @@ func (self *Node) Handlers() {
 		var err error
 
 		if self.Config.HasCache {
+			Log.Debugf("Node has cache file. Using cached id %s", self.Config.Cache.Id)
+
 			Log.Infof("Connection successful. Id: %s", self.Config.Cache.Id)
 			self.Id = self.Config.Cache.Id
 		} else {
@@ -66,6 +68,8 @@ func (self *Node) Handlers() {
 			if err != nil {
 				Log.Fatalf("Error creating id: %s", err)
 			}
+
+			Log.Debugf("No cache file found. Creating cache file and new id %s", id)
 
 			Log.Infof("Connection successful. Id: %s", id.String())
 			self.Config.Cache.Id = id.String()

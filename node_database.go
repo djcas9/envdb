@@ -35,6 +35,13 @@ func (self *NodeDb) Update() error {
 }
 
 func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
+	sess := x.NewSession()
+	defer sess.Close()
+
+	if err := sess.Begin(); err != nil {
+		return nil, err
+	}
+
 	find, err := GetNodeByNodeId(node.Id)
 
 	if find != nil {
@@ -47,19 +54,21 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 		find.OsQueryVersion = node.OsQueryVersion
 		find.Online = node.Online
 
-		Log.Debug("Found Node: ", find.Online, node.Online)
+		if _, err := sess.Id(find.Id).AllCols().Update(find); err != nil {
+			sess.Rollback()
+			return find, err
+		}
 
-		_, err := x.Id(find.Id).AllCols().Update(find)
+		err := sess.Commit()
 
 		if err != nil {
-			return find, err
+			return nil, err
 		}
 
 		return find, nil
 	}
 
-	Log.Debugf("Couldn't find record for node (%s).", node.Id)
-	Log.Debugf("Error: %s", err)
+	Log.Warnf("Error: %s", err)
 
 	Log.Debugf("Creating a new record.")
 
@@ -73,7 +82,12 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 		OsQueryVersion: node.OsQueryVersion,
 	}
 
-	_, err = x.Insert(a)
+	if _, err := sess.Insert(a); err != nil {
+		sess.Rollback()
+		return nil, err
+	}
+
+	err = sess.Commit()
 
 	if err != nil {
 		return nil, err

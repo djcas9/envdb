@@ -156,11 +156,15 @@ func (self *Server) sendAll(in interface{}) []QueryResults {
 
 	Log.Debug("Sending request to nodes.")
 
+	Log.Debugf("Request: %s", in.(Query).Sql)
+
 	for s, node := range self.Nodes {
 		wg.Add(1)
 
 		go func(s *gotalk.Sock, node *NodeData) {
 			defer wg.Done()
+
+			start := time.Now()
 
 			var data []byte
 			err := s.Request("query", in, &data)
@@ -176,7 +180,9 @@ func (self *Server) sendAll(in interface{}) []QueryResults {
 				qr.Error = err.Error()
 			}
 
-			Log.Debugf("%s done", node.Name)
+			elapsed := time.Since(start)
+			Log.Debugf(" * %s (%s)", node.Name, elapsed)
+
 			results = append(results, qr)
 		}(s, node)
 	}
@@ -184,6 +190,8 @@ func (self *Server) sendAll(in interface{}) []QueryResults {
 	Log.Debug("Waiting for all requests to return.")
 
 	wg.Wait()
+
+	Log.Debug("Sending results back to requester.")
 
 	return results
 	// }()
@@ -265,7 +273,7 @@ func (self *Server) Run(webPort int) error {
 	self.Socket.HeartbeatInterval = 20 * time.Second
 
 	self.Socket.OnHeartbeat = func(load int, t time.Time) {
-		Log.Debugf("Got heartbeat: Load (%d), Time: (%s)", load, t.Format(TimeFormat))
+		// Log.Debugf("Got heartbeat: Load (%d), Time: (%s)", load, t.Format(TimeFormat))
 	}
 
 	self.Socket.AcceptHandler = self.onAccept

@@ -585,9 +585,11 @@ table.query-results tr.row:hover{
 table.query-results td{
   text-align: left;
   padding: 13px;
-  white-space: nowrap; 
-  overflow: hidden;
   max-width: 500px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 table.query-results td strong{
@@ -1185,7 +1187,57 @@ ul#queries li div.name{
 }
 
 ul#queries li div.query{
+  margin-top: 6px;
   font-weight: 300;
-  padding-right: 50px;
+  padding-right: 100px;
   font-size: 0.8em;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.table-filter{
+  display: none;
+  position: absolute;
+  top: 11px;
+  left: 222px;
+}
+
+.table-filter.node-view{
+  left: 235px;
+}
+
+.dataTables_filter{
+  display: none;
+}
+
+.table-filter i{
+  position: absolute;
+  z-index: 999;
+  left: 11px;
+  top: 4px;
+  opacity: 0.4;
+}
+
+.table-filter input {
+	width: 400px;
+	outline: none;
+	vertical-align: middle;
+	display: inline-block;
+	position: relative;
+	border: 1px solid #dcdcdc;
+	padding: 8px;
+	font-size: 0.8em;	
+	top: -3px;
+  border-radius: 100px;
+  -moz-border-radius: 100px;
+  -webkit-border-radius: 100px;
+  padding-left: 33px;
+}
+
+.table-filter input:focus{
+  border: 1px solid #5897fb;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);		
+}
+

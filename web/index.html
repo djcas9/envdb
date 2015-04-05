@@ -91,6 +91,11 @@
           <a href="#" class="button action run-query">Run Query</a>
           <a href="#" class="button export-results">Export</a>
 
+          <div class="table-filter">
+            <i class="fa fa-search search-icon"></i>
+            <input placeholder="Filter Results" id="table-filter-input" type="text" name="table-filter">
+          </div>
+
           <a href="#" class="load-query button right save">Load</a>
           <a href="#" class="save-query button right save">Save</a>
         </div>
@@ -232,7 +237,7 @@
             {{#each this}}
               <li data-query-id="{{id}}" data-query-type="{{Type}}">
                 <div class="name">{{Name}}</div>
-                <div class="query">{{Query}}</div>
+                <div title="{{Query}}" class="query">{{Query}}</div>
 
                 <a class="load-saved-query button action" href="#">Load</a>
                 <a class="delete-saved-query button warning" href="#">
