@@ -29,7 +29,7 @@ func LoadDefaultSavedQueries() error {
 	queries = append(queries, q2)
 
 	q3 := QueryDb{
-		Name:  "All currently executing processes",
+		Name:  "All currently executing processes where the original binary no longer exists",
 		Query: "SELECT name, path, pid FROM processes WHERE on_disk = 0;",
 		Type:  "all",
 	}
