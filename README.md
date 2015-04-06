@@ -19,8 +19,8 @@ Video Intro: [https://youtu.be/ydYr7Ykwzy8](https://youtu.be/ydYr7Ykwzy8)
 
 # How it works.
 
-Envdb wraps the osquery process with an agent that can communicate back to a central location.
-When an agent gets a new query, it's executed and then sent back to the tcp server for rendering. Once the
+Envdb wraps the osquery process with a node agent (node as in cluster node) that can communicate back to a central location.
+When that node gets a new query, it's executed and then sent back to the tcp server for rendering. Once the
 request is processed it's then sent to any avaliable web clients using websockets.
 
 Envdb has an embedded sqlite database for node storage and saved searches.
@@ -29,7 +29,7 @@ ui --websockets--> server --tcp--> node client.
 
 ## Moving Forward
 
-I plan to add support and a plugin interface for extending what Envdb can request from a node. Currently that list of planned extentions includes: ~~[yara](http://plusvic.github.io/yara/)~~ (osquery is adding support for this), [bro](https://www.bro.org/) and [memory](Volatility). The hope is to wrap these processes and query them using sql like osquery and allowing you to join on similar data points. 
+I plan to add support for a plugin interface for extending what Envdb can request from a node. Currently that list of planned extentions includes: ~~[yara](http://plusvic.github.io/yara/)~~ (osquery is adding support for this), [bro](https://www.bro.org/) and [memory](Volatility). The hope is to wrap these processes and query them using sql like osquery and allowing you to join on similar data points. 
 
 Example: `select * from listening_ports a join bro_conn b on a.port = b.source_port;`
 
