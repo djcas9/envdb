@@ -44,6 +44,7 @@ Building on macosx is easy tho, checkout the section below.
 
   Make sure you have Go installed. I used Go version 1.4.1.
 
+  * `go get github.com/elazarl/go-bindata-assetfs`
   * `go get github.com/tools/godep`
   * `go get github.com/jteeuwen/go-bindata/...`
   * `git clone https://github.com/mephux/envdb.git`
