@@ -10,6 +10,13 @@ type QueryDb struct {
 }
 
 func LoadDefaultSavedQueries() error {
+	sess := x.NewSession()
+	defer sess.Close()
+
+	if err := sess.Begin(); err != nil {
+		return err
+	}
+
 	queries := []QueryDb{}
 
 	q1 := QueryDb{
@@ -47,7 +54,14 @@ AS listening ON process.pid = listening.pid;`,
 
 	queries = append(queries, q4)
 
-	if _, err := x.Insert(&queries); err != nil {
+	if _, err := sess.Insert(&queries); err != nil {
+		sess.Rollback()
+		return err
+	}
+
+	err := sess.Commit()
+
+	if err != nil {
 		return err
 	}
 
@@ -71,10 +85,21 @@ func FindSavedQueryById(id int64) (*QueryDb, error) {
 }
 
 func (self *QueryDb) Delete() error {
-	_, err := x.Delete(&QueryDb{Id: self.Id})
+	sess := x.NewSession()
+	defer sess.Close()
+
+	if err := sess.Begin(); err != nil {
+		return err
+	}
+
+	if _, err := sess.Delete(&QueryDb{Id: self.Id}); err != nil {
+		Log.Debug("Saved Query Delete Error: ", err)
+		return err
+	}
+
+	err := sess.Commit()
 
 	if err != nil {
-		Log.Debug("Saved Query Delete Error: ", err)
 		return err
 	}
 

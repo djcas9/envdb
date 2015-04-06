@@ -7,6 +7,9 @@ import (
 
 	"github.com/go-xorm/xorm"
 	_ "github.com/mattn/go-sqlite3"
+
+	// _ "github.com/cznic/ql/driver"
+	// _ "github.com/go-xorm/ql"
 )
 
 var (
@@ -49,6 +52,7 @@ func getEngine(DbPath string) (*xorm.Engine, error) {
 	cnnstr := ""
 	os.MkdirAll(path.Dir(DbPath), os.ModePerm)
 	cnnstr = "file:" + DbPath + "?cache=shared&mode=rwc"
+	// cnnstr = DbPath
 
 	return xorm.NewEngine("sqlite3", cnnstr)
 }
@@ -79,7 +83,7 @@ func SetEngine(DbPath string, LogPath string) (err error) {
 	x.ShowWarn = false
 
 	if err = x.StoreEngine("InnoDB").Sync2(tables...); err != nil {
-		return fmt.Errorf("sync database struct error: %v\n", err)
+		return fmt.Errorf("sync database struct error: %v", err)
 	}
 
 	return nil

@@ -16,7 +16,21 @@ func DbSettings() (*SettingsDb, error) {
 	} else if !has {
 		Log.Debug("Couldn't find settings. Creating a new settings row.")
 
-		if _, err := x.Insert(s); err != nil {
+		sess := x.NewSession()
+		defer sess.Close()
+
+		if err := sess.Begin(); err != nil {
+			return nil, err
+		}
+
+		if _, err := sess.Insert(s); err != nil {
+			sess.Rollback()
+			return nil, err
+		}
+
+		err := sess.Commit()
+
+		if err != nil {
 			return nil, err
 		}
 	}

@@ -32,7 +32,24 @@ func AllNodes() ([]*NodeDb, error) {
 }
 
 func (self *NodeDb) Update() error {
-	_, err := x.Id(self.Id).AllCols().Update(self)
+	sess := x.NewSession()
+	defer sess.Close()
+
+	if err := sess.Begin(); err != nil {
+		return err
+	}
+
+	if _, err := sess.Id(self.Id).AllCols().Update(self); err != nil {
+		sess.Rollback()
+		return err
+	}
+
+	err := sess.Commit()
+
+	if err != nil {
+		return err
+	}
+
 	return err
 }
 

@@ -48,7 +48,7 @@ func NewServer(port int) (*Server, error) {
 	Log.Debugf("Attempting to open server store: %s.", config.StorePath)
 
 	if err := DBInit(config.StorePath, config.LogPath); err != nil {
-		Log.Fatal("Unable to setup sqlite database.")
+		Log.Error("Unable to setup sqlite database.")
 		Log.Fatalf("Error: %s", err)
 	}
 
