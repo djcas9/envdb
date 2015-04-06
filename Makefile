@@ -22,15 +22,14 @@ else
 	ECHO=/bin/echo -e
 endif
 
-all: deps
+all: bindata
 	@mkdir -p bin/
 	@$(ECHO) "$(OK_COLOR)==> Building $(NAME) $(VERSION) $(NO_COLOR)"
 	@godep go build -ldflags "-s" -o bin/$(NAME)
 	@chmod +x bin/$(NAME)
 	@$(ECHO) "$(OK_COLOR)==> Done$(NO_COLOR)"
 
-
-deps: bindata
+build: bindata all
 	@$(ECHO) "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
 	@godep get
 
