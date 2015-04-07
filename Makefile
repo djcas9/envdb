@@ -43,7 +43,7 @@ bindata:
 	@$(ECHO) "$(OK_COLOR)==> Embedding Assets$(NO_COLOR)"
 	@go-bindata web/...
 
-test: deps
+test: build
 	@$(ECHO) "$(OK_COLOR)==> Testing $(NAME)...$(NO_COLOR)"
 	go test ./...
 
