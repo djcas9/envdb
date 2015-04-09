@@ -45,7 +45,7 @@ bindata:
 
 test:
 	@$(ECHO) "$(OK_COLOR)==> Testing $(NAME)...$(NO_COLOR)"
-	go test ./...
+	godep go test ./...
 
 goxBuild:
 	@CGO_ENABLED=1 GOOS=linux GOARCH=amd64 gox -os="$(CCOS)" -arch="$(CCARCH)" -build-toolchain
