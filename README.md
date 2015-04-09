@@ -44,9 +44,9 @@ Building on macosx is easy tho, checkout the section below.
 
   Make sure you have Go installed. I used Go version 1.4.1.
 
+  * `go get github.com/jteeuwen/go-bindata/...`
   * `go get github.com/elazarl/go-bindata-assetfs`
   * `go get github.com/tools/godep`
-  * `go get github.com/jteeuwen/go-bindata/...`
   * `git clone https://github.com/mephux/envdb.git`
   * `cd envdb`
   * `make`
@@ -106,7 +106,6 @@ you would like to stalk me, follow [mephux](http://dweb.io/) on
 
 # TODO
 
-  * Tests. Sorry :(
   * TLS for the agent/server communications (top of list)
   * Node/Server auth, verification and validation.
   * Code cleanup (will continue forever).
