@@ -4,6 +4,7 @@ git:
   branches:
     - master
 script:
+  - make
   - make test
 notify:
   email:
