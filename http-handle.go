@@ -3,76 +3,57 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
-	"mime"
 	"net/http"
-	"path/filepath"
 	"strconv"
 	"text/template"
 )
 
-type Context struct {
-	Name    string
-	Version string
-	Nodes   []*NodeDb
-}
+var funcs = template.FuncMap{}
 
-func renderFile(w http.ResponseWriter, filename string) error {
+func newTemplate(filename string) *template.Template {
 	var file []byte
-	var ext string
 	var err error
-
-	nodes, _ := AllNodes()
-
-	context := Context{
-		Name:    Name,
-		Version: Version,
-		Nodes:   nodes,
-	}
-
-	if filename == "/" {
-		filename = "/index.html"
-	} else if filename == "/favicon.ico" || filename == "/favicon.png" {
-		//..
-	} else {
-		return nil
-	}
 
 	if DEV_MODE {
 		// dev
-		file, err = ioutil.ReadFile("web" + filename)
+		file, err = ioutil.ReadFile("web/" + filename)
 	} else {
-		file, err = Asset("web" + filename)
+		file, err = Asset("web/" + filename)
 	}
-
-	if err != nil {
-		return err
-	}
-
-	ext = filepath.Ext("web" + filename)
-
-	if ext != "" {
-		w.Header().Set("Content-Type", mime.TypeByExtension(ext))
-	}
-	if file != nil {
-		// w.Write(file)
-		t, _ := template.New("index").Delims("<%", "%>").Parse(string(file))
-
-		Log.Debug("HTTP Rendering file: ", filename)
-		t.Execute(w, context)
-	}
-
-	return nil
-}
-
-func RouteIndex(w http.ResponseWriter, r *http.Request) {
-	err := renderFile(w, r.URL.Path)
 
 	if err != nil {
 		Log.Error(err)
 	}
+
+	// Log.Debug("HTTP Rendering file: ", filename)
+	return template.Must(template.New("*").Delims("<%", "%>").Funcs(funcs).Parse(string(file)))
 }
 
-func RouteDeleteQuery(w http.ResponseWriter, r *http.Request) {
+var tpls = map[string]*template.Template{
+	"home": newTemplate("index.html"),
+}
+
+func executeTemplate(w http.ResponseWriter, name string, status int, data interface{}) error {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(status)
+
+	return tpls[name].Execute(w, data)
+}
+
+func RouteIndex(w http.ResponseWriter, r *http.Request) error {
+
+	nodes, _ := AllNodes()
+
+	return executeTemplate(w, "home", 200, map[string]interface{}{
+		"Section": "home",
+		"Name":    Name,
+		"Version": Version,
+		"Nodes":   nodes,
+	})
+
+}
+
+func RouteDeleteQuery(w http.ResponseWriter, r *http.Request) error {
 	var errorMsg string = ""
 
 	r.ParseForm()
@@ -83,19 +64,17 @@ func RouteDeleteQuery(w http.ResponseWriter, r *http.Request) {
 		Log.Debug("got id: ", id)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			return err
 		}
 
 		query, err := FindSavedQueryById(id)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			return err
 		}
 
 		if err := query.Delete(); err != nil {
-			errorMsg = err.Error()
+			return err
 		}
 
 		data := map[string]interface{}{
@@ -106,32 +85,31 @@ func RouteDeleteQuery(w http.ResponseWriter, r *http.Request) {
 		js, err := json.Marshal(data)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			return err
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(js)
 	}
+
+	return nil
 }
 
-func RouteSavedQueries(w http.ResponseWriter, r *http.Request) {
+func RouteSavedQueries(w http.ResponseWriter, r *http.Request) error {
 	data, _ := AllSavedQueries()
 
 	js, err := json.Marshal(data)
 
 	if err != nil {
-		Log.Error("Error: ", err)
-
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
+	return nil
 }
 
-func RouteSaveQuery(w http.ResponseWriter, r *http.Request) {
+func RouteSaveQuery(w http.ResponseWriter, r *http.Request) error {
 	r.ParseForm()
 
 	if r.Method == "POST" {
@@ -145,7 +123,7 @@ func RouteSaveQuery(w http.ResponseWriter, r *http.Request) {
 		var errorMsg string = ""
 
 		if err != nil {
-			errorMsg = err.Error()
+			return err
 		}
 
 		data := map[string]interface{}{
@@ -156,27 +134,27 @@ func RouteSaveQuery(w http.ResponseWriter, r *http.Request) {
 		js, err := json.Marshal(data)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			return err
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(js)
 	}
 
+	return nil
 }
 
-func RouteNodes(w http.ResponseWriter, r *http.Request) {
+func RouteNodes(w http.ResponseWriter, r *http.Request) error {
 
 	nodes, _ := AllNodes()
 
 	js, err := json.Marshal(nodes)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
+	return nil
 }

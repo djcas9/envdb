@@ -43,12 +43,7 @@ var (
 	DEV_MODE bool
 )
 
-func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
-
-	app.Version(Version)
-	args, err := app.Parse(os.Args[1:])
-
+func initLogger() {
 	Log = NewLogger()
 
 	Log.Prefix = Name
@@ -70,6 +65,16 @@ func main() {
 	if *quiet {
 		Log.SetLevel(FatalLevel)
 	}
+
+}
+
+func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	initLogger()
+
+	app.Version(Version)
+	args, err := app.Parse(os.Args[1:])
 
 	switch kingpin.MustParse(args, err) {
 

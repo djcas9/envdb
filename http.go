@@ -8,6 +8,9 @@ import (
 	"sync"
 
 	"github.com/elazarl/go-bindata-assetfs"
+	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/rsms/gotalk"
 )
 
@@ -45,39 +48,14 @@ func WebSocketSend(name string, in interface{}) {
 	}
 }
 
-// func readCsv(data string) ([]map[string]string, error) {
-// var dd []map[string]string
+// handlerFunc adapts a function to an http.Handler.
+type handlerFunc func(http.ResponseWriter, *http.Request) error
 
-// reader := csv.NewReader(strings.NewReader(data))
-// reader.FieldsPerRecord = -1
-
-// rawCSVdata, err := reader.ReadAll()
-
-// if err != nil {
-// return dd, err
-// }
-
-// header := rawCSVdata[0]
-
-// for i, each := range rawCSVdata {
-// if i == 0 {
-// continue
-// }
-
-// data := make(map[string]string)
-
-// for ii, e := range each {
-// data[header[ii]] = e
-// }
-
-// fmt.Println(i, each)
-// dd = append(dd, data)
-// }
-
-// return dd, nil
-// }
+var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
 func NewWebServer(webPort int, server *Server) {
+	r := mux.NewRouter()
+	r.StrictSlash(true)
 
 	gotalk.Handle("tables", func(sql SqlRequest) (QueryResults, error) {
 		var tables []string
@@ -89,6 +67,7 @@ func NewWebServer(webPort int, server *Server) {
 
 		if len(data) != 1 {
 			d := QueryResults{}
+
 			return d, errors.New(fmt.Sprintf("Node not found for id (%s).", sql.Id))
 		}
 
@@ -113,6 +92,7 @@ func NewWebServer(webPort int, server *Server) {
 
 		if len(data) != 1 {
 			d := QueryResults{}
+
 			return d, errors.New(fmt.Sprintf("Node not found for id (%s).", sql.Id))
 		}
 
@@ -141,37 +121,63 @@ func NewWebServer(webPort int, server *Server) {
 
 	if DEV_MODE {
 		// dev
-		http.Handle("/public/", http.FileServer(http.Dir("./web/")))
+		r.PathPrefix("/public/").Handler(http.FileServer(http.Dir("./web/")))
 	} else {
-		http.Handle("/public/",
-			http.FileServer(
-				&assetfs.AssetFS{
-					Asset:    Asset,
-					AssetDir: AssetDir,
-					Prefix:   "web",
-				},
-			),
-		)
+		r.PathPrefix("/public/").Handler(http.FileServer(
+			&assetfs.AssetFS{
+				Asset:    Asset,
+				AssetDir: AssetDir,
+				Prefix:   "web",
+			},
+		))
 	}
 
-	http.HandleFunc("/", RouteIndex)
-
-	http.HandleFunc("/query/save", RouteSaveQuery)
-	http.HandleFunc("/query/delete", RouteDeleteQuery)
-
-	// API - Version 1
-	http.HandleFunc("/api/v1/nodes", RouteNodes)
-	http.HandleFunc("/api/v1/queries", RouteSavedQueries)
+	r.Handle("/", handlerFunc(RouteIndex))
+	r.Handle("/query/save", handlerFunc(RouteSaveQuery))
+	r.Handle("/query/delete", handlerFunc(RouteDeleteQuery))
+	r.Handle("/api/v1/nodes", handlerFunc(RouteNodes))
+	r.Handle("/api/v1/queries", handlerFunc(RouteSavedQueries))
 
 	http.Handle("/gotalk/", ws)
+	http.Handle("/", r)
 
 	var port string = fmt.Sprintf(":%d", webPort)
+	var err error
+	var proto string = "http"
 
-	Log.Infof("HTTP Server: http://%s%s", "127.0.0.1", port)
+	if SSL {
+		proto = "https"
+	}
 
-	err := http.ListenAndServe(port, nil)
+	Log.Infof("HTTP Server: %s://%s%s", proto, "127.0.0.1", port)
+
+	if SSL {
+		err = http.ListenAndServeTLS(port, DefaultPublicKeyPath, DefaultPrivateKeyPath, context.ClearHandler(http.DefaultServeMux))
+	} else {
+		err = http.ListenAndServe(port, context.ClearHandler(http.DefaultServeMux))
+	}
 
 	if err != nil {
 		Log.Error(err.Error())
+	}
+}
+
+func (f handlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	// session, _ := store.Get(r, "envdb")
+
+	// if session.Values["current_user"] == nil {
+	// http.Redirect(w, r, "/login", 301)
+	// return
+	// }
+
+	// if err := session.Save(r, w); err != nil {
+	// Log.Fatal(err)
+	// }
+
+	err := f(w, r)
+
+	if err != nil {
+		Log.Fatal(err)
 	}
 }
