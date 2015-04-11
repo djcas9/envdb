@@ -37,6 +37,12 @@ func (u *UserDb) AvatarLink() string {
 	return "//1.gravatar.com/avatar/" + u.Avatar
 }
 
+func FindAllUsers() ([]*UserDb, error) {
+	var users []*UserDb
+	err := x.Find(&users)
+	return users, err
+}
+
 func GetUserSalt(n int, alphabets ...byte) string {
 	const alphanum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	var bytes = make([]byte, n)
@@ -195,4 +201,14 @@ func FindUserByEmail(email string) (*UserDb, error) {
 	}
 
 	return nil, errors.New("User not found")
+}
+
+func (self *UserDb) Delete() error {
+	_, err := x.Delete(self)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

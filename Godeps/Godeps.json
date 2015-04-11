@@ -41,6 +41,10 @@
 			"Rev": "3e759b5c5532bec4f3934ea4c745e4ae5d69737a"
 		},
 		{
+			"ImportPath": "github.com/howeyc/gopass",
+			"Rev": "2c70fa70727c953c51695f800f25d6b44abb368e"
+		},
+		{
 			"ImportPath": "github.com/mattn/go-sqlite3",
 			"Rev": "e28cd440fabdd39b9520344bc26829f61db40ece"
 		},
@@ -51,6 +55,10 @@
 		{
 			"ImportPath": "github.com/nu7hatch/gouuid",
 			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ssh/terminal",
+			"Rev": "1351f936d976c60a0a48d728281922cf63eafb8d"
 		},
 		{
 			"ImportPath": "golang.org/x/net/websocket",

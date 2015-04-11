@@ -1,18 +1,20 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 
+	"github.com/howeyc/gopass"
 	"gopkg.in/alecthomas/kingpin.v1"
 )
 
 const (
 	Name    = "envdb"
-	Version = "0.1.1"
+	Version = "0.2.0"
 
 	DefaultServerPort    = 3636
 	DefaultWebServerPort = 8080
@@ -37,6 +39,10 @@ var (
 	nodeName   = node.Arg("node-name", "A name used to uniquely identify this node.").Required().String()
 	nodeServer = node.Flag("server", "Address for server to connect to.").PlaceHolder("127.0.0.1").Required().String()
 	nodePort   = node.Flag("port", "Port to use for connection.").Int()
+
+	users      = app.Command("users", "User Management (Default lists all users).")
+	addUser    = users.Flag("add", "Add a new user.").Bool()
+	removeUser = users.Flag("remove", "Remove user by email.").PlaceHolder("email").String()
 
 	Log *Logger
 
@@ -78,28 +84,41 @@ func main() {
 
 	switch kingpin.MustParse(args, err) {
 
-	case server.FullCommand():
+	case users.FullCommand():
+		serverSetup(false)
 
-		var svrPort int = DefaultServerPort
-		var svrWebPort int = DefaultWebServerPort
-
-		if *serverPort != 0 {
-			svrPort = *serverPort
+		if *addUser {
+			addDBUser()
+			return
 		}
 
-		if *serverWebPort != 0 {
-			svrWebPort = *serverWebPort
+		if len(*removeUser) > 0 {
+			if user, err := FindUserByEmail(*removeUser); err != nil {
+				Log.Fatal(err)
+			} else {
+				if err := user.Delete(); err != nil {
+					Log.Fatal(err)
+				}
+			}
+
+			Log.Info("User removed successfully.")
+			return
 		}
 
-		svr, err := NewServer(svrPort)
+		users, err := FindAllUsers()
 
 		if err != nil {
 			Log.Fatal(err)
 		}
 
-		if err := svr.Run(svrWebPort); err != nil {
-			Log.Error(err)
+		fmt.Println("Listing Users: ")
+		for _, user := range users {
+			fmt.Printf("  * %s (%s)\n", user.Name, user.Email)
 		}
+
+	case server.FullCommand():
+
+		serverSetup(true)
 
 	case node.FullCommand():
 
@@ -144,4 +163,78 @@ func main() {
 		app.Usage(os.Stdout)
 	}
 
+}
+
+func serverSetup(start bool) {
+	var svrPort int = DefaultServerPort
+	var svrWebPort int = DefaultWebServerPort
+
+	if *serverPort != 0 {
+		svrPort = *serverPort
+	}
+
+	if *serverWebPort != 0 {
+		svrWebPort = *serverWebPort
+	}
+
+	svr, err := NewServer(svrPort)
+
+	if err != nil {
+		Log.Fatal(err)
+	}
+
+	if start {
+		if err := svr.Run(svrWebPort); err != nil {
+			Log.Error(err)
+		}
+	}
+}
+
+func ask(reader *bufio.Reader, question string) string {
+	fmt.Print(question)
+
+	value, _ := reader.ReadString('\n')
+	trim := strings.Trim(value, "\n")
+
+	if len(trim) <= 0 {
+		Log.Fatalf("value cannot be blank.")
+	}
+
+	return trim
+}
+
+func addDBUser() {
+	reader := bufio.NewReader(os.Stdin)
+
+	name := ask(reader, "Name: ")
+
+	email := ask(reader, "Email ")
+
+	if !IsEmail(email) {
+		Log.Fatalf("%s is not a valid email address.", email)
+	}
+
+	fmt.Print("Password: ")
+	pass := gopass.GetPasswd()
+
+	fmt.Print("Confirm: ")
+	cpass := gopass.GetPasswd()
+
+	if string(pass) != string(cpass) {
+		Log.Fatal("Password and confirm do not match.")
+	}
+
+	user := &UserDb{
+		Name:     name,
+		Email:    email,
+		Password: string(pass),
+	}
+
+	err := CreateUser(user)
+
+	if err != nil {
+		Log.Fatal(err)
+	}
+
+	Log.Info("User created successfully.")
 }

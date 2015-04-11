@@ -200,8 +200,6 @@ func RouteLogin(w http.ResponseWriter, r *http.Request) error {
 			return nil
 		}
 
-		Log.Info(email, password)
-
 		if !user.ValidatePassword(password) {
 			Log.Warnf("Authentication Failed for user: %s", email)
 			http.Redirect(w, r, "/", 302)

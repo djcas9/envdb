@@ -1395,3 +1395,8 @@ body.login input[type="submit"]{
   margin-left: 122px;
   padding: 15px;
 }
+
+span.split{
+  margin-left: 5px;
+  opacity: 0.3;
+}

@@ -147,13 +147,9 @@ func NewWebServer(webPort int, server *Server) {
 
 	var port string = fmt.Sprintf(":%d", webPort)
 	var err error
-	var proto string = "http"
+	var proto string = "https"
 
-	if SSL {
-		proto = "https"
-	}
-
-	Log.Infof("HTTP Server: %s://%s%s", proto, "127.0.0.1", port)
+	Log.Infof("** NOTICE ** HTTP Server: %s://%s%s", proto, "127.0.0.1", port)
 
 	err = http.ListenAndServeTLS(port, DefaultPublicKeyPath, DefaultPrivateKeyPath, context.ClearHandler(http.DefaultServeMux))
 
