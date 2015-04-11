@@ -53,7 +53,7 @@ Building on macosx is easy tho, checkout the section below.
 
 # Usage
 
-  * NOTICE: The default username and password for the UI.
+  * **NOTICE**: The default username and password for the UI.
     * username: **admin@envdb.io**
     * password: **envdb**
 
