@@ -71,10 +71,10 @@ func initLogger() {
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	initLogger()
-
 	app.Version(Version)
 	args, err := app.Parse(os.Args[1:])
+
+	initLogger()
 
 	switch kingpin.MustParse(args, err) {
 

@@ -14,41 +14,55 @@ func newTemplate(filename string) *template.Template {
 	var file []byte
 	var err error
 
+	var layout []byte
+
 	if DEV_MODE {
-		// dev
 		file, err = ioutil.ReadFile("web/" + filename)
+		layout, err = ioutil.ReadFile("web/layout.html")
 	} else {
 		file, err = Asset("web/" + filename)
+		layout, err = Asset("web/layout.html")
 	}
 
 	if err != nil {
 		Log.Error(err)
 	}
 
-	// Log.Debug("HTTP Rendering file: ", filename)
-	return template.Must(template.New("*").Delims("<%", "%>").Funcs(funcs).Parse(string(file)))
-}
-
-var tpls = map[string]*template.Template{
-	"home": newTemplate("index.html"),
+	html := string(layout) + string(file)
+	return template.Must(template.New("*").Delims("<%", "%>").Funcs(funcs).Parse(html))
 }
 
 func executeTemplate(w http.ResponseWriter, name string, status int, data interface{}) error {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(status)
 
-	return tpls[name].Execute(w, data)
+	return newTemplate(name).Execute(w, data)
 }
 
 func RouteIndex(w http.ResponseWriter, r *http.Request) error {
 
+	session, err := store.Get(r, "envdb")
+
+	if err != nil {
+		Log.Debug(err)
+	}
+
 	nodes, _ := AllNodes()
 
-	return executeTemplate(w, "home", 200, map[string]interface{}{
+	user, err := FindUserByEmail(session.Values["current_user"].(string))
+
+	if err != nil {
+		session.Values["current_user"] = nil
+		http.Redirect(w, r, "/login", 301)
+		return nil
+	}
+
+	return executeTemplate(w, "index.html", 200, map[string]interface{}{
 		"Section": "home",
 		"Name":    Name,
 		"Version": Version,
 		"Nodes":   nodes,
+		"User":    user,
 	})
 
 }
@@ -156,5 +170,70 @@ func RouteNodes(w http.ResponseWriter, r *http.Request) error {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
+	return nil
+}
+
+func RouteLogin(w http.ResponseWriter, r *http.Request) error {
+	if r.Method == "GET" {
+		return executeTemplate(w, "login.html", 200, map[string]interface{}{
+			"Section": "login",
+			"Name":    Name,
+			"Version": Version,
+		})
+	} else if r.Method == "POST" {
+		r.ParseForm()
+
+		session, err := store.Get(r, "envdb")
+
+		if err != nil {
+			Log.Debug(err)
+		}
+
+		email := r.PostFormValue("email")
+		password := r.PostFormValue("password")
+
+		user, err := FindUserByEmail(email)
+
+		if err != nil {
+			Log.Warn(err)
+			http.Redirect(w, r, "/", 302)
+			return nil
+		}
+
+		Log.Info(email, password)
+
+		if !user.ValidatePassword(password) {
+			Log.Warnf("Authentication Failed for user: %s", email)
+			http.Redirect(w, r, "/", 302)
+			return nil
+		}
+
+		Log.Debug("Setting current user.")
+		session.Values["current_user"] = email
+
+		if err := session.Save(r, w); err != nil {
+			Log.Fatal(err)
+		}
+
+		http.Redirect(w, r, "/", 302)
+		return nil
+	} else if r.Method == "DELETE" {
+		session, err := store.Get(r, "envdb")
+
+		if err != nil {
+			Log.Debug(err)
+		}
+
+		session.Values["current_user"] = nil
+		session.Options.MaxAge = -1
+
+		if err := session.Save(r, w); err != nil {
+			Log.Fatal(err)
+		}
+
+		return nil
+	}
+
+	http.Redirect(w, r, "/", 302)
 	return nil
 }

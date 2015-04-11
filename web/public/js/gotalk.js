@@ -639,7 +639,7 @@ if (typeof TextDecoder !== 'undefined') {
 
 }
 
-// var s = '∆åßf'; // '日本語'
+// var s = 'âˆ†Ã¥ÃŸf'; // 'æ—¥æœ¬èªž'
 // var b = exports.encode(s);
 // console.log('encode("'+s+'") =>', b);
 // console.log('decode(',b,') =>', exports.decode(b));
@@ -662,13 +662,7 @@ gotalk.protocol = protocol;
 gotalk.Buf = Buf;
 
 function decodeJSON(v) {
-  var value;
-  try {
-    value = JSON.parse(v);
-  } catch (e) {
-    // console.warn('failed to decode JSON "'+(typeof v === 'string' ? v : v.toString())+'":',e);
-  }
-  return value;
+  try { return JSON.parse(v); } catch (e) {}
 }
 
 
@@ -700,6 +694,7 @@ exports.Sock = Sock;
 
 var resetSock = function(s, causedByErr) {
   s.pendingClose = false;
+  s.stopSendingHeartbeats();
 
   if (s.ws) {
     s.ws.onmessage = null;
@@ -754,6 +749,15 @@ Sock.prototype.adoptWebSocket = function(ws) {
     if (!ws._bufferedMessages) ws._bufferedMessages = [];
     ws._bufferedMessages.push(ev.data);
   };
+};
+
+
+Sock.prototype.adopt = function(rwc) {
+  if (adopt instanceof WebSocket) {
+    return this.adoptWebSocket(rwc);
+  } else {
+    throw new Error('unsupported transport');
+  }
 };
 
 
@@ -1067,10 +1071,9 @@ Sock.prototype.notify = function(op, value) {
 // event is emitted, where error is non-empty if the request failed.
 var StreamRequest = function(s, op, id) {
   return Object.create(StreamRequest.prototype, {
-    s:          {value:s},
-    op:         {value:op, enumerable:true},
-    id:         {value:id, enumerable:true},
-    onresponse: {value:function(){}, enumerable:true, write:true}
+    s:  {value:s},
+    op: {value:op, enumerable:true},
+    id: {value:id, enumerable:true},
   });
 };
 
@@ -1174,6 +1177,8 @@ Handlers.prototype.findNotificationHandler = function(name) {
   return handler || this.noteFallbackHandler;
 };
 
+// TODO: Implement support for handling stream requests
+
 // ===============================================================================================
 
 function openWebSocket(s, addr, callback) {
@@ -1206,12 +1211,12 @@ function openWebSocket(s, addr, callback) {
 
 // gotalk.defaultResponderAddress is defined if the responder has announced a default address
 // to which connect to.
-if (window.gotalkResponderAt !== undefined) {
-  var at = window.gotalkResponderAt;
-  delete window.gotalkResponderAt;
+if (global.gotalkResponderAt !== undefined) {
+  var at = global.gotalkResponderAt;
   if (at && at.ws) {
-    gotalk.defaultResponderAddress = 'ws://' + document.location.host + at.ws;
+    gotalk.defaultResponderAddress = 'wss://' + document.location.host + at.ws;
   }
+  delete global.gotalkResponderAt;
 }
 
 
@@ -1222,18 +1227,7 @@ Sock.prototype.open = function(addr, callback) {
     addr = null;
   }
 
-  if (!addr) {
-    if (!gotalk.defaultResponderAddress) {
-      throw new Error('address not specified (responder has not announced any default address)')
-    }
-    addr = gotalk.defaultResponderAddress;
-  }
-
-  if (addr.substr(0,3) === 'ws:') {
-    openWebSocket(s, addr, callback);
-  } else {
-    throw new Error('unsupported address');
-  }
+  openWebSocket(s, 'wss://' + document.location.host + "/gotalk/", callback);
   return s;
 };
 
@@ -1248,9 +1242,7 @@ Sock.prototype.open = function(addr, callback) {
 //   Throws an error if `gotalk.defaultResponderAddress` isn't defined.
 //
 gotalk.open = function(addr, onConnect) {
-  var s = Sock(gotalk.defaultHandlers);
-  s.open(addr, onConnect);
-  return s;
+  return Sock(gotalk.defaultHandlers).open(addr, onConnect);
 };
 
 
@@ -1270,9 +1262,7 @@ Sock.prototype.openKeepAlive = function(addr) {
 // The Connection is automatically kept alive (by reconnecting) until Sock.end() is called.
 // If `addr` is not provided, `gotalk.defaultResponderAddress` is used instead.
 gotalk.connection = function(addr) {
-  var s = Sock(gotalk.defaultHandlers);
-  s.openKeepAlive(addr);
-  return s;
+  return Sock(gotalk.defaultHandlers).openKeepAlive(addr);
 };
 
 
@@ -1294,10 +1284,6 @@ gotalk.handleNotification = function (name, handler) {
   return gotalk.defaultHandlers.handleNotification(name, handler);
 };
 
-// -----------------------------------------------------------------------------------------------
-
-
-
 };
 
 
@@ -1305,4 +1291,4 @@ __mainapi = {exports:{}};
 __main(__mainapi);
 
 global.gotalk = __mainapi.exports;
-})(typeof window !== "undefined" ? window : this);
+})(this);

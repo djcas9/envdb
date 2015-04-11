@@ -1,13 +1,14 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"os"
 	"time"
 
+	"github.com/mephux/gotalk"
 	"github.com/nu7hatch/gouuid"
-	"github.com/rsms/gotalk"
 )
 
 var (
@@ -135,7 +136,9 @@ func (self *Node) Server() string {
 func (self *Node) Connect() error {
 	Log.Infof("Connecting to %s", self.Server())
 
-	s, err := gotalk.Connect("tcp", self.Server())
+	s, err := gotalk.Connect("tcp", self.Server(), &tls.Config{
+		InsecureSkipVerify: true,
+	})
 
 	if err != nil {
 		return err

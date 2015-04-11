@@ -19,7 +19,8 @@ var (
 )
 
 func DBInit(storePath, logPath string) error {
-	tables = append(tables, new(NodeDb), new(QueryDb), new(SettingsDb))
+	tables = append(tables, new(NodeDb), new(QueryDb), new(SettingsDb),
+		new(UserDb))
 
 	if err := SetEngine(storePath, logPath); err != nil {
 		return err
@@ -32,13 +33,24 @@ func DBInit(storePath, logPath string) error {
 		return err
 	}
 
-	if !s.LoadSavedQueries {
+	if !s.Setup {
+
+		user := &UserDb{
+			Name:     "Administrator",
+			Email:    "admin@envdb.io",
+			Password: "envdb",
+		}
+
+		if err := CreateUser(user); err != nil {
+			Log.Fatal("Unable to create default admin user.")
+		}
+
 		if err := LoadDefaultSavedQueries(); err != nil {
 			Log.Error("Unable to load default saved queries.")
 			Log.Errorf("Error: %s", err)
 		}
 
-		s.LoadSavedQueries = true
+		s.Setup = true
 
 		if err := s.Update(); err != nil {
 			Log.Errorf("Unable to update settings: %s", err)

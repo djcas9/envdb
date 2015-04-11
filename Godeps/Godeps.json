@@ -45,12 +45,12 @@
 			"Rev": "e28cd440fabdd39b9520344bc26829f61db40ece"
 		},
 		{
-			"ImportPath": "github.com/nu7hatch/gouuid",
-			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
+			"ImportPath": "github.com/mephux/gotalk",
+			"Rev": "bfc3ceb2346b163c25d5d26abbc834350cbcf3ac"
 		},
 		{
-			"ImportPath": "github.com/rsms/gotalk",
-			"Rev": "8424c387046410d50ce7bb3d3125fa89fadf7ac8"
+			"ImportPath": "github.com/nu7hatch/gouuid",
+			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 		},
 		{
 			"ImportPath": "golang.org/x/net/websocket",

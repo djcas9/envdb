@@ -10,8 +10,9 @@ import (
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
-	"github.com/rsms/gotalk"
+	"github.com/mephux/gotalk"
 )
 
 var (
@@ -51,7 +52,7 @@ func WebSocketSend(name string, in interface{}) {
 // handlerFunc adapts a function to an http.Handler.
 type handlerFunc func(http.ResponseWriter, *http.Request) error
 
-var store = sessions.NewCookieStore([]byte("something-very-secret"))
+var store = sessions.NewCookieStore(securecookie.GenerateRandomKey(32))
 
 func NewWebServer(webPort int, server *Server) {
 	r := mux.NewRouter()
@@ -121,8 +122,10 @@ func NewWebServer(webPort int, server *Server) {
 
 	if DEV_MODE {
 		// dev
+		Log.Debugf("Loading assets from disk.")
 		r.PathPrefix("/public/").Handler(http.FileServer(http.Dir("./web/")))
 	} else {
+		Log.Debugf("Loading assets from memory.")
 		r.PathPrefix("/public/").Handler(http.FileServer(
 			&assetfs.AssetFS{
 				Asset:    Asset,
@@ -133,6 +136,7 @@ func NewWebServer(webPort int, server *Server) {
 	}
 
 	r.Handle("/", handlerFunc(RouteIndex))
+	r.Handle("/login", handlerFunc(RouteLogin))
 	r.Handle("/query/save", handlerFunc(RouteSaveQuery))
 	r.Handle("/query/delete", handlerFunc(RouteDeleteQuery))
 	r.Handle("/api/v1/nodes", handlerFunc(RouteNodes))
@@ -151,11 +155,7 @@ func NewWebServer(webPort int, server *Server) {
 
 	Log.Infof("HTTP Server: %s://%s%s", proto, "127.0.0.1", port)
 
-	if SSL {
-		err = http.ListenAndServeTLS(port, DefaultPublicKeyPath, DefaultPrivateKeyPath, context.ClearHandler(http.DefaultServeMux))
-	} else {
-		err = http.ListenAndServe(port, context.ClearHandler(http.DefaultServeMux))
-	}
+	err = http.ListenAndServeTLS(port, DefaultPublicKeyPath, DefaultPrivateKeyPath, context.ClearHandler(http.DefaultServeMux))
 
 	if err != nil {
 		Log.Error(err.Error())
@@ -163,19 +163,32 @@ func NewWebServer(webPort int, server *Server) {
 }
 
 func (f handlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	Log.Debugf("HTTP: %s %s", r.Method, r.URL)
 
-	// session, _ := store.Get(r, "envdb")
+	session, err := store.Get(r, "envdb")
 
-	// if session.Values["current_user"] == nil {
-	// http.Redirect(w, r, "/login", 301)
-	// return
-	// }
+	if err != nil {
+		Log.Debug(err)
+	}
 
-	// if err := session.Save(r, w); err != nil {
-	// Log.Fatal(err)
-	// }
+	if session.IsNew {
+		Log.Debug("Create New Session (cookie)")
 
-	err := f(w, r)
+		session.Options.Secure = true
+
+		if err := session.Save(r, w); err != nil {
+			Log.Fatal(err)
+		}
+	}
+
+	if r.URL.String() != "/login" {
+		if session.Values["current_user"] == nil {
+			http.Redirect(w, r, "/login", 301)
+			return
+		}
+	}
+
+	err = f(w, r)
 
 	if err != nil {
 		Log.Fatal(err)

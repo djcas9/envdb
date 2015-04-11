@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
@@ -34,6 +35,7 @@ type ServerConfig struct {
 	LogPath    string
 	PublicKey  string
 	PrivateKey string
+	Cert       tls.Certificate
 }
 
 func NewServerConfig() (*ServerConfig, error) {
@@ -70,15 +72,21 @@ func NewServerConfig() (*ServerConfig, error) {
 	config.StorePath = DefaultStorePath
 	config.LogPath = DefaultLogPath
 
-	if SSL {
-		if !IsExist(DefaultPrivateKeyPath) || !IsExist(DefaultPublicKeyPath) {
-			err := NewKeyPair()
+	if !IsExist(DefaultPrivateKeyPath) || !IsExist(DefaultPublicKeyPath) {
+		err := NewKeyPair()
 
-			if err != nil {
-				os.Exit(-1)
-			}
+		if err != nil {
+			os.Exit(-1)
 		}
 	}
+
+	cert, err := tls.LoadX509KeyPair(DefaultPublicKeyPath, DefaultPrivateKeyPath)
+
+	if err != nil {
+		log.Fatalf("server: loadkeys: %s", err)
+	}
+
+	config.Cert = cert
 
 	return config, err
 }

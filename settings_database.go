@@ -1,8 +1,8 @@
 package main
 
 type SettingsDb struct {
-	Id               int64
-	LoadSavedQueries bool
+	Id    int64
+	Setup bool
 }
 
 func DbSettings() (*SettingsDb, error) {

@@ -1,295 +1,274 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title><%.Name%> <% .Version %></title>
+<% define "body" %>
+<body class="main">
+  <div id="wrapper">
 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <div id="sidebar">
+      <div class="logo">
+        <i class="fa fa-cogs settings-icon"></i>
 
-    <script type="text/javascript" src="/gotalk/gotalk.js"></script>
-    <script type="text/javascript" src="/public/js/jquery.js"></script>
-    <script type="text/javascript" src="/public/js/handlebars.js"></script>
-    <script type="text/javascript" src="/public/js/ace.js"></script>
-    <script type="text/javascript" src="/public/js/ace-sql.js"></script>
-    <script type="text/javascript" src="/public/js/ace-theme.js"></script>
-    <script type="text/javascript" src="/public/js/ace-tools.js"></script>
-    <script type="text/javascript" src="/public/js/pace.js"></script>
-    <script type="text/javascript" src="/public/js/list.js"></script>
-    <script type="text/javascript" src="/public/js/dataTables.js"></script>
-    <script type="text/javascript" src="/public/js/dataTables-fixedheader.js"></script>
-    <script type="text/javascript" src="/public/js/csv.js"></script>
-    <script type="text/javascript" src="/public/js/limp.js"></script>
-    <script type="text/javascript" src="/public/js/<% .Name %>.js"></script>
-
-    <link rel="stylesheet" href="/public/css/grid.css">
-    <link rel="stylesheet" href="/public/css/font-awesome.css">
-    <link rel="stylesheet" href="/public/css/fonts.css">
-    <link rel="stylesheet" href="/public/css/<% .Name %>.css">
-
-    <link rel="shortcut icon" href="favicon.png" />
-  </head>
-  <body>
-
-    <div id="wrapper">
-
-      <div id="sidebar">
-        <div class="logo">
-          <i class="fa fa-cogs settings-icon"></i>
-
-          <a href="/">
-            <span class="name">
-              <i style="font-size:0.9em;margin-right:5px;" class="fa fa-database"></i>
-              Env<strong>DB</strong>
-            </span>
-            <span class="version">v<% .Version %></span>
-          </a>
-        </div>
-
-        <div class="nodes-filter">
-          <i class="fa fa-search search-icon"></i>
-          <input placeholder="Filter Nodes" id="nodes-filter" class="search" type="text">
-        </div>
-
-        <ul id="nodes" class="list">
-          <% range .Nodes %>
-          <li class="node <% if .Online %>online<% else %>offline<% end %>" data-id="<% .Id %>" data-node-id="<% .NodeId %>">
-
-            <i class="fa fa-circle status-icon"></i>
-
-            <div class="node-header">
-              <span class="node-name"><% .Name %></span>
-            </div>
-
-            <div class="node-metadata">
-              <span class="node-node-id"><% .Ip %> / <% .Hostname %></span>
-            </div>
-
-
-          </li>
-          <% end %>
-        </ul>
-
-        <div class="sidebar-footer">
-          <% .Name %> v<% .Version %> by Dustin Willis Webber
-        </div>
+        <a href="/">
+          <span class="name">
+            <i style="font-size:0.9em;margin-right:5px;" class="fa fa-database"></i>
+            Env<strong>DB</strong>
+          </span>
+          <span class="version">v<% .Version %></span>
+        </a>
       </div>
 
-      <div id="header">
-        <div class="title">Query All Nodes</div>
+      <div class="nodes-filter">
+        <i class="fa fa-search search-icon"></i>
+        <input placeholder="Filter Nodes" id="nodes-filter" class="search" type="text">
       </div>
 
-      <div id="envdb-query">
-        <div id="editor"></div>
+      <ul id="nodes" class="list">
+        <% range .Nodes %>
+        <li class="node <% if .Online %>online<% else %>offline<% end %>" data-id="<% .Id %>" data-node-id="<% .NodeId %>">
 
-        <div class="envdb-control">
+          <i class="fa fa-circle status-icon"></i>
 
-          <div id="flash-message" class="error">
-            <span class="success">Query successfully saved.</span>
+          <div class="node-header">
+            <span class="node-name"><% .Name %></span>
           </div>
 
-          <a href="#" class="button action run-query">Run Query</a>
-          <a href="#" class="button export-results">Export</a>
-
-          <div class="table-filter">
-            <i class="fa fa-search search-icon"></i>
-            <input placeholder="Filter Results" id="table-filter-input" type="text" name="table-filter">
+          <div class="node-metadata">
+            <span class="node-node-id"><% .Ip %> / <% .Hostname %></span>
           </div>
 
-          <a href="#" class="load-query button right save">Load</a>
-          <a href="#" class="save-query button right save">Save</a>
-        </div>
-      </div>
 
-      <div id="content">
-        <div id="tables"></div>
-        <div class="wrapper">
+        </li>
+        <% end %>
+      </ul>
 
-        </div>
+      <div class="sidebar-footer">
+        <% .Name %> v<% .Version %> by Dustin Willis Webber
       </div>
     </div>
 
-    <script id="query-results-table" type="text/x-handlebars-template">
-      <table class="query-results">
-      <thead>
-      <tr>
-      {{#unless hideNode}}
-      <th data-name="node-name">
-      node
-      </th>
-      {{/unless}}
+    <div id="header">
+      <div class="title">Query All Nodes</div>
 
-      {{#each results}}
-      <th data-name="{{@key}}">
-      {{@key}}
-      </th>
-      {{/each}}
-      </tr>
-      </thead>
-      <tbody>
-      </tbody>
-      </table>
-    </script>
-
-    <script id="node-template" type="text/x-handlebars-template">
-      <li class="node {{#if online}}online{{else}}offline{{/if}}" data-node-id="{{id}}">
-
-      <i class="fa fa-circle status-icon"></i>
-
-      <div class="node-header">
-      <span class="node-name">{{name}}</span>
+      <div id="user-control">
+        <img height="20px" width="20px" class="avatar-30" src="<% .User.AvatarLink %>" alt="user-avatar" />
+        <span class="user-name">
+          <% .User.Name %>
+        </span>
+        |
+        <a href="#" class='logout'>
+          <i class="fa fa-sign-out"></i>
+          Logout
+        </a>
       </div>
+    </div>
 
-      <div class="node-metadata">
-      <span class="node-node-id">{{ip}}/ {{hostname}}</span>
+    <div id="envdb-query">
+      <div id="editor"></div>
+
+      <div class="envdb-control">
+
+        <div id="flash-message" class="error">
+          <span class="success">Query successfully saved.</span>
+        </div>
+
+        <a href="#" class="button action run-query">Run Query</a>
+        <a href="#" class="button export-results">Export</a>
+
+        <div class="table-filter">
+          <i class="fa fa-search search-icon"></i>
+          <input placeholder="Filter Results" id="table-filter-input" type="text" name="table-filter">
+        </div>
+
+        <a href="#" class="load-query button right save">Load</a>
+        <a href="#" class="save-query button right save">Save</a>
       </div>
+    </div>
 
+    <div id="content">
+      <div id="tables"></div>
+      <div class="wrapper">
 
-      </li>
-    </script>
-
-    <script id="tables-template" type="text/x-handlebars-template">
-      <div id="node-tables">
-
-      <div class="title">
-      Tables
       </div>
+    </div>
+  </div>
 
-      <ul class="tables">
-      {{#each this}}
-      <li data-table-name="{{this}}">
+  <script id="query-results-table" type="text/x-handlebars-template">
+    <table class="query-results">
+    <thead>
+    <tr>
+    {{#unless hideNode}}
+    <th data-name="node-name">
+    node
+    </th>
+    {{/unless}}
+
+    {{#each results}}
+    <th data-name="{{@key}}">
+    {{@key}}
+    </th>
+    {{/each}}
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    </table>
+  </script>
+
+  <script id="node-template" type="text/x-handlebars-template">
+    <li class="node {{#if online}}online{{else}}offline{{/if}}" data-node-id="{{id}}">
+
+    <i class="fa fa-circle status-icon"></i>
+
+    <div class="node-header">
+    <span class="node-name">{{name}}</span>
+    </div>
+
+    <div class="node-metadata">
+    <span class="node-node-id">{{ip}}/ {{hostname}}</span>
+    </div>
+
+
+    </li>
+  </script>
+
+  <script id="tables-template" type="text/x-handlebars-template">
+    <div id="node-tables">
+
+    <div class="title">
+    Tables
+    </div>
+
+    <ul class="tables">
+    {{#each this}}
+    <li data-table-name="{{this}}">
+    {{this}}
+    </li>
+    {{/each}}
+    </ul>
+    </div>
+  </script>
+
+
+  <script id="query-results-row" type="text/x-handlebars-template">
+    {{#each results}}
+    <tr class="row">
+
+    {{#unless ../hideNode}}
+    <td data-name="node-name">
+    <strong>{{../../name}}</strong> ({{../../hostname}})
+    </td>
+    {{/unless}}
+
+    {{#each this}}
+    <td data-name="{{@key}}" title="{{this}}">
+    {{#if this}}
       {{this}}
-      </li>
-      {{/each}}
-      </ul>
-      </div>
-    </script>
+    {{else}}
+      --
+      {{/if}}
+    </td>
+    {{/each}}
+    </tr>
+    {{/each}}
+  </script>
 
+  <script id="save-query-template" type="text/x-handlebars-template">
+    <div class="lbox">
 
-    <script id="query-results-row" type="text/x-handlebars-template">
-      {{#each results}}
-      <tr class="row">
+    <div class='lbox-title'>
+    <div class='fa fa-edit'></div>
+    Save Query
+    </div>
 
-      {{#unless ../hideNode}}
-      <td data-name="node-name">
-      <strong>{{../../name}}</strong> ({{../../hostname}})
-      </td>
-      {{/unless}}
+    <div class="panel-content">
+    <div class="field">
+    <label class="req" for="save-query-name">Query Name</label>
+      <input placeholder="My Query" id="save-query-name" type="text" name="save-query-name" required>
+    </div>
+    <div class="field last">
+    <label class="left" for="description">Query</label>
+      <div id="save-query-editor"></div>
+    </div>
+    </div>
 
-      {{#each this}}
-      <td data-name="{{@key}}" title="{{this}}">
-      {{#if this}}
-        {{this}}
-      {{else}}
-        --
-        {{/if}}
-      </td>
-      {{/each}}
-      </tr>
-      {{/each}}
-    </script>
+    <div class="lbox-footer">
 
-    <script id="save-query-template" type="text/x-handlebars-template">
-      <div class="lbox">
+    <div class='form-actions'>
+    <a class='button action add limp-action'>Save Query</a>
+    <a class='button save' onClick='$.limpClose();return false;'>Cancel</a>
+    </div>
 
-        <div class='lbox-title'>
-          <div class='fa fa-edit'></div>
-          Save Query
-        </div>
+    </div>
+    </div>
+  </script>
 
-        <div class="panel-content">
-          <div class="field">
-            <label class="req" for="save-query-name">Query Name</label>
-            <input placeholder="My Query" id="save-query-name" type="text" name="save-query-name" required>
-          </div>
-          <div class="field last">
-            <label class="left" for="description">Query</label>
-              <div id="save-query-editor"></div>
-          </div>
-        </div>
+  <script id="load-query-template" type="text/x-handlebars-template">
+    <div id="load-query-select" class="lbox">
 
-        <div class="lbox-footer">
+    <div class='lbox-title'>
+    <div class='fa fa-edit'></div>
+    Load Query
+    </div>
 
-          <div class='form-actions'>
-            <a class='button action add limp-action'>Save Query</a>
-            <a class='button save' onClick='$.limpClose();return false;'>Cancel</a>
-          </div>
+    <div class="panel-content">
+    <div class="field">
+    <label class="req" for="search">Filter</label>
+      <input class="search" placeholder="Filter Queries" type="text" name="search">
+    </div>
+    <div class="field last queries">
+    <ul id="queries" class="list">
+    {{#each this}}
+    <li data-query-id="{{id}}" data-query-type="{{Type}}">
+    <div class="name">{{Name}}</div>
+    <div title="{{Query}}" class="query">{{Query}}</div>
 
-        </div>
-      </div>
-    </script>
+    <a class="load-saved-query button action" href="#">Load</a>
+    <a class="delete-saved-query button warning" href="#">
+    <i class="fa fa-trash"></i>
+    </a>
+    </li>
+    {{/each}}
+    </ul>
+    </div>
+    </div>
 
-    <script id="load-query-template" type="text/x-handlebars-template">
-      <div id="load-query-select" class="lbox">
+    <div class="lbox-footer">
+    <div class='form-actions'>
+    <a class='button save' onClick='$.limpClose();return false;'>Cancel</a>
+    </div>
+    </div>
+    </div>
+  </script>
 
-        <div class='lbox-title'>
-          <div class='fa fa-edit'></div>
-          Load Query
-        </div>
+  <script id="node-context-menu-template" type="text/x-handlebars-template">
+    <ul class="custom-menu">
+    <li>
+    <a href="#" class="disconnect-node">Disconnect Node</a>
+    </li>
+    <li>
+    <a href="#" class="delete-node">Delete Node</a>
+    </li>
+    </ul>
+  </script>
 
-        <div class="panel-content">
-          <div class="field">
-            <label class="req" for="search">Filter</label>
-            <input class="search" placeholder="Filter Queries" type="text" name="search">
-          </div>
-          <div class="field last queries">
-            <ul id="queries" class="list">
-            {{#each this}}
-              <li data-query-id="{{id}}" data-query-type="{{Type}}">
-                <div class="name">{{Name}}</div>
-                <div title="{{Query}}" class="query">{{Query}}</div>
+  <script id="confirm-template" type="text/x-handlebars-template">
+    <div class="lbox">
 
-                <a class="load-saved-query button action" href="#">Load</a>
-                <a class="delete-saved-query button warning" href="#">
-                  <i class="fa fa-trash"></i>
-                </a>
-              </li>
-              {{/each}}
-            </ul>
-          </div>
-        </div>
+    <div class='lbox-title'>
+    <div class='fa {{icon}}'></div>
+    {{title}}
+    </div>
 
-        <div class="lbox-footer">
-          <div class='form-actions'>
-            <a class='button save' onClick='$.limpClose();return false;'>Cancel</a>
-          </div>
-        </div>
-      </div>
-    </script>
+    <div class="lbox-content">
+    {{message}}
+    </div>
 
+    <div class="lbox-footer">
+    <div class='form-actions'>
+    <a class='button warning warning limp-action'>{{buttonTitle}}</a>
+    <a class='button' onClick='$.limpClose();return false;'>Cancel</a>
+    </div>
+    </div>
 
-    <script id="node-context-menu-template" type="text/x-handlebars-template">
-      <ul class="custom-menu">
-        <li>
-          <a href="#" class="disconnect-node">Disconnect Node</a>
-        </li>
-        <li>
-          <a href="#" class="delete-node">Delete Node</a>
-        </li>
-      </ul>
-    </script>
-
-    <script id="confirm-template" type="text/x-handlebars-template">
-      <div class="lbox">
-
-        <div class='lbox-title'>
-          <div class='fa {{icon}}'></div>
-          {{title}}
-        </div>
-
-        <div class="lbox-content">
-          {{message}}
-        </div>
-
-        <div class="lbox-footer">
-          <div class='form-actions'>
-            <a class='button warning warning limp-action'>{{buttonTitle}}</a>
-            <a class='button' onClick='$.limpClose();return false;'>Cancel</a>
-          </div>
-        </div>
-
-      </div>
-    </script>
-
-  </body>
-</html>
+    </div>
+  </script>
+</body>
+<% end %>

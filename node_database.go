@@ -88,7 +88,7 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 		return find, nil
 	}
 
-	Log.Warnf("Error: %s", err)
+	Log.Debugf("Error: %s", err)
 
 	Log.Debugf("Creating a new record.")
 

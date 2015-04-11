@@ -786,4 +786,15 @@ jQuery(document).ready(function($) {
     }
   });
 
+  $(document).on("click", "a.logout", function(e) {
+    e.preventDefault();
+    $.ajax({
+      url: "/login",
+      type: "DELETE",
+      success: function() {
+        window.location = "/login";
+      }
+    })
+  });
+
 });

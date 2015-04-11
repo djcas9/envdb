@@ -117,6 +117,21 @@ html, body {
 
 }
 
+body.login {
+  background: url(../images/login-bg.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
 #wrapper{
   overflow-x: hidden;
   overflow-y: hidden;
@@ -128,6 +143,10 @@ html, body {
   left: 0;
   right: 0;
   
+}
+
+body.login #wrapper {
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 #sidebar {
@@ -456,7 +475,7 @@ border-radius: 100px;
   margin-right: 5px;
 }
 
-a.button{
+.button{
   cursor: pointer;
   float: left;
   opacity: 1;
@@ -480,41 +499,44 @@ a.button{
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+
+    outline: none;
+    border: none;
 }
 
-a.button i{
+.button i{
   padding: 0;
   margin: 0;
   margin-right: -3px;
 }
 
-a.button.disabled{
+.button.disabled{
   cursor: none;
   opacity: 0.5;
   pointer-events: none;
 }
 
-a.button.warning{
+.button.warning{
   background-color: #E00D0D;
 }
 
-a.button.warning:hover{
+.button.warning:hover{
   background-color: #FF0000;
 }
 
-a.button.action{
+.button.action{
   background-color: #51BA3A;
 }
 
-a.button.action:hover{
+.button.action:hover{
   background-color: #5BCF42;
 }
 
-a.button.save{
+.button.save{
   background-color: #4E8EF7;
 }
 
-a.button.save:hover{
+.button.save:hover{
   background-color: #70A4F9;
 }
 
@@ -1278,4 +1300,98 @@ ul#queries li div.query{
   text-decoration: none;
   color: #000;
   font-size: 0.9em;
+}
+
+#user-control{
+  height: 35px;
+  line-height: 35px;
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 10px;
+  font-size: 0.9em;
+}
+
+#user-control span{
+}
+
+#user-control a{
+  color: #000;
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+#user-control a i{
+  margin-right: 2px;
+}
+
+#user-control img{
+  display: inline-block;
+  position: relative;
+  top: 5px;
+  margin-right: 5px;
+
+border-radius: 100px; 
+-moz-border-radius: 100px; 
+-webkit-border-radius: 100px; 
+}
+
+body.login label{
+  top: 13px;
+  color: #fff;
+  width: 60px;
+}
+
+body.login #login{
+  display: none;
+  opacity:0;
+  padding-top: 20px;
+  width: 500px;
+  height: 400px;
+  position:absolute;
+  left:50%;
+  top:50%;
+  margin:-200px 0 0 -250px
+}
+
+
+body.login #login .logo{
+  /* text-align: center; */
+  color: #fff;
+  margin-bottom: -15px;
+}
+
+body.login #login input[type="text"],
+body.login #login input[type="password"]{
+  padding: 12px;
+  font-size: 1.2em;
+  opacity: 1;
+
+  /* background-color: rgba(0, 0, 0, 0.55); */
+  border-color: rgba(255, 255, 255, 0.2);
+  /* color: #fff; */
+}
+
+body.login #login input[type="text"]:focus,
+body.login #login input[type="password"]:focus{
+  opacity: 1;
+}
+
+body.login #login .logo span.name{
+  font-size: 6.0em;
+  font-weight: 300;
+}
+
+body.login #login .logo span.name strong{
+  font-weight: 100;
+}
+
+body.login #login .logo span.version{
+  font-size: 1.0em;
+  font-weight: 300;
+}
+
+body.login input[type="submit"]{
+  margin-left: 122px;
+  padding: 15px;
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"os"
@@ -8,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rsms/gotalk"
+	"github.com/mephux/gotalk"
 )
 
 type NodeData struct {
@@ -129,7 +130,7 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			dbNode, err := NodeUpdateOrCreate(node)
 
 			if err != nil {
-				Log.Error("unable update node record")
+				Log.Error("unable to update node record")
 				Log.Error("Error: ", err)
 			}
 
@@ -314,7 +315,10 @@ func (self *Server) Run(webPort int) error {
 		Log.Infof("Output %s: %s", name, string(b))
 	})
 
-	s, err := gotalk.Listen("tcp", fmt.Sprintf(":%d", self.Port))
+	s, err := gotalk.Listen("tcp", fmt.Sprintf(":%d", self.Port), &tls.Config{
+		Certificates: []tls.Certificate{self.Config.Cert},
+		ClientAuth:   tls.NoClientCert,
+	})
 
 	if err != nil {
 		return err

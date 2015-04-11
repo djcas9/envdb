@@ -1,0 +1,49 @@
+<% define "body" %>
+<body class="login">
+
+  <div id="wrapper">
+
+    <div id="login">
+
+      <div class="logo">
+        <span class="name">
+          <i style="font-size:0.9em;margin-right:5px;" class="fa fa-database"></i>
+          Env<strong>DB</strong>
+        </span>
+        <span class="version">v<% .Version %></span>
+      </div>
+
+      <form action="/login" method="post" accept-charset="utf-8">
+
+        <div class="panel-content">
+          <div class="field">
+            <label class="req" for="email">Email</label>
+            <input placeholder="admin@envdb.io" id="user-email" name="email" type="text">
+          </div>
+
+          <div class="field">
+            <label class="req" for="password">Password</label>
+            <input placeholder="Password" id="user-password" name="password" type="password">
+          </div>
+        </div>
+
+        <p>
+          <input class="button action" type="submit" value="Welcome, Login to get started.">
+        </p>
+      </form>
+
+
+    </div>
+
+  </div>
+
+  <script>
+    $("#login").show().stop().animate({
+      opacity: 1,
+    }, 2000, function() {
+      $("#user-email").focus();
+    });
+  </script>
+
+</body>
+<% end %>

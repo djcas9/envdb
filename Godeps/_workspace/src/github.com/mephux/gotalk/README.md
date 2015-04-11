@@ -225,7 +225,7 @@ Here's a complete description of the protocol:
     ProtocolVersion = <hexdigit> <hexdigit>
 
     SingleRequest   = "r" requestID operation payload
-    StreamRequest   = "s" requestID operation payload StreamReqPart+
+    StreamRequest   = "s" requestID operation payload StreamReqPart*
     StreamReqPart   = "p" requestID payload
     SingleResult    = "R" requestID payload
     StreamResult    = "S" requestID payload StreamResult*
@@ -248,7 +248,7 @@ Here's a complete description of the protocol:
     text3Size       = hexUInt3
     text3Value      = <<byte>{text3Size} as utf8 text>
 
-    payload         = payloadSize payloadData?
+    payload         = payloadSize payloadData
     payloadSize     = hexUInt8
     payloadData     = <byte>{payloadSize}
 
