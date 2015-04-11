@@ -57,7 +57,7 @@ Building on macosx is easy tho, checkout the section below.
     * username: **admin@envdb.io**
     * password: **envdb**
 
-  ```
+```
 usage: envdb [<flags>] <command> [<flags>] [<args> ...]
 
 The Environment Database - SELECT * FROM awesome;
@@ -78,7 +78,7 @@ Commands:
 
   node --server=127.0.0.1 [<flags>] <node-name>
     Register a new node.
-  ```
+```
 
   * Server
 
