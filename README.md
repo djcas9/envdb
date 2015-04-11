@@ -4,7 +4,7 @@
 
 * NOTE: envdb is still beta software.
 
-<img style="float:left;" height="244px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb.gif?token=AABXAYgKkzBNt0LlqD4LsRb9kpvnzp1aks5VKIX0wA%3D%3D">
+<img style="float:left;" height="244px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb.gif">
 
 Envdb turns your production, dev, cloud, etc environments into a database 
 cluster you can search using [osquery](https://github.com/facebook/osquery) as the foundation.
@@ -94,11 +94,11 @@ Commands:
 
 # More UI
 
-<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-1.png?token=AABXAWJKIKgF-jy_wKmaxnhuD2snsbO0ks5VKH-fwA%3D%3D">
+<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-1.png">
 
-<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-2.png?token=AABXAcgvqnqiFViMFULsVUrfC2FWRjhwks5VKH_AwA%3D%3D">
+<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-2.png">
 
-<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-3.png?token=AABXAQeDVrKIbzu08PHKroPiltQJ6z3cks5VKH_KwA%3D%3D">
+<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-3.png">
 
 ## Self-Promotion
 
