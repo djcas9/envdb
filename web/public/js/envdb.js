@@ -180,7 +180,7 @@ var Envdb = {
 
       $("#content").removeClass("node-view");
       $("#node-tables").remove();
-      $(".save-query, .load-query").addClass("disabled");
+      // $(".save-query, .load-query").addClass("disabled");
       $('.table-filter').addClass("node-view");
       $(".table-filter").show().find("input").val("");
       $("#content").css("left", 460);
@@ -190,7 +190,7 @@ var Envdb = {
       this.clean();
       $("#header .title").text("Query All Nodes");
       $("a.run-query").text("Run Query");
-      $(".save-query, .load-query").removeClass("disabled");
+      // $(".save-query, .load-query").removeClass("disabled");
       $('.table-filter').removeClass("node-view");
       $(".table-filter").hide().find("input").val("");
       $("#content").css("left", 230);
@@ -507,6 +507,7 @@ var Envdb = {
       }
 
       var table = null;
+      var count = 0
 
       if (results && results.length > 0) {
 
@@ -540,6 +541,25 @@ var Envdb = {
           var row = Envdb.Templates.row(data)
           $("table.query-results tbody").append(row);
 
+          count++;
+        }
+
+        if (count <= 0) {
+          if (Envdb.fixedTable) {
+            Envdb.fixedTable._fnDestroy();
+            Envdb.fixedTable = false;
+          }
+
+          if (Envdb.table) {
+            Envdb.table.destroy();
+            Envdb.table = false;
+          }
+
+          Envdb.Loading.done()
+          Envdb.Flash.error("No results found.");
+
+          $("#content .wrapper").html("");
+          return
         }
 
         Envdb.table = $("table.query-results")

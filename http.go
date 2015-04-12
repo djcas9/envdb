@@ -69,7 +69,8 @@ func NewWebServer(webPort int, server *Server) {
 		if len(data) != 1 {
 			d := QueryResults{}
 
-			return d, errors.New(fmt.Sprintf("Node not found for id (%s).", sql.Id))
+			err := errors.New(fmt.Sprintf("Node not found for id (%s).", sql.Id))
+			return d, err
 		}
 
 		tables = strings.Split(data[0].Results.(string), "\n")
@@ -94,7 +95,8 @@ func NewWebServer(webPort int, server *Server) {
 		if len(data) != 1 {
 			d := QueryResults{}
 
-			return d, errors.New(fmt.Sprintf("Node not found for id (%s).", sql.Id))
+			err := errors.New(fmt.Sprintf("Node not found for id (%s).", sql.Id))
+			return d, err
 		}
 
 		return data[0], nil

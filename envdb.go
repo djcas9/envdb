@@ -14,7 +14,7 @@ import (
 
 const (
 	Name    = "envdb"
-	Version = "0.2.1"
+	Version = "0.2.2"
 
 	DefaultServerPort    = 3636
 	DefaultWebServerPort = 8080
@@ -30,8 +30,7 @@ var (
 
 	server = app.Command("server", "Start the tcp server for node connections.")
 	// serverConfig = server.Flag("config", "Server configuration file.").File()
-	serverPort = server.Flag("port", "Port for the server to listen on.").PlaceHolder(fmt.Sprintf("%d", DefaultServerPort)).Int()
-
+	serverPort    = server.Flag("port", "Port for the server to listen on.").PlaceHolder(fmt.Sprintf("%d", DefaultServerPort)).Int()
 	serverWebPort = server.Flag("http-port", "Port for the web server to listen on.").PlaceHolder(fmt.Sprintf("%d", DefaultWebServerPort)).Int()
 
 	node = app.Command("node", "Register a new node.")
