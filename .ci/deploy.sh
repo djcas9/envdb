@@ -19,11 +19,11 @@ if [ "$DRONE_BRANCH" = "$BRANCH" ] && [ "$DRONE_PR" != "true" ]; then
 
   if [ "$YANK_OLD_VERSIONS" = true ]; then
 
-    # package_cloud yank $PREFIX/ubuntu/lucid   $DEB
-    # package_cloud yank $PREFIX/ubuntu/hardy   $DEB
-    # package_cloud yank $PREFIX/ubuntu/utopic  $DEB
-    # package_cloud yank $PREFIX/ubuntu/precise $DEB
-    # package_cloud yank $PREFIX/ubuntu/trusty  $DEB
+    package_cloud yank $PREFIX/ubuntu/lucid   $DEB
+    package_cloud yank $PREFIX/ubuntu/hardy   $DEB
+    package_cloud yank $PREFIX/ubuntu/utopic  $DEB
+    package_cloud yank $PREFIX/ubuntu/precise $DEB
+    package_cloud yank $PREFIX/ubuntu/trusty  $DEB
 
     package_cloud yank $PREFIX/ubuntu/lucid   $DEB386
     package_cloud yank $PREFIX/ubuntu/hardy   $DEB386
