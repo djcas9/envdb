@@ -59,7 +59,7 @@ gox:
 	@CGO_ENABLED=1 GOPATH=$(shell godep path) gox -ldflags "-s" -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
 	@rm -rf Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
 
-release: clean all gox setup package
+release: clean all test gox setup package
 	@echo $(VERSION) > .Version
 	@for os in $(CCOS); do \
 		for arch in $(CCARCH); do \

@@ -4,8 +4,7 @@ git:
   branches:
     - master
 script:
-  - make
-  - make test
+  - make release
   - ./.ci/deploy.sh
 notify:
   email:
@@ -15,7 +14,6 @@ publish:
   github:
     branch: master
     script:
-      - make release
     artifacts:
       - release
     tag: v$(cat .Version)
