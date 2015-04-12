@@ -4,7 +4,7 @@ set -e
 NAME="envdb"
 BRANCH="master"
 
-VERSION=$(cat ${NAME}.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
+VERSION=$(cat ${NAME}.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$)")
 YANK_OLD_VERSIONS=true
 
 PREFIX="mephux/$NAME"
