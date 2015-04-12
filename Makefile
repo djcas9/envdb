@@ -1,4 +1,6 @@
 NAME="envdb"
+DESCRIPTION="Ask your environment questions"
+WEBSITE="http://envdb.io"
 
 VERSION=$(shell cat $(NAME).go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
 CWD=$(shell pwd)
@@ -48,17 +50,16 @@ test:
 	godep go test ./...
 
 goxBuild:
-	@CGO_ENABLED=1 GOOS=linux GOARCH=amd64 gox -os="$(CCOS)" -arch="$(CCARCH)" -build-toolchain
+	@CGO_ENABLED=1 gox -os="$(CCOS)" -arch="$(CCARCH)" -build-toolchain
 
 gox: 
 	@$(ECHO) "$(OK_COLOR)==> Cross Compiling $(NAME)$(NO_COLOR)"
 	@mkdir -p Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
 	@cp -R *.go Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
-	@CGO_ENABLED=1 GOOS=linux GOARCH=amd64 GOPATH=$(shell godep path) gox -ldflags "-s" -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
+	@CGO_ENABLED=1 GOPATH=$(shell godep path) gox -ldflags "-s" -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
 	@rm -rf Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
 
-release: clean all gox
-	@mkdir -p release/
+release: clean all gox setup package
 	@echo $(VERSION) > .Version
 	@for os in $(CCOS); do \
 		for arch in $(CCARCH); do \
@@ -77,6 +78,39 @@ clean:
 	@rm -rf bin/
 	@rm -rf pkg/
 	@rm -rf release/
+	@rm -rf package/
+
+setup:
+	@$(ECHO) "$(OK_COLOR)==> Building Packages $(NAME)$(NO_COLOR)"
+	@mkdir -p package/root/usr/bin
+	@cp -R bin/$(NAME) package/root/usr/bin
+	@mkdir -p release/
+
+package: deb386 debamd64
+
+debamd64:
+	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p release/$(NAME)-amd64.deb \
+		--deb-priority optional --category admin \
+		--force \
+		--deb-compression bzip2 \
+		--url $(WEBSITE) \
+		--description $(DESCRIPTION) \
+		-m "Dustin Webber <dustin.webber@gmail.com>" \
+		--vendor "Dustin Willis Webber" -a amd64 \
+		--exclude */**.gitkeep \
+		package/root/=/
+
+deb386:
+	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p release/$(NAME)-386.deb \
+		--deb-priority optional --category admin \
+		--force \
+		--deb-compression bzip2 \
+		--url $(WEBSITE) \
+		--description $(DESCRIPTION) \
+		-m "Dustin Webber <dustin.webber@gmail.com>" \
+		--vendor "Dustin Willis Webber" -a 386 \
+		--exclude */**.gitkeep \
+		package/root/=/
 
 install: clean all
 

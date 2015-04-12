@@ -6,6 +6,7 @@ git:
 script:
   - make
   - make test
+  - ./.ci/deploy.sh
 notify:
   email:
     recipients:
