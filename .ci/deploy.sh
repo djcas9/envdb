@@ -5,8 +5,8 @@ NAME="envdb"
 BRANCH="master"
 
 VERSION=$(cat ${NAME}.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$)")
-OLD_VERSION=$VERSION
-YANK_OLD_VERSIONS=false
+OLD_VERSION="0.2.0"
+YANK_OLD_VERSIONS=true
 
 PREFIX="mephux/$NAME"
 RELEASE_PATH="release"

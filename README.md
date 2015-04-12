@@ -40,6 +40,13 @@ Pre-built versions of envdb are avaliable for linux 386/amd64.
 
 Building on macosx is easy tho, checkout the section below.
 
+## apt-get
+  
+  `curl https://packagecloud.io/install/repositories/mephux/envdb/script.deb | sudo bash`
+  `sudo apt-get install envdb`
+
+  * View all deb packages: [https://packagecloud.io/mephux/envdb](https://packagecloud.io/mephux/envdb)
+
 # Building
 
   Make sure you have Go installed. I used Go version 1.4.1.
