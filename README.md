@@ -67,14 +67,15 @@ Building on macosx is easy tho, checkout the section below.
 ```
 usage: envdb [<flags>] <command> [<flags>] [<args> ...]
 
-The Environment Database - SELECT * FROM awesome;
+The Environment Database - Ask your environment questions
 
 Flags:
   --help       Show help.
   --debug      Enable debug logging.
-  --dev        Enable dev mode. (read assets from disk and enable debug
-               output)
+  --dev        Enable dev mode. (read assets from disk and
+               enable debug output)
   -q, --quiet  Remove all output logging.
+  --version    Show application version.
 
 Commands:
   help [<command>]
@@ -85,19 +86,33 @@ Commands:
 
   node --server=127.0.0.1 [<flags>] <node-name>
     Register a new node.
+
+  users [<flags>]
+    User Management (Default lists all users).
 ```
 
-  * Server
+## Server
 
     `envdb server`
 
     * Note: By default this will start the tcp server on port 3636 and the web server on port 8080.
 
-  * Node Client
+## Node Client
 
     `sudo envdb node --server <ip to server> SomeBoxName`
 
   * That's it - it's really that simple.
+
+## User Management
+
+  * list users
+    `envdb users`
+
+  * add a new user
+    `envdb users --add`
+
+  * remove a new user
+    `envdb users --remove <email>`
 
 # More UI
 
