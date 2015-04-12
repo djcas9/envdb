@@ -5,13 +5,14 @@ NAME="envdb"
 BRANCH="master"
 
 VERSION=$(cat ${NAME}.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$)")
-YANK_OLD_VERSIONS=true
+OLD_VERSION=$VERSION
+YANK_OLD_VERSIONS=false
 
 PREFIX="mephux/$NAME"
 RELEASE_PATH="release"
 
-DEB="${NAME}_${VERSION}_amd64.deb"
-DEB386="${NAME}-${VERSION}_386.deb"
+DEB="${NAME}_${OLD_VERSION}_amd64.deb"
+DEB386="${NAME}-${OLD_VERSION}_386.deb"
 
 if [ "$DRONE_BRANCH" = "$BRANCH" ] && [ "$DRONE_PR" != "true" ]; then
   echo "MASTER BRANCH: Deploying..."
