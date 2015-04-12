@@ -4,7 +4,7 @@ set -e
 NAME="envdb"
 BRANCH="master"
 
-VERSION=$(cat ${NAME}.go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$)")
+VERSION=$(cat .Version)
 OLD_VERSION="0.2.0"
 YANK_OLD_VERSIONS=true
 
@@ -12,18 +12,18 @@ PREFIX="mephux/$NAME"
 RELEASE_PATH="release"
 
 DEB="${NAME}_${OLD_VERSION}_amd64.deb"
-DEB386="${NAME}-${OLD_VERSION}_386.deb"
+DEB386="${NAME}_${OLD_VERSION}_386.deb"
 
 if [ "$DRONE_BRANCH" = "$BRANCH" ] && [ "$DRONE_PR" != "true" ]; then
   echo "MASTER BRANCH: Deploying..."
 
   if [ "$YANK_OLD_VERSIONS" = true ]; then
 
-    package_cloud yank $PREFIX/ubuntu/lucid   $DEB
-    package_cloud yank $PREFIX/ubuntu/hardy   $DEB
-    package_cloud yank $PREFIX/ubuntu/utopic  $DEB
-    package_cloud yank $PREFIX/ubuntu/precise $DEB
-    package_cloud yank $PREFIX/ubuntu/trusty  $DEB
+    # package_cloud yank $PREFIX/ubuntu/lucid   $DEB
+    # package_cloud yank $PREFIX/ubuntu/hardy   $DEB
+    # package_cloud yank $PREFIX/ubuntu/utopic  $DEB
+    # package_cloud yank $PREFIX/ubuntu/precise $DEB
+    # package_cloud yank $PREFIX/ubuntu/trusty  $DEB
 
     package_cloud yank $PREFIX/ubuntu/lucid   $DEB386
     package_cloud yank $PREFIX/ubuntu/hardy   $DEB386

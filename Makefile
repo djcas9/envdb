@@ -60,7 +60,6 @@ gox:
 	@rm -rf Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
 
 release: clean all test gox setup package
-	@echo $(VERSION) > .Version
 	@for os in $(CCOS); do \
 		for arch in $(CCARCH); do \
 			cd pkg/$$os-$$arch/; \
@@ -82,6 +81,7 @@ clean:
 
 setup:
 	@$(ECHO) "$(OK_COLOR)==> Building Packages $(NAME)$(NO_COLOR)"
+	@echo $(VERSION) > .Version
 	@mkdir -p package/root/usr/bin
 	@cp -R bin/$(NAME) package/root/usr/bin
 	@mkdir -p release/
