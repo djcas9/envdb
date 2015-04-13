@@ -20,8 +20,9 @@ type NodeData struct {
 	Socket         *gotalk.Sock `json:"-"`
 	OsQuery        bool
 	OsQueryVersion string
-	Online         bool `json:"online"`
-	PendingDelete  bool `json:"-"`
+	Online         bool   `json:"online"`
+	PendingDelete  bool   `json:"-"`
+	Os             string `json:"os"`
 }
 
 type Server struct {
@@ -113,6 +114,7 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			Ip:             resp.Data["ip"].(string),
 			Hostname:       resp.Data["hostname"].(string),
 			PendingDelete:  false,
+			Os:             resp.Data["os"].(string),
 		}
 
 		self.Nodes[s] = node

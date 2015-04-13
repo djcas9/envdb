@@ -268,12 +268,14 @@ var Envdb = {
     },
     start: function() {
       this.self = Pace.start(this.options);
-      $("#envdb-query, #content").css("opacity", 0.5);
+      $("#content .wrapper").css("opacity", 0.5);
+      $("#content .loading").show();
       // $("#loading").show();
     },
     stop: function() {
       Pace.stop();
-      $("#envdb-query, #content").css("opacity", 1);
+      $("#content .wrapper").css("opacity", 1);
+      $("#content .loading").hide();
       // $("#loading").hide();
     },
     restart: function() {
@@ -281,7 +283,8 @@ var Envdb = {
     },
     done: function() {
       Pace.stop();
-      $("#envdb-query, #content").css("opacity", 1);
+      $("#content .wrapper").css("opacity", 1);
+      $("#content .loading").hide();
       // $("#loading").hide();
     }
   },
@@ -488,10 +491,10 @@ var Envdb = {
     Render: function(results, err, callback) {
 
       if (results && results.length > 0) {
-        if (results[0].error.length > 0) {
+        if (Envdb.Node.current && results[0].error.length > 0) {
           var er = results[0].error;
           if (er === "exit status 1") {
-            Envdb.Flash.error("Query Syntax Error - Check your query and try again.");
+            Envdb.Flash.error("Query syntax error or table does not exist.");
           } else {
             Envdb.Flash.error("Query Error: " + er);
           }
@@ -514,6 +517,11 @@ var Envdb = {
         for (record in results) {
 
           var node = results[record];
+
+          if (node.error.length > 0) {
+            // ignore table missing
+            continue
+          }
 
           node.results = JSON.parse(node.results)
 
