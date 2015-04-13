@@ -62,24 +62,30 @@ func NewServer(port int) (*Server, error) {
 			case sig := <-sigChan:
 				if sig.String() == "interrupt" {
 					Log.Info("Received Interrupt. Exiting.")
-					nodes, _ := AllNodes()
-
-					for _, node := range nodes {
-						node.Online = false
-
-						if err := node.Update(); err != nil {
-							Log.Error("unable to update node record")
-							Log.Error("Error: ", err)
-						}
-					}
-
-					os.Exit(1)
+					server.Shutdown()
 				}
 			}
 		}
 	}()
 
 	return server, nil
+}
+
+func (self *Server) Shutdown() {
+	Log.Infof("%s shutting down.", Name)
+
+	nodes, _ := AllNodes()
+
+	for _, node := range nodes {
+		node.Online = false
+
+		if err := node.Update(); err != nil {
+			Log.Error("unable to update node record")
+			Log.Error("Error: ", err)
+		}
+	}
+
+	os.Exit(1)
 }
 
 func (self *Server) onAccept(s *gotalk.Sock) {

@@ -3,10 +3,13 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
+	"os/signal"
 	"runtime"
 	"strings"
+	"syscall"
 
 	"github.com/howeyc/gopass"
 	"gopkg.in/alecthomas/kingpin.v1"
@@ -24,24 +27,31 @@ var (
 	TimeFormat = "15:04:05"
 
 	app   = kingpin.New(Name, "The Environment Database - Ask your environment questions")
-	debug = app.Flag("debug", "Enable debug logging.").Bool()
-	dev   = app.Flag("dev", "Enable dev mode. (read assets from disk and enable debug output)").Bool()
+	debug = app.Flag("debug", "Enable debug logging.").Short('v').Bool()
+	dev   = app.Flag("dev", "Enable dev mode.").Bool()
 	quiet = app.Flag("quiet", "Remove all output logging.").Short('q').Bool()
 
-	server = app.Command("server", "Start the tcp server for node connections.")
+	server        = app.Command("server", "Start the tcp server for node connections.")
+	serverCommand = server.Arg("command", "Daemon command. (start,status,stop)").String()
 	// serverConfig = server.Flag("config", "Server configuration file.").File()
-	serverPort    = server.Flag("port", "Port for the server to listen on.").PlaceHolder(fmt.Sprintf("%d", DefaultServerPort)).Int()
-	serverWebPort = server.Flag("http-port", "Port for the web server to listen on.").PlaceHolder(fmt.Sprintf("%d", DefaultWebServerPort)).Int()
+	serverPort = server.Flag("port", "Port for the server to listen on.").
+			Short('p').PlaceHolder(fmt.Sprintf("%d", DefaultServerPort)).Int()
+
+	serverWebPort = server.Flag("http-port", "Port for the web server to listen on.").
+			Short('P').PlaceHolder(fmt.Sprintf("%d", DefaultWebServerPort)).Int()
 
 	node = app.Command("node", "Register a new node.")
 	// clientConfig = client.Flag("config", "Client configuration file.").File()
-	nodeName   = node.Arg("node-name", "A name used to uniquely identify this node.").Required().String()
-	nodeServer = node.Flag("server", "Address for server to connect to.").PlaceHolder("127.0.0.1").Required().String()
-	nodePort   = node.Flag("port", "Port to use for connection.").Int()
+	nodeName = node.Arg("node-name", "A name used to uniquely identify this node.").Required().String()
+
+	nodeServer = node.Flag("server", "Address for server to connect to.").
+			Short('s').PlaceHolder("127.0.0.1").Required().String()
+
+	nodePort = node.Flag("port", "Port to use for connection.").Short('p').Int()
 
 	users      = app.Command("users", "User Management (Default lists all users).")
-	addUser    = users.Flag("add", "Add a new user.").Bool()
-	removeUser = users.Flag("remove", "Remove user by email.").PlaceHolder("email").String()
+	addUser    = users.Flag("add", "Add a new user.").Short('a').Bool()
+	removeUser = users.Flag("remove", "Remove user by email.").Short('r').PlaceHolder("email").String()
 
 	Log *Logger
 
@@ -182,11 +192,91 @@ func serverSetup(start bool) {
 		Log.Fatal(err)
 	}
 
-	if start {
+	cntxt := svr.Config.Daemon
+
+	if !start {
+		return
+	}
+
+	if len(*serverCommand) <= 0 {
 		if err := svr.Run(svrWebPort); err != nil {
 			Log.Error(err)
 		}
+	} else {
+
+		switch *serverCommand {
+		case "start":
+			fmt.Printf("Starting %s server in daemon mode\n", Name)
+			Log.SetLevel(DebugLevel)
+
+			d, err := cntxt.Reborn()
+
+			if err != nil {
+				Log.Fatal(err)
+			}
+
+			if d != nil {
+				fmt.Printf("%s is already running. PID: %d", Name, d.Pid)
+				return
+			}
+
+			defer cntxt.Release()
+
+			fmt.Println("hello?")
+
+			go func() {
+				if err := svr.Run(svrWebPort); err != nil {
+					Log.Error(err)
+				}
+			}()
+
+			sigChan := make(chan os.Signal, 1)
+			signal.Notify(sigChan,
+				syscall.SIGINT,
+				syscall.SIGTERM,
+				syscall.SIGQUIT)
+
+			for {
+				select {
+				case sig := <-sigChan:
+					Log.Debug("Go Signal: ", sig)
+					svr.Shutdown()
+				}
+			}
+
+			if err != nil {
+				log.Println("Error:", err)
+			}
+
+			break
+		case "stop":
+			fmt.Println("got stop")
+			break
+		case "status":
+			d, err := cntxt.Search()
+
+			if err != nil {
+				Log.Fatal(err)
+			}
+
+			err = d.Signal(syscall.Signal(0))
+
+			if err != nil {
+				cntxt.Release()
+				fmt.Printf("%s server is NOT running.\n", Name)
+			} else {
+				fmt.Printf("%s server is running. PID: %d\n", Name, d.Pid)
+			}
+
+			break
+		default:
+			{
+				Log.Fatalf("Error: Unknown Command %s.", *serverCommand)
+			}
+		}
+
 	}
+
 }
 
 func ask(reader *bufio.Reader, question string) string {
