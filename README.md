@@ -93,7 +93,23 @@ Commands:
 
 ## Server
 
-    `envdb server`
+    ```
+    $ envdb help server
+
+      usage: envdb [<flags>] server [<flags>] [<command>]
+
+      Start the tcp server for node connections.
+
+      Flags:
+        -p, --port=3636  Port for the server to listen on.
+        -P, --http-port=8080  
+                         Port for the web server to listen on.
+
+      Args:
+        [<command>]  Daemon command. (start,status,stop)
+    ```
+
+    Running the server without a `command` (start, stop or status) will run the server in the foreground.
 
     * Note: By default this will start the tcp server on port 3636 and the web server on port 8080.
 
