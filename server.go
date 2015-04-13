@@ -62,7 +62,7 @@ func NewServer(port int) (*Server, error) {
 			select {
 			case sig := <-sigChan:
 				if sig.String() == "interrupt" {
-					Log.Info("Received Interrupt. Exiting.")
+					Log.Info("Received Interrupt.")
 					server.Shutdown()
 				}
 			}

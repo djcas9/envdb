@@ -3,13 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
-	"os/signal"
 	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/howeyc/gopass"
 	"gopkg.in/alecthomas/kingpin.v1"
@@ -17,7 +14,7 @@ import (
 
 const (
 	Name    = "envdb"
-	Version = "0.2.2"
+	Version = "0.2.3"
 
 	DefaultServerPort    = 3636
 	DefaultWebServerPort = 8080
@@ -192,8 +189,6 @@ func serverSetup(start bool) {
 		Log.Fatal(err)
 	}
 
-	cntxt := svr.Config.Daemon
-
 	if !start {
 		return
 	}
@@ -206,68 +201,13 @@ func serverSetup(start bool) {
 
 		switch *serverCommand {
 		case "start":
-			fmt.Printf("Starting %s server in daemon mode\n", Name)
-			Log.SetLevel(DebugLevel)
-
-			d, err := cntxt.Reborn()
-
-			if err != nil {
-				Log.Fatal(err)
-			}
-
-			if d != nil {
-				fmt.Printf("%s is already running. PID: %d", Name, d.Pid)
-				return
-			}
-
-			defer cntxt.Release()
-
-			fmt.Println("hello?")
-
-			go func() {
-				if err := svr.Run(svrWebPort); err != nil {
-					Log.Error(err)
-				}
-			}()
-
-			sigChan := make(chan os.Signal, 1)
-			signal.Notify(sigChan,
-				syscall.SIGINT,
-				syscall.SIGTERM,
-				syscall.SIGQUIT)
-
-			for {
-				select {
-				case sig := <-sigChan:
-					Log.Debug("Go Signal: ", sig)
-					svr.Shutdown()
-				}
-			}
-
-			if err != nil {
-				log.Println("Error:", err)
-			}
-
+			svr.Config.Daemon.StartServer(svr, svrWebPort)
 			break
 		case "stop":
-			fmt.Println("got stop")
+			svr.Config.Daemon.Stop()
 			break
 		case "status":
-			d, err := cntxt.Search()
-
-			if err != nil {
-				Log.Fatal(err)
-			}
-
-			err = d.Signal(syscall.Signal(0))
-
-			if err != nil {
-				cntxt.Release()
-				fmt.Printf("%s server is NOT running.\n", Name)
-			} else {
-				fmt.Printf("%s server is running. PID: %d\n", Name, d.Pid)
-			}
-
+			svr.Config.Daemon.Status()
 			break
 		default:
 			{

@@ -38,7 +38,7 @@ type ServerConfig struct {
 	PublicKey  string
 	PrivateKey string
 	Cert       tls.Certificate
-	Daemon     *daemon.Context
+	Daemon     *Daemon
 }
 
 func NewServerConfig() (*ServerConfig, error) {
@@ -91,13 +91,15 @@ func NewServerConfig() (*ServerConfig, error) {
 
 	config.Cert = cert
 
-	config.Daemon = &daemon.Context{
-		PidFileName: fmt.Sprintf("%s/%s-server.pid", DefaultServerPath, Name),
-		PidFilePerm: 0644,
-		LogFileName: fmt.Sprintf("%s/%s-server.log", DefaultLogPath, Name),
-		LogFilePerm: 0640,
-		WorkDir:     DefaultServerPath,
-		Umask:       027,
+	config.Daemon = &Daemon{
+		d: &daemon.Context{
+			PidFileName: fmt.Sprintf("%s/%s-server.pid", DefaultServerPath, Name),
+			PidFilePerm: 0644,
+			LogFileName: fmt.Sprintf("%s/%s-server.log", DefaultLogPath, Name),
+			LogFilePerm: 0640,
+			WorkDir:     DefaultServerPath,
+			Umask:       027,
+		},
 	}
 
 	return config, err
