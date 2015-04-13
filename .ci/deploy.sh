@@ -68,4 +68,8 @@ if [ "$DRONE_BRANCH" = "$BRANCH" ] && [ "$DRONE_PR" != "true" ]; then
   package_cloud push $PREFIX/debian/squeeze $RELEASE_PATH/$NAME-386.deb
   package_cloud push $PREFIX/debian/jessie  $RELEASE_PATH/$NAME-386.deb
   package_cloud push $PREFIX/debian/wheezy  $RELEASE_PATH/$NAME-386.deb
+
+else
+  make
+  make test
 fi

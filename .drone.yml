@@ -4,7 +4,6 @@ git:
   branches:
     - master
 script:
-  - make release
   - ./.ci/deploy.sh
 notify:
   email:
