@@ -4,19 +4,20 @@ set -e
 NAME="envdb"
 BRANCH="master"
 
-VERSION=$(cat .Version)
-OLD_VERSION="0.2.2"
-YANK_OLD_VERSIONS=true
-
-PREFIX="mephux/$NAME"
-RELEASE_PATH="release"
-
-DEB="${NAME}_${OLD_VERSION}_amd64.deb"
-DEB386="${NAME}_${OLD_VERSION}_386.deb"
 
 if [ "$DRONE_BRANCH" = "$BRANCH" ] && [ "$DRONE_PR" != "true" ]; then
   echo "MASTER BRANCH: Deploying..."
   make release
+
+  VERSION=$(cat .Version)
+  OLD_VERSION="0.2.2"
+  YANK_OLD_VERSIONS=true
+
+  PREFIX="mephux/$NAME"
+  RELEASE_PATH="release"
+
+  DEB="${NAME}_${OLD_VERSION}_amd64.deb"
+  DEB386="${NAME}_${OLD_VERSION}_386.deb"
 
   if [ "$YANK_OLD_VERSIONS" = true ]; then
 
