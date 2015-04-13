@@ -76,10 +76,10 @@ if [ "$DRONE_BRANCH" = "$BRANCH" ] && [ "$DRONE_PR" != "true" ]; then
 
   result=$(github-release release -u mephux -r envdb -t v$(cat .Version) -n "v$(cat .Version)" -d ""   || true)
 
-  if [ $result == *422* ]; then
+  if [ "$result" == *422* ]; then
     echo -e "Release already exists for this tag.";
     exit 0
-  elif [ $result == "" ]; then
+  elif [ "$result" == "" ]; then
     echo -e "Release created.";
   else
     echo -e "Error creating release: $result"
