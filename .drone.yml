@@ -1,9 +1,11 @@
 image: mephux/docker-golang
+branches:
+  - master
+  - develop
 git:
   path: github.com/mephux/envdb
-  branches:
-    - master
 script:
+  - make release
   - ./.ci/deploy.sh
 notify:
   email:
