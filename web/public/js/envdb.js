@@ -268,13 +268,13 @@ var Envdb = {
     },
     start: function() {
       this.self = Pace.start(this.options);
-      $("#envdb-query, #content .wrapper").css("opacity", 0.5);
+      $("#content .wrapper").css("opacity", 0.5);
       $("#content .loading").show();
       // $("#loading").show();
     },
     stop: function() {
       Pace.stop();
-      $("#envdb-query, #content .wrapper").css("opacity", 1);
+      $("#content .wrapper").css("opacity", 1);
       $("#content .loading").hide();
       // $("#loading").hide();
     },
@@ -283,7 +283,7 @@ var Envdb = {
     },
     done: function() {
       Pace.stop();
-      $("#envdb-query, #content .wrapper").css("opacity", 1);
+      $("#content .wrapper").css("opacity", 1);
       $("#content .loading").hide();
       // $("#loading").hide();
     }
