@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/mephux/gotalk"
@@ -120,6 +121,7 @@ func (self *Node) Handlers() {
 				"osquery-version": version,
 				"ip":              ip,
 				"hostname":        hostname,
+				"os":              runtime.GOOS,
 			},
 		}
 

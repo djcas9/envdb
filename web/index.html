@@ -27,7 +27,13 @@
 
       <ul id="nodes" class="list">
         <% range .Nodes %>
-        <li class="node <% if .Online %>online<% else %>offline<% end %>" data-id="<% .Id %>" data-node-id="<% .NodeId %>">
+        <li data-os="<% .Os %>" class="node <% if .Online %>online<% else %>offline<% end %>" data-id="<% .Id %>" data-node-id="<% .NodeId %>">
+
+          <% if eq .Os "linux" %>
+            <i class="fa fa-linux os-icon"></i>
+          <% else if eq .Os "darwin" %>
+            <i class="fa fa-apple os-icon"></i>
+          <% end %>
 
           <i class="fa fa-circle status-icon"></i>
 
@@ -88,6 +94,7 @@
     </div>
 
     <div id="content">
+      <div class="loading"></div>
       <div id="tables"></div>
       <div class="wrapper">
 

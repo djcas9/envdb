@@ -12,6 +12,7 @@ type NodeDb struct {
 	Name     string
 	Ip       string
 	Hostname string
+	Os       string
 
 	Online bool
 
@@ -69,6 +70,7 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 		find.Name = node.Name
 		find.Ip = node.Ip
 		find.Hostname = node.Hostname
+		find.Os = node.Os
 		find.OsQuery = node.OsQuery
 		find.OsQueryVersion = node.OsQueryVersion
 		find.Online = node.Online
@@ -97,6 +99,7 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 		Name:           node.Name,
 		Ip:             node.Ip,
 		Hostname:       node.Hostname,
+		Os:             node.Os,
 		Online:         node.Online,
 		OsQuery:        node.OsQuery,
 		OsQueryVersion: node.OsQueryVersion,
