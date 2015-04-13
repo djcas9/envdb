@@ -5,7 +5,7 @@ NAME="envdb"
 BRANCH="master"
 
 VERSION=$(cat .Version)
-OLD_VERSION="0.2.2"
+OLD_VERSION=$VERSION
 YANK_OLD_VERSIONS=true
 
 PREFIX="mephux/$NAME"
@@ -68,5 +68,21 @@ if [ "$DRONE_BRANCH" = "$BRANCH" ] && [ "$DRONE_PR" != "true" ]; then
   package_cloud push $PREFIX/debian/squeeze $RELEASE_PATH/$NAME-386.deb
   package_cloud push $PREFIX/debian/jessie  $RELEASE_PATH/$NAME-386.deb
   package_cloud push $PREFIX/debian/wheezy  $RELEASE_PATH/$NAME-386.deb
+
+
+  # Upload To Github
+  curl -L -o /tmp/github-release.tar.bz2 https://github.com/aktau/github-release/releases/download/v0.5.2/linux-amd64-github-release.tar.bz2
+  tar jxf /tmp/github-release.tar.bz2 -C /tmp/ && sudo mv /tmp/bin/linux/amd64/github-release /usr/local/bin/github-release
+
+  result=$(github-release release -u mephux -r envdb -t v$(cat .Version) -n "v$(cat .Version)" -d ""   || true)
+  if [[ $result == *422* ]]; then
+    echo -e "Release already exists for this tag.";
+    exit 0
+  elif [[ $result == "" ]]; then
+    echo -e "Release created.";
+  else
+    echo -e "Error creating release: $result"
+    exit 1
+  fi
 
 fi
