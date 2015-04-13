@@ -16,6 +16,7 @@ DEB386="${NAME}_${OLD_VERSION}_386.deb"
 
 if [ "$DRONE_BRANCH" = "$BRANCH" ] && [ "$DRONE_PR" != "true" ]; then
   echo "MASTER BRANCH: Deploying..."
+  make release
 
   if [ "$YANK_OLD_VERSIONS" = true ]; then
 
