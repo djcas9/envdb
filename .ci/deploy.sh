@@ -5,7 +5,7 @@ NAME="envdb"
 BRANCH="master"
 
 VERSION=$(cat .Version)
-OLD_VERSION="0.2.1"
+OLD_VERSION="0.2.2"
 YANK_OLD_VERSIONS=true
 
 PREFIX="mephux/$NAME"

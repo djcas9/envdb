@@ -57,6 +57,10 @@
 			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 		},
 		{
+			"ImportPath": "github.com/sevlyar/go-daemon",
+			"Rev": "5841a7979e56bc7b2efa860e69f1d944e14f4d4a"
+		},
+		{
 			"ImportPath": "golang.org/x/crypto/ssh/terminal",
 			"Rev": "1351f936d976c60a0a48d728281922cf63eafb8d"
 		},
