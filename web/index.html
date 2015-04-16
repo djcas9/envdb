@@ -16,7 +16,7 @@
             <i style="font-size:0.9em;margin-right:5px;" class="fa fa-database"></i>
             Env<strong>DB</strong>
           </span>
-          <span class="version">v<% .Version %></span>
+          <span class="version"><% .Version %></span>
         </a>
       </div>
 
@@ -42,16 +42,17 @@
           </div>
 
           <div class="node-metadata">
-            <span class="node-node-id"><% .Ip %> / <% .Hostname %></span>
+            <span class="node-ip"><% .Ip %> / <% .Hostname %></span>
           </div>
 
-
+          <span class="online-status" style="display:none;"><% if .Online %>1<% else %>0<% end %></span>
+          <span class="node-node-id" style="display:none;"><% .NodeId %></span>
         </li>
         <% end %>
       </ul>
 
       <div class="sidebar-footer">
-        <% .Name %> v<% .Version %> by Dustin Willis Webber
+        <% .Name %> (<% .Version %>) by Dustin Willis Webber
       </div>
     </div>
 
@@ -125,7 +126,15 @@
   </script>
 
   <script id="node-template" type="text/x-handlebars-template">
-    <li class="node {{#if online}}online{{else}}offline{{/if}}" data-node-id="{{id}}">
+    <li data-os="{{os}}" class="node {{#if online}}online{{else}}offline{{/if}}" data-node-id="{{id}}">
+
+    {{#if linux}}
+      <i class="fa fa-linux os-icon"></i>
+    {{/if}}
+
+    {{#if darwin}}
+      <i class="fa fa-apple os-icon"></i>
+    {{/if}}
 
     <i class="fa fa-circle status-icon"></i>
 
@@ -134,10 +143,14 @@
     </div>
 
     <div class="node-metadata">
-    <span class="node-node-id">{{ip}}/ {{hostname}}</span>
+    <span class="node-node-id">{{ip}} / {{hostname}}</span>
     </div>
 
+    <span class="online-status" style="display:none;">
+    {{#if online}}1{{else}}0{{/if}}
+    </span>
 
+    <span class="node-node-id" style="display:none;">{{id}}</span>
     </li>
   </script>
 
@@ -164,8 +177,8 @@
     <tr class="row">
 
     {{#unless ../hideNode}}
-    <td data-name="node-name">
-    <strong>{{../../name}}</strong> ({{../../hostname}})
+    <td data-name="node-name" title="{{../../name}} ({{../../hostname}})">
+    <strong>{{../../name}}</strong> ({{truncate ../../hostname 10}})
     </td>
     {{/unless}}
 

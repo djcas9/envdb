@@ -114,8 +114,6 @@ func (self *Node) Handlers() {
 
 		os := runtime.GOOS
 
-		Log.Infof("Node OS: %s", os)
-
 		rmsg := Message{
 			Error: err,
 			Data: map[string]interface{}{

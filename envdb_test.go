@@ -94,8 +94,4 @@ func TestNewNode(t *testing.T) {
 	if c.Config.CacheFile != p2 {
 		t.Fatal("Node cache file path is wrong.")
 	}
-
-	// if !c.Config.HasCache {
-	// t.Fatal("Node couldn't create a cache file.")
-	// }
 }

@@ -46,6 +46,10 @@ func Open(driverName, dataSourceName string) (*DB, error) {
 	return &DB{db, NewCacheMapper(&SnakeMapper{})}, err
 }
 
+func FromDB(db *sql.DB) *DB {
+	return &DB{db, NewCacheMapper(&SnakeMapper{})}
+}
+
 func (db *DB) Query(query string, args ...interface{}) (*Rows, error) {
 	rows, err := db.DB.Query(query, args...)
 	return &Rows{rows, db.Mapper}, err

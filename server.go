@@ -187,19 +187,26 @@ func (self *Server) Delete(id string) error {
 	node, err := self.GetNodeById(id)
 
 	if err != nil {
-		return err
-	}
 
-	node.PendingDelete = true
+		n, dberr := GetNodeByNodeId(id)
 
-	if _, err := NodeUpdateOrCreate(node); err != nil {
-		return err
-	}
+		if dberr != nil {
+			return err
+		}
 
-	err = self.Disconnect(id)
+		return n.Delete()
+	} else {
+		node.PendingDelete = true
 
-	if err != nil {
-		return err
+		if _, err := NodeUpdateOrCreate(node); err != nil {
+			return err
+		}
+
+		err = self.Disconnect(id)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -269,6 +276,11 @@ func (self *Server) sendTo(id string, in interface{}) []QueryResults {
 		return results
 	}
 
+	Log.Debugf("%s: sending request.", node.Name)
+	Log.Debugf("%s: request: %s", node.Name, in.(Query).Sql)
+
+	start := time.Now()
+
 	var data []byte
 	err = node.Socket.Request("query", in, &data)
 
@@ -284,6 +296,9 @@ func (self *Server) sendTo(id string, in interface{}) []QueryResults {
 	}
 
 	results = append(results, qr)
+
+	elapsed := time.Since(start)
+	Log.Debugf("%s: done (%s)", node.Name, elapsed)
 
 	return results
 }
@@ -341,17 +356,6 @@ func (self *Server) Run(webPort int) error {
 
 	self.Socket.AcceptHandler = self.onAccept
 	self.Socket.Handlers = handlers
-
-	// go func() {
-	// for {
-	// time.Sleep(10 * time.Second)
-
-	// self.Send(Query{
-	// Sql:    "SELECT uid, name, port FROM listening_ports l, processes p WHERE l.pid=p.pid;",
-	// Format: "json",
-	// })
-	// }
-	// }()
 
 	go NewWebServer(webPort, self)
 

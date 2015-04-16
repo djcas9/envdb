@@ -11,7 +11,9 @@ var SqlHighlightRules = function() {
         "groups|hardware_events|interface_addresses|interface_details|kernel_info|last|" +
         "listening_ports|logged_in_users|mounts|os_version|passwd_changes|pci_devices|process_envs|" +
         "process_open_files|process_open_sockets|processes|routes|shell_history|smbios_tables|suid_bin|" +
-        "system_controls|usb_devices|users|process_memory_map|" +
+        "system_controls|usb_devices|users|process_memory_map|time|shared_memory|osquery_info|" +
+        "kernel_modules|kernel_integrity|hash|" +
+        "apt_sources|osquery_extensions|osquery_flags|osquery_registry|deb_packages|file|memory_map|" +
         "select|insert|update|delete|from|where|and|or|group|by|order|limit|offset|having|as|case|" +
         "when|else|end|type|left|right|join|on|outer|desc|asc|union"
     );

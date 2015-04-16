@@ -10,14 +10,13 @@ Envdb turns your production, dev, cloud, etc environments into a database
 cluster you can search using [osquery](https://github.com/facebook/osquery) as the foundation.
 
 Envdb allows you to register each computer, server or asset as a node in a cluster. Once a new
-node is connected it becomes available for search from the Envdb ui.
-
+node is connected it becomes available for search from the Envdb ui. 
 Envdb was built using golang so the whole application, node client and server comes as one single binary.
 This makes it really easy to deploy and get working in seconds.
 
 Video Intro: [https://youtu.be/ydYr7Ykwzy8](https://youtu.be/ydYr7Ykwzy8)
 
-# How it works.
+## How it works.
 
 Envdb wraps the osquery process with a node agent (node as in cluster node) that can communicate back to a central location.
 When that node gets a new query, it's executed and then sent back to the tcp server for rendering. Once the
@@ -27,31 +26,30 @@ Envdb has an embedded sqlite database for node storage and saved searches.
 
 ui --websockets--> server --tcp--> node client.
 
-## Moving Forward
-
-I plan to add support for a plugin interface for extending what Envdb can request from a node. Currently that list of planned extentions includes: ~~[yara](http://plusvic.github.io/yara/)~~ (osquery is adding support for this), [bro](https://www.bro.org/) and [memory](Volatility). The hope is to wrap these processes and query them using sql like osquery and allowing you to join on similar data points. 
-
-Example: `select * from listening_ports a join bro_conn b on a.port = b.source_port;`
-
-# Download
+## Download
 
 Pre-built versions (deb/tar.gz) of envdb are avaliable for linux 386/amd64. 
 [linux downloads](https://github.com/mephux/envdb/releases)
 
 Building on macosx is easy tho, checkout the section below.
 
-# Building
+## Building
 
   Make sure you have Go installed. I used Go version 1.4.1.
+
+#### deps
 
   * `go get github.com/jteeuwen/go-bindata/...`
   * `go get github.com/elazarl/go-bindata-assetfs`
   * `go get github.com/tools/godep`
+
+#### make
+
   * `git clone https://github.com/mephux/envdb.git`
   * `cd envdb`
   * `make`
 
-# Usage
+## Usage
 
   * **NOTICE**: The default username and password for the UI.
     * username: **admin@envdb.io**
@@ -84,35 +82,35 @@ Commands:
     User Management (Default lists all users).
 ```
 
-## Server
+#### Server
 
-    ```
-    $ envdb help server
+```
+$ envdb help server
 
-      usage: envdb [<flags>] server [<flags>] [<command>]
+  usage: envdb [<flags>] server [<flags>] [<command>]
 
-      Start the tcp server for node connections.
+  Start the tcp server for node connections.
 
-      Flags:
-        -p, --port=3636  Port for the server to listen on.
-        -P, --http-port=8080  
-                         Port for the web server to listen on.
+  Flags:
+    -p, --port=3636  Port for the server to listen on.
+    -P, --http-port=8080  
+                     Port for the web server to listen on.
 
-      Args:
-        [<command>]  Daemon command. (start,status,stop)
-    ```
+  Args:
+    [<command>]  Daemon command. (start,status,stop)
+```
 
     Running the server without a `command` (start, stop or status) will run the server in the foreground.
 
     * Note: By default this will start the tcp server on port 3636 and the web server on port 8080.
 
-## Node Client
+#### Node Client
 
     `sudo envdb node --server <ip to server> SomeBoxName`
 
   * That's it - it's really that simple.
 
-## User Management
+#### User Management
 
   * list users
     `envdb users`
@@ -123,7 +121,7 @@ Commands:
   * remove a new user
     `envdb users --remove <email>`
 
-# More UI
+## More UI
 
 <img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-1.png">
 
@@ -139,8 +137,8 @@ you would like to stalk me, follow [mephux](http://dweb.io/) on
 [Twitter](http://twitter.com/mephux) and
 [GitHub](https://github.com/mephux).
 
-# TODO
+## TODO
 
-  * TLS for the agent/server communications (top of list)
+  * add in memeory pagination for results.
   * Node/Server auth, verification and validation.
   * Code cleanup (will continue forever).

@@ -17,7 +17,7 @@
 		},
 		{
 			"ImportPath": "github.com/go-xorm/core",
-			"Rev": "8cc025cd8e89196cf8932ef7e3b102e71772b8aa"
+			"Rev": "0c84d4c49e1d83083d451918456c5fc75da741e2"
 		},
 		{
 			"ImportPath": "github.com/go-xorm/xorm",
@@ -50,7 +50,7 @@
 		},
 		{
 			"ImportPath": "github.com/mephux/gotalk",
-			"Rev": "bfc3ceb2346b163c25d5d26abbc834350cbcf3ac"
+			"Rev": "6e4be93289c48b002648cb714be49c0ad18671ff"
 		},
 		{
 			"ImportPath": "github.com/nu7hatch/gouuid",
@@ -66,7 +66,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/net/websocket",
-			"Rev": "b6fdb7d8a4ccefede406f8fe0f017fb58265054c"
+			"Rev": "84ba27dd5b2d8135e9da1395277f2c9333a2ffda"
 		},
 		{
 			"ImportPath": "gopkg.in/alecthomas/kingpin.v1",

@@ -5,6 +5,29 @@ var Envdb = {
   table: false,
   fixedTable: false,
 
+  FormatQuery: function(query) {
+    query = query.replace(/\-\-.*$/gm, '');
+    query = query.replace(/(\r\n|\n|\r)/gm, " ")
+
+    split = query.split(";");
+
+    if (split.length > 1) {
+
+      var clean = []
+
+      for (var i = 0, len = split.length; i < len; i++) {
+        var item = split[i].trim();
+        if (item !== "") {
+          clean.push(item);
+        }
+      }
+
+      query = clean.pop();
+    }
+
+    return query
+  },
+
   lbox: {
     open: function(template, data, args) {
       var self = this;
@@ -108,7 +131,6 @@ var Envdb = {
             if (err) {
               Envdb.Flash.error(err);
             } else {
-              console.log(data.id)
               $("li.node[data-node-id='"+data.id+"']").remove();
             }
 
@@ -152,6 +174,8 @@ var Envdb = {
         id: self.current,
         sql: "pragma table_info(" + table + ");",
       }, function(err, data) {
+
+        Envdb.Editor.self.setValue("select * from " + table + ";");
 
           if (typeof callback === "function") {
             data.hideNode = true;
@@ -300,6 +324,28 @@ var Envdb = {
       this.loadQuery = Handlebars.compile($("#load-query-template").html());
       this.nodeContextMenu = Handlebars.compile($("#node-context-menu-template").html());
       this.confirm = Handlebars.compile($("#confirm-template").html());
+
+      Handlebars.registerHelper ('truncate', function (str, len) {
+        if (str.length > len) {
+          var new_str = str.substr (0, len+1);
+
+          while (new_str.length) {
+            var ch = new_str.substr ( -1 );
+            new_str = new_str.substr ( 0, -1 );
+
+            if (ch == ' ') {
+              break;
+            }
+          }
+
+          if ( new_str == '' ) {
+            new_str = str.substr ( 0, len );
+          }
+
+          return new Handlebars.SafeString ( new_str +'...' ); 
+        }
+        return str;
+      });
     }
 
   },
@@ -324,7 +370,7 @@ var Envdb = {
 
       Envdb.Loading.start()
 
-      Envdb.Query.Run("query", query.replace(/(\r\n|\n|\r)/gm, " "), function(results, err) {
+      Envdb.Query.Run("query", Envdb.FormatQuery(query), function(results, err) {
         Envdb.Query.Render(results, err);
         if (typeof callback === "function") {
           callback();
@@ -439,8 +485,6 @@ var Envdb = {
                 var item = $(this).parents("li");
                 var id = item.attr("data-query-id");
 
-                console.log(id)
-
                 $.ajax({
                   url: "/query/delete",
                   type: "POST",
@@ -449,7 +493,6 @@ var Envdb = {
                     id: id
                   },
                   success: function(data) {
-                    console.log(data)
                     item.fadeOut("fast");
                   }
                 });
@@ -482,19 +525,21 @@ var Envdb = {
 
       Envdb.Loading.start()
 
-      Envdb.Query.Run("query", value.replace(/(\r\n|\n|\r)/gm, " "), function(results, err) {
+      Envdb.Query.Run("query", Envdb.FormatQuery(value), function(results, err) {
         Envdb.Query.Render(results, err);
       });
 
     },
 
     Render: function(results, err, callback) {
+      var err = false;
 
       if (results && results.length > 0) {
         if (Envdb.Node.current && results[0].error.length > 0) {
           var er = results[0].error;
+
           if (er === "exit status 1") {
-            Envdb.Flash.error("Query syntax error or table does not exist.");
+            Envdb.Flash.error(results[0].results);
           } else {
             Envdb.Flash.error("Query Error: " + er);
           }
@@ -519,11 +564,18 @@ var Envdb = {
           var node = results[record];
 
           if (node.error.length > 0) {
-            // ignore table missing
+            if (!err) {
+              err = node.error;
+            }
             continue
           }
 
-          node.results = JSON.parse(node.results)
+          try {
+            node.results = JSON.parse(node.results)
+          } catch (e) {
+            err = "Envdb only supports select queries.";
+            node.results = [];
+          }
 
           if (node.results.length <= 0) {
             continue;
@@ -564,7 +616,7 @@ var Envdb = {
           }
 
           Envdb.Loading.done()
-          Envdb.Flash.error("No results found.");
+          Envdb.Flash.error(err || "No results found.");
 
           $("#content .wrapper").html("");
           return
@@ -597,7 +649,7 @@ var Envdb = {
         }
 
       } else {
-        Envdb.Flash.error("Your query returned no data.")
+        Envdb.Flash.error(err || "Your query returned no data.")
         // error - no data
       }
 
@@ -648,7 +700,7 @@ var Envdb = {
 
       editor.setOptions({
         enableBasicAutocompletion: true,
-        enableSnippets: true,
+        enableSnippets: false,
         enableLiveAutocompletion: true
       });
 
@@ -704,11 +756,29 @@ var Envdb = {
 
     gotalk.handleNotification('node-update', function(node) {
       var item = $("li[data-node-id='" + node.id + "']");
+
+      if (node.os === "linux") {
+        node.linux = true
+      } else if (node.os === "darwin") {
+        node.darwin = true
+      }
+
       if (item.length > 0) {
         item.replaceWith(Envdb.Templates.node(node))
+
       } else {
         $("ul#nodes").append(Envdb.Templates.node(node))
       }
+
+      delete(Envdb.nodeList)
+
+      Envdb.nodeList = new List('sidebar', {
+        valueNames: [
+          'node-name', 'node-ip', 'node-node-id', 'online-status'
+        ]
+      });
+
+      Envdb.nodeList.sort('online-status', { order: "desc" });
     });
 
     Envdb.Socket = gotalk.connection().on('open', function() {});
@@ -721,6 +791,7 @@ var Envdb = {
 jQuery(document).ready(function($) {
 
   Envdb.Init();
+  $.fn.dataTableExt.sErrMode = "none";
 
   var lastScrollLeft = 0;
   $("#content").on("scroll", function() {
@@ -791,10 +862,13 @@ jQuery(document).ready(function($) {
     $("ul.custom-menu").hide();
   });
 
-
-  var nodeList = new List('sidebar', {
-    valueNames: ['node-name', 'node-node-id']
+  Envdb.nodeList = new List('sidebar', {
+    valueNames: [
+      'node-name', 'node-ip', 'node-node-id', 'online-status'
+    ]
   });
+
+  Envdb.nodeList.sort('online-status', { order: "desc" });
 
   $(document).on("click", ".envdb-control a.save-query", function(e) {
     e.preventDefault();

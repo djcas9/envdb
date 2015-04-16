@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"runtime"
 	"sync"
@@ -357,7 +356,6 @@ func (s *Sock) readBufferReq(limits Limits, id, op string, size int) error {
 			if r := recover(); r != nil {
 				if s.conn != nil {
 					if err := s.respondError(0, id, fmt.Sprint(r)); err != nil {
-						log.Println(err)
 						s.Close()
 					}
 				}
@@ -366,14 +364,11 @@ func (s *Sock) readBufferReq(limits Limits, id, op string, size int) error {
 		}()
 		outbuf, err := handler(s, op, inbuf)
 		if err != nil {
-			log.Println(err)
 			if err := s.respondError(0, id, err.Error()); err != nil {
-				log.Println(err)
 				s.Close()
 			}
 		} else {
 			if err := s.respondOK(id, outbuf); err != nil {
-				log.Println(err)
 				s.Close()
 			}
 		}
@@ -448,7 +443,6 @@ func (s *Sock) readStreamReq(limits Limits, id, op string, size int) error {
 		if err := handler(s, op, rch, out); err != nil {
 			s.deallocReqChan(id)
 			if err := s.respondError(0, id, err.Error()); err != nil {
-				log.Println(err)
 				s.Close()
 			}
 		}

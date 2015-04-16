@@ -336,6 +336,10 @@ border-radius: 100px;
   font-weight: 100;
   font-size: 0.65em;
   margin-left: 20px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #header{

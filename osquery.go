@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -112,8 +113,8 @@ func (self *Query) Run() ([]byte, error) {
 	output, err := exec.Command("/usr/bin/sudo", items...).CombinedOutput()
 
 	if err != nil {
-		return output, err
+		err = errors.New(string(output))
 	}
 
-	return output, nil
+	return output, err
 }

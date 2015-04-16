@@ -54,6 +54,56 @@ AS listening ON process.pid = listening.pid;`,
 
 	queries = append(queries, q4)
 
+	q5 := QueryDb{
+		Name:  "Third-party kernel extensions (OS X)",
+		Query: "SELECT * FROM kernel_extensions WHERE name NOT LIKE 'com.apple.%' AND name != '__kernel__';",
+		Type:  "all",
+	}
+
+	queries = append(queries, q5)
+
+	q6 := QueryDb{
+		Name:  "Startup items (OS X / LaunchDaemons & LaunchAgents)",
+		Query: `SELECT disabled, path, program FROM launchd;`,
+		Type:  "all",
+	}
+
+	queries = append(queries, q6)
+
+	q7 := QueryDb{
+		Name:  "Shell history",
+		Query: `SELECT * FROM shell_history`,
+		Type:  "all",
+	}
+
+	queries = append(queries, q7)
+
+	q8 := QueryDb{
+		Name:  "All users with group information",
+		Query: `SELECT * FROM users u JOIN groups g where u.gid = g.gid;`,
+		Type:  "all",
+	}
+
+	queries = append(queries, q8)
+
+	q9 := QueryDb{
+		Name: "Interface information",
+		Query: `SELECT address, mac, id.interface
+FROM interface_details AS id, interface_addresses AS ia WHERE id.interface = ia.interface;`,
+		Type: "all",
+	}
+
+	queries = append(queries, q9)
+
+	// q8 := QueryDb{
+	// Name: "All empty groups",
+	// Query: `SELECT groups.gid, groups.name FROM groups
+	// LEFT JOIN users ON (groups.gid = users.gid) WHERE users.uid IS NULL;`,
+	// Type: "all",
+	// }
+
+	// queries = append(queries, q8)
+
 	if _, err := sess.Insert(&queries); err != nil {
 		sess.Rollback()
 		return err
