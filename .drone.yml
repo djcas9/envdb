@@ -6,8 +6,17 @@ git:
   path: github.com/mephux/envdb
 script:
   - make release
-  - ./.ci/deploy.sh
 notify:
   email:
     recipients:
       - dustin.webber@gmail.com
+publish:
+  github:
+    branch: master
+    script:
+    artifacts:
+      - release
+    tag: v$(cat .Version)
+    token: $$github_token
+    user: mephux
+    repo: envdb

@@ -71,9 +71,8 @@ if [ "$DRONE_BRANCH" = "$BRANCH" ] && [ "$DRONE_PR" != "true" ]; then
 
 
   # Upload To Github
-  curl -L -o /tmp/github-release.tar.bz2 https://github.com/aktau/github-release/releases/download/v0.5.2/linux-amd64-github-release.tar.bz2
-  tar jxf /tmp/github-release.tar.bz2 -C /tmp/ && sudo mv /tmp/bin/linux/amd64/github-release /usr/local/bin/github-release
+  # curl -L -o /tmp/github-release.tar.bz2 https://github.com/aktau/github-release/releases/download/v0.5.2/linux-amd64-github-release.tar.bz2
+  # tar jxf /tmp/github-release.tar.bz2 -C /tmp/ && sudo mv /tmp/bin/linux/amd64/github-release /usr/local/bin/github-release
 
-  cd ..
-  github-release release -u mephux -r envdb -t v$(cat .Version) -n "v$(cat .Version)" -d ""   || true
+  # github-release release -u mephux -r envdb -t v$(cat .Version) -n "v$(cat .Version)" -d "" || true
 fi
