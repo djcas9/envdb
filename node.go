@@ -112,6 +112,10 @@ func (self *Node) Handlers() {
 			}
 		}
 
+		os := runtime.GOOS
+
+		Log.Infof("Node OS: %s", os)
+
 		rmsg := Message{
 			Error: err,
 			Data: map[string]interface{}{
@@ -121,7 +125,7 @@ func (self *Node) Handlers() {
 				"osquery-version": version,
 				"ip":              ip,
 				"hostname":        hostname,
-				"os":              runtime.GOOS,
+				"os":              os,
 			},
 		}
 

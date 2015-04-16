@@ -14,7 +14,7 @@ import (
 
 const (
 	Name    = "envdb"
-	Version = "0.2.3"
+	Version = "0.2.4"
 
 	DefaultServerPort    = 3636
 	DefaultWebServerPort = 8080
