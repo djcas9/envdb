@@ -106,6 +106,22 @@ $ envdb help server
 
 #### Node Client
 
+```
+$ envdb help node
+
+  usage: envdb [<flags>] node --server=127.0.0.1 [<flags>] <node-name>
+
+  Register a new node.
+
+  Flags:
+    -s, --server=127.0.0.1  
+                     Address for server to connect to.
+    -p, --port=PORT  Port to use for connection.
+
+  Args:
+    <node-name>  A name used to uniquely identify this node.
+```
+
     `sudo envdb node --server <ip to server> SomeBoxName`
 
   * That's it - it's really that simple.
