@@ -22,3 +22,4 @@ publish:
     repo: envdb
     when: 
       branch: master
+      pull_requests: false
