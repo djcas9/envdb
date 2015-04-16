@@ -20,3 +20,5 @@ publish:
     token: $$GITHUB_TOKEN
     user: mephux
     repo: envdb
+    when: 
+      branch: master
