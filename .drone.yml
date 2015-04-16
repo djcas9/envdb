@@ -17,6 +17,6 @@ publish:
     artifacts:
       - release
     tag: v$(cat .Version)
-    token: $$github_token
+    token: $$GITHUB_TOKEN
     user: mephux
     repo: envdb
