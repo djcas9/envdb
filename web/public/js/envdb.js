@@ -82,12 +82,9 @@ var Envdb = {
         background: '#000',
         opacity: 0.7
       },
-      onOpen: function() {
-      },
-      afterOpen: function() {
-      },
-      afterDestroy: function() {
-      },
+      onOpen: function() {},
+      afterOpen: function() {},
+      afterDestroy: function() {},
       onTemplate: function(template, data, limp) {
         return template;
       }
@@ -103,10 +100,8 @@ var Envdb = {
         var box = Envdb.lbox.open(Envdb.Templates.confirm(data), {}, {
           width: "760px",
           disableDefaultAction: true,
-          afterClose: function() {
-          },
-          afterOpen: function() {
-          },
+          afterClose: function() {},
+          afterOpen: function() {},
           onAction: function() {
             callback();
           }
@@ -131,7 +126,7 @@ var Envdb = {
             if (err) {
               Envdb.Flash.error(err);
             } else {
-              $("li.node[data-node-id='"+data.id+"']").remove();
+              $("li.node[data-node-id='" + data.id + "']").remove();
             }
 
             $.limpClose();
@@ -147,12 +142,12 @@ var Envdb = {
         id: self.current
       }, function(err, data) {
 
-        self.tables = data;
+          self.tables = data;
 
-        if (typeof callback === "function") {
-          return callback(data, err);
-        }
-      });
+          if (typeof callback === "function") {
+            return callback(data, err);
+          }
+        });
     },
 
     fetchTableInfo: function(table, callback) {
@@ -175,7 +170,7 @@ var Envdb = {
         sql: "pragma table_info(" + table + ");",
       }, function(err, data) {
 
-        Envdb.Editor.self.setValue("select * from " + table + ";");
+          Envdb.Editor.self.setValue("select * from " + table + ";");
 
           if (typeof callback === "function") {
             data.hideNode = true;
@@ -231,7 +226,7 @@ var Envdb = {
         Envdb.Loading.done();
 
         $("a.run-query").text("Query Node");
-        $("#header .title").text("Query Node: " + data.name + " (" + data.hostname + " / " + data.id + ")");
+        $("#header .title").text("Query Node: " + data.name + " (" + data.hostname + ")");
         $("#content").addClass("node-view");
         $("#wrapper").append(Envdb.Templates.tables(data.results));
 
@@ -325,24 +320,24 @@ var Envdb = {
       this.nodeContextMenu = Handlebars.compile($("#node-context-menu-template").html());
       this.confirm = Handlebars.compile($("#confirm-template").html());
 
-      Handlebars.registerHelper ('truncate', function (str, len) {
+      Handlebars.registerHelper ('truncate', function(str, len) {
         if (str.length > len) {
-          var new_str = str.substr (0, len+1);
+          var new_str = str.substr (0, len + 1);
 
           while (new_str.length) {
-            var ch = new_str.substr ( -1 );
-            new_str = new_str.substr ( 0, -1 );
+            var ch = new_str.substr (-1);
+            new_str = new_str.substr (0, -1);
 
             if (ch == ' ') {
               break;
             }
           }
 
-          if ( new_str == '' ) {
-            new_str = str.substr ( 0, len );
+          if (new_str == '') {
+            new_str = str.substr (0, len);
           }
 
-          return new Handlebars.SafeString ( new_str +'...' ); 
+          return new Handlebars.SafeString (new_str + '...');
         }
         return str;
       });
@@ -435,7 +430,7 @@ var Envdb = {
               }
 
             },
-            error: function(a,b,c) {
+            error: function(a, b, c) {
               // console.log(a,b,c)
             }
           })
@@ -454,7 +449,7 @@ var Envdb = {
       Envdb.Request.load = $.ajax({
         url: "/api/v1/queries",
         dataType: "json",
-        error: function(a,b,c) {
+        error: function(a, b, c) {
           // console.log(a,b,c)
         },
         success: function(data) {
@@ -509,7 +504,6 @@ var Envdb = {
 
     Execute: function() {
       $("#content").scrollTop(0);
-      $(".table-filter").show().find("input").val("");
 
       if (Envdb.fixedTable) {
         Envdb.fixedTable._fnDestroy();
@@ -532,7 +526,6 @@ var Envdb = {
     },
 
     Render: function(results, err, callback) {
-      var err = false;
 
       if (results && results.length > 0) {
         if (Envdb.Node.current && results[0].error.length > 0) {
@@ -548,12 +541,15 @@ var Envdb = {
           return;
         }
       } else {
-        Envdb.Flash.error("Notice: Your query returned no data.")
+        Envdb.Flash.error("Error: " + err)
 
         Envdb.Editor.self.focus();
         Envdb.Loading.done()
+
+        return;
       }
 
+      var err = false;
       var table = null;
       var count = 0
 
@@ -572,8 +568,9 @@ var Envdb = {
 
           try {
             node.results = JSON.parse(node.results)
-          } catch (e) {
+          } catch ( e ) {
             err = "Envdb only supports select queries.";
+            console.log(e)
             node.results = [];
           }
 
@@ -629,14 +626,17 @@ var Envdb = {
               $("#content").scrollTop(0);
             }
           }).DataTable({
-          searching: true,
-          paging: false,
-          info: false
-        });
-
+            searching: true,
+            paging: false,
+            info: false,
+            ordering: true,
+            order: []
+          });
 
         Envdb.fixedTable = new $.fn.dataTable.FixedHeader(Envdb.table, {
         });
+
+        $(".table-filter").show().find("input").val("");
 
         window.onresize = function() {
           if (Envdb.fixedTable) {
@@ -660,7 +660,6 @@ var Envdb = {
     },
 
     Run: function(type, sql, callback) {
-
       var id = "all";
 
       if (Envdb.Node.current) {
@@ -672,21 +671,25 @@ var Envdb = {
         sql: sql,
       }, function(err, data) {
 
-        if (!data || data.length <= 0) {
-          return callback(null, "No data");
-        }
-
-        for (var i = 0, len = data.length; i < len; i++) {
-          if (id !== "all" && data[i]) {
-            data[i].hideNode = true
+          if (!data || data.length <= 0) {
+            if (err) {
+              return callback(null, err.message);
+            } else {
+              return callback(null, "No data");
+            }
           }
-        }
 
-        if (typeof callback === "function") {
-          return callback(data, err);
-        }
+          for (var i = 0, len = data.length; i < len; i++) {
+            if (id !== "all" && data[i]) {
+              data[i].hideNode = true
+            }
+          }
 
-      });
+          if (typeof callback === "function") {
+            return callback(data, err);
+          }
+
+        });
     }
   },
 
@@ -770,7 +773,7 @@ var Envdb = {
         $("ul#nodes").append(Envdb.Templates.node(node))
       }
 
-      delete(Envdb.nodeList)
+      delete (Envdb.nodeList)
 
       Envdb.nodeList = new List('sidebar', {
         valueNames: [
@@ -778,7 +781,7 @@ var Envdb = {
         ]
       });
 
-      Envdb.nodeList.sort('online-status', { order: "desc" });
+      // Envdb.nodeList.sort('online-status', { order: "desc" });
     });
 
     Envdb.Socket = gotalk.connection().on('open', function() {});
@@ -828,23 +831,33 @@ jQuery(document).ready(function($) {
     }
   });
 
-  $(document).on("contextmenu", "li.node", function(event) { 
+  $(document).on("contextmenu", "li.node", function(event) {
     event.preventDefault();
-    var id = $(this).attr("data-node-id");
+    var parent = $(this);
+    var id = parent.attr("data-node-id");
     var menu = $(Envdb.Templates.nodeContextMenu({
       id: id
     })).appendTo("body")
-    .css({top: event.pageY + "px", left: event.pageX + "px"});
+      .css({
+        top: event.pageY + "px",
+        left: event.pageX + "px"
+      });
 
     $("a.disconnect-node").on("click", function(e) {
       e.preventDefault();
-      Envdb.Node.commands.disconnect({
-        id: id,
-        title: "Disconnect Node",
-        message: "Are you sure you want to disconnect this node?",
-        icon: "fa-exclamation",
-        buttonTitle: "Disconnect"
-      });
+
+      if (parent.hasClass("online")) {
+        Envdb.Node.commands.disconnect({
+          id: id,
+          title: "Disconnect Node",
+          message: "Are you sure you want to disconnect this node?",
+          icon: "fa-exclamation",
+          buttonTitle: "Disconnect"
+        });
+      } else {
+        Envdb.Flash.error("This node is already offline.");
+      }
+
     });
 
     $("a.delete-node").on("click", function(e) {
@@ -868,7 +881,9 @@ jQuery(document).ready(function($) {
     ]
   });
 
-  Envdb.nodeList.sort('online-status', { order: "desc" });
+  Envdb.nodeList.sort('online-status', {
+    order: "desc"
+  });
 
   $(document).on("click", ".envdb-control a.save-query", function(e) {
     e.preventDefault();

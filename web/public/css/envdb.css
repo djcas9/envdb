@@ -287,7 +287,8 @@ border-radius: 100px;
 }
 
 #nodes li.current{
-  background-color: #6E4FC5;
+  /* background-color: #6E4FC5; */
+  background-color: #0077FF;
 }
 
 #nodes li.current .node-metadata{

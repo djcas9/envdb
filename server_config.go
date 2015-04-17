@@ -28,6 +28,8 @@ var (
 	DefaultPublicKeyPath  = ""
 	DefaultPrivateKeyPath = ""
 
+	DefaultRowLimit = 10000
+
 	SSL = false
 )
 

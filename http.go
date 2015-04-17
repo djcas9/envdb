@@ -66,14 +66,14 @@ func NewWebServer(webPort int, server *Server) {
 			Format: "json",
 		})
 
-		if len(data) != 1 {
+		if len(data.Results) != 1 {
 			d := QueryResults{}
 
 			err := errors.New(fmt.Sprintf("Node not found for id (%s).", sql.Id))
 			return d, err
 		}
 
-		tables = strings.Split(data[0].Results.(string), "\n")
+		tables = strings.Split(data.Results[0].Results.(string), "\n")
 
 		for i, t := range tables {
 			newT := strings.Replace(t, "  => ", "", -1)
@@ -81,9 +81,9 @@ func NewWebServer(webPort int, server *Server) {
 		}
 
 		tables = tables[:len(tables)-1]
-		data[0].Results = tables
+		data.Results[0].Results = tables
 
-		return data[0], nil
+		return data.Results[0], data.Error
 	})
 
 	gotalk.Handle("table-info", func(sql SqlRequest) (QueryResults, error) {
@@ -92,14 +92,14 @@ func NewWebServer(webPort int, server *Server) {
 			Format: "json",
 		})
 
-		if len(data) != 1 {
+		if len(data.Results) != 1 {
 			d := QueryResults{}
 
 			err := errors.New(fmt.Sprintf("Node not found for id (%s).", sql.Id))
 			return d, err
 		}
 
-		return data[0], nil
+		return data.Results[0], data.Error
 	})
 
 	gotalk.Handle("query", func(sql SqlRequest) ([]QueryResults, error) {
@@ -108,7 +108,7 @@ func NewWebServer(webPort int, server *Server) {
 			Format: "json",
 		})
 
-		return data, nil
+		return data.Results, data.Error
 	})
 
 	gotalk.Handle("disconnect", func(id string) error {

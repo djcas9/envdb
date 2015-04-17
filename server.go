@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -212,18 +213,50 @@ func (self *Server) Delete(id string) error {
 	return nil
 }
 
-func (self *Server) sendAll(in interface{}) []QueryResults {
-	// go func() {
+func ProcessResults(data []byte) (bool, []map[string]interface{}, []byte) {
+	var all = []map[string]interface{}{}
+	var returnData = []map[string]interface{}{}
+
+	if err := json.Unmarshal(data, &all); err == nil {
+		if len(all) > DefaultRowLimit {
+
+			Log.Debug("Results too large. sending first 2000.")
+
+			for i, d := range all {
+
+				if i >= DefaultRowLimit {
+					break
+				}
+
+				returnData = append(returnData, d)
+			}
+
+			if data, err := json.Marshal(returnData); err == nil {
+				return true, all, data
+			}
+
+		} else {
+			return false, all, data
+		}
+	} else {
+		return false, all, data
+	}
+
+	return false, all, data
+}
+
+func (self *Server) sendAll(in interface{}) *Response {
 	self.mu.RLock()
 	defer self.mu.RUnlock()
 
 	var wg sync.WaitGroup
 
-	var results []QueryResults
+	resp := NewResponse()
 
 	Log.Debug("Sending request to nodes.")
-
 	Log.Debugf("Request: %s", in.(Query).Sql)
+
+	var count int
 
 	for s, node := range self.Nodes {
 		wg.Add(1)
@@ -235,6 +268,8 @@ func (self *Server) sendAll(in interface{}) []QueryResults {
 
 			var data []byte
 			err := s.Request("query", in, &data)
+
+			_, all, _ := ProcessResults(data)
 
 			qr := QueryResults{
 				Id:       node.Id,
@@ -248,9 +283,11 @@ func (self *Server) sendAll(in interface{}) []QueryResults {
 			}
 
 			elapsed := time.Since(start)
-			Log.Debugf(" * %s (%s)", node.Name, elapsed)
 
-			results = append(results, qr)
+			count += len(all)
+
+			Log.Debugf("  * %s (%s)", node.Name, elapsed)
+			resp.Results = append(resp.Results, qr)
 		}(s, node)
 	}
 
@@ -258,52 +295,66 @@ func (self *Server) sendAll(in interface{}) []QueryResults {
 
 	wg.Wait()
 
-	Log.Debug("Sending results back to requester.")
+	resp.Total = count
 
-	return results
-	// }()
+	if resp.Total > DefaultRowLimit {
+		resp.Error = errors.New(fmt.Sprintf("Results too large. (Limit: %d got %d)", DefaultRowLimit, resp.Total))
+	}
+
+	Log.Debug("Sending results back to requester.")
+	return resp
 }
 
-func (self *Server) sendTo(id string, in interface{}) []QueryResults {
+func (self *Server) sendTo(id string, in interface{}) *Response {
 	self.mu.RLock()
 	defer self.mu.RUnlock()
 
-	var results []QueryResults
+	resp := NewResponse()
 
 	node, err := self.GetNodeById(id)
 
 	if err != nil {
-		return results
-	}
+		resp.Total = 0
 
-	Log.Debugf("%s: sending request.", node.Name)
-	Log.Debugf("%s: request: %s", node.Name, in.(Query).Sql)
+		return resp
+	}
 
 	start := time.Now()
 
 	var data []byte
 	err = node.Socket.Request("query", in, &data)
 
+	var newData []byte
+	over, all, cut := ProcessResults(data)
+
+	if over {
+		newData = cut
+	} else {
+		newData = data
+	}
+
+	resp.Total = len(all)
+
 	qr := QueryResults{
 		Id:       node.Id,
 		Name:     node.Name,
 		Hostname: node.Hostname,
-		Results:  string(data),
+		Results:  string(newData),
 	}
 
 	if err != nil {
 		qr.Error = err.Error()
 	}
 
-	results = append(results, qr)
+	resp.Results = append(resp.Results, qr)
 
 	elapsed := time.Since(start)
-	Log.Debugf("%s: done (%s)", node.Name, elapsed)
 
-	return results
+	Log.Debugf("\n  - Node: %s\n  - Request: %s\n  - Response Id: %s\n  - Total: %d\n  - Elapsed Time: %s", node.Name, in.(Query).Sql, resp.Id, resp.Total, elapsed)
+	return resp
 }
 
-func (self *Server) Send(id string, in interface{}) []QueryResults {
+func (self *Server) Send(id string, in interface{}) *Response {
 
 	if id == "all" {
 		return self.sendAll(in)

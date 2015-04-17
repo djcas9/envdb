@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1 2015-04-18
+
+  + Fix table sort - respect query order by first.
+  + perf limit added to query response. Limit by 10k.
+  + better query debug output for node scope queries.
+  + minor UI fixes.
+  + rename osquery.go to query.go
+
 ## 0.3.0 - 2015-04-16
 
   + fix bug with node template not showing os icon

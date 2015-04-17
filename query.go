@@ -5,6 +5,8 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/nu7hatch/gouuid"
 )
 
 const (
@@ -22,6 +24,27 @@ type QueryResults struct {
 	Hostname string      `json:"hostname"`
 	Results  interface{} `json:"results"`
 	Error    string      `json:"error"`
+}
+
+type Response struct {
+	Id      string         `json:"id"`
+	Results []QueryResults `json:"results"`
+	Total   int            `json:"total"`
+	Error   error          `json:"error"`
+}
+
+func NewResponse() *Response {
+	var id string
+
+	if uuid, err := uuid.NewV4(); err == nil {
+		id = uuid.String()
+	}
+
+	return &Response{
+		Id:    id,
+		Error: nil,
+		Total: 0,
+	}
 }
 
 func CheckOsQueryVersion(version string) bool {

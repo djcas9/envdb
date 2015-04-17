@@ -72,7 +72,7 @@ AS listening ON process.pid = listening.pid;`,
 
 	q7 := QueryDb{
 		Name:  "Shell history",
-		Query: `SELECT * FROM shell_history`,
+		Query: `SELECT * FROM shell_history;`,
 		Type:  "all",
 	}
 
