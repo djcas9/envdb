@@ -83,7 +83,7 @@ setup:
 	@$(ECHO) "$(OK_COLOR)==> Building Packages $(NAME)$(NO_COLOR)"
 	@echo $(VERSION) > .Version
 	@mkdir -p package/root/usr/bin
-	@cp -R bin/$(NAME) package/root/usr/bin
+	@cp -R pkg/linux-amd64/$(NAME) package/root/usr/bin
 	@mkdir -p release/
 
 package: deb386 debamd64
