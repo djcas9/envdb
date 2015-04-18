@@ -42,8 +42,8 @@ func (self *Node) Handlers() {
 		Connection <- true
 	})
 
-	handlers.HandleBufferNotification("ping", func(_ *gotalk.Sock, _ string, b []byte) {
-		fmt.Printf("client: handling 'ping' request: %q\n", string(b))
+	handlers.Handle("ping", func(_ bool) ([]byte, error) {
+		return []byte("pong"), nil
 	})
 
 	handlers.Handle("query", func(query Query) ([]byte, error) {

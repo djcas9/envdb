@@ -65,6 +65,7 @@ func NewServer(port int) (*Server, error) {
 				if sig.String() == "interrupt" {
 					Log.Info("Received Interrupt.")
 					server.Shutdown()
+					os.Exit(1)
 				}
 			}
 		}
@@ -86,8 +87,6 @@ func (self *Server) Shutdown() {
 			Log.Error("Error: ", err)
 		}
 	}
-
-	os.Exit(1)
 }
 
 func (self *Server) onAccept(s *gotalk.Sock) {
@@ -100,7 +99,7 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 		err := s.Request("checkin", Message{}, &resp)
 
 		if err != nil {
-			Log.Fatalf("ERROR: %s", err)
+			Log.Fatalf("%s", err)
 		}
 
 		Log.Infof("New node connected. (%s / %s)", resp.Data["name"], resp.Data["id"])
@@ -162,6 +161,27 @@ func (self *Server) Broadcast(name string, in interface{}) {
 	for s, _ := range self.Nodes {
 		s.Notify(name, in)
 	}
+}
+
+func (self *Server) Alive(id string) bool {
+	node, err := self.GetNodeById(id)
+
+	if err != nil {
+		return false
+	}
+
+	var data []byte
+	err = node.Socket.Request("ping", true, &data)
+
+	if err != nil {
+		return false
+	}
+
+	if string(data) != "pong" {
+		return false
+	}
+
+	return true
 }
 
 func (self *Server) Disconnect(id string) error {

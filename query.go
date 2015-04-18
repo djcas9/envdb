@@ -107,9 +107,7 @@ func OsQueryInfo() (bool, string) {
 		return false, string(output)
 	}
 
-	items := []string{binary, "--version"}
-
-	output, err := exec.Command("/usr/bin/sudo", items...).CombinedOutput()
+	output, err := exec.Command(binary, "--version").CombinedOutput()
 
 	data := string(output)
 

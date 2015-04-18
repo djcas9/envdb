@@ -1,21 +1,74 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"path"
 	"testing"
+	"time"
 )
 
-func TestNewServer(t *testing.T) {
+var (
+	testServer      *Server
+	testServerError error
+
+	testNode            Node
+	testNodeConfig      *NodeConfig
+	testNodeConfigError error
+)
+
+func TestMain(m *testing.M) {
+	*quiet = true
 	initLogger()
 
-	var svrPort int = 3636
-	// var svrWebPort int = 8080
+	testServer, testServerError = NewServer(3636)
 
-	svr, err := NewServer(svrPort)
-
-	if err != nil {
-		t.Fatal(err)
+	if testServerError != nil {
+		fmt.Println(testServerError)
+		os.Exit(-1)
 	}
+
+	go func() {
+		if err := testServer.Run(8080); err != nil {
+			fmt.Println(err)
+			os.Exit(-1)
+		}
+	}()
+
+	testNode = Node{
+		Name:       "test",
+		Host:       "localhost",
+		Port:       3636,
+		RetryCount: 50,
+	}
+
+	testNodeConfig, testNodeConfigError = NewNodeConfig()
+
+	if testNodeConfigError != nil {
+		fmt.Println(testNodeConfigError)
+		os.Exit(-1)
+	}
+
+	testNode.Config = testNodeConfig
+
+	go func() {
+		if err := testNode.Run(); err != nil {
+			fmt.Println(err)
+			os.Exit(-1)
+		}
+	}()
+
+	// wait for node to get setup.
+	time.Sleep(time.Second * 1)
+
+	code := m.Run()
+
+	testServer.Shutdown()
+
+	os.Exit(code)
+}
+
+func TestServer(t *testing.T) {
 
 	p, err := HomeDir()
 
@@ -23,7 +76,7 @@ func TestNewServer(t *testing.T) {
 		t.Fatal("Unable to get home path.")
 	}
 
-	if svr.Port != svrPort {
+	if testServer.Port != 3636 {
 		t.Fatal("Server has wrong port set.")
 	}
 
@@ -31,50 +84,34 @@ func TestNewServer(t *testing.T) {
 	ps := path.Join(DefaultServerPath, "store.db")
 	pl := path.Join(DefaultServerPath, "logs")
 
-	if svr.Config.Path != pp {
+	if testServer.Config.Path != pp {
 		t.Fatal("Server path is wrong.")
 	}
 
-	if svr.Config.StorePath != ps {
+	if testServer.Config.StorePath != ps {
 		t.Fatal("Server store path is wrong.")
 	}
 
-	if svr.Config.LogPath != pl {
+	if testServer.Config.LogPath != pl {
 		t.Fatal("Server log path is wrong.")
 	}
 }
 
-func TestNewNode(t *testing.T) {
-	initLogger()
+func TestNode(t *testing.T) {
 
-	var c = Node{
-		Name:       "test",
-		Host:       "test-server",
-		Port:       3636,
-		RetryCount: 50,
-	}
-
-	config, err := NewNodeConfig()
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	c.Config = config
-
-	if c.Port != 3636 {
+	if testNode.Port != 3636 {
 		t.Fatal("Node has wrong port set.")
 	}
 
-	if c.Name != "test" {
+	if testNode.Name != "test" {
 		t.Fatal("Node name is wrong.")
 	}
 
-	if c.Host != "test-server" {
+	if testNode.Host != "localhost" {
 		t.Fatal("Node host is wrong.")
 	}
 
-	if c.RetryCount != 50 {
+	if testNode.RetryCount != 50 {
 		t.Fatal("Node retry count is wrong.")
 	}
 
@@ -87,11 +124,15 @@ func TestNewNode(t *testing.T) {
 	p1 := path.Join(p, "."+Name)
 	p2 := path.Join(DefaultNodePath, "node.cache")
 
-	if c.Config.Path != p1 {
+	if testNode.Config.Path != p1 {
 		t.Fatal("Node path is wrong.")
 	}
 
-	if c.Config.CacheFile != p2 {
+	if testNode.Config.CacheFile != p2 {
 		t.Fatal("Node cache file path is wrong.")
+	}
+
+	if testNode.Server() != "localhost:3636" {
+		t.Fatal("Node has the wrong server to connect to.")
 	}
 }

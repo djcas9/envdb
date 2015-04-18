@@ -203,7 +203,7 @@ func NewKeyPair() error {
 	keyOut, err := os.OpenFile(DefaultPrivateKeyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 
 	if err != nil {
-		Log.Errorf("failed to open %s for writing:", DefaultPrivateKeyPath, err)
+		Log.Errorf("failed to open %s for writing: %s", DefaultPrivateKeyPath, err.Error())
 		return err
 	}
 

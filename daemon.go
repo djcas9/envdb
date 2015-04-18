@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -67,12 +66,10 @@ func (self *Daemon) StartServer(svr *Server, svrWebPort int) {
 		case sig := <-sigChan:
 			Log.Debug("Go Signal: ", sig)
 			svr.Shutdown()
+			os.Exit(1)
 		}
 	}
 
-	if err != nil {
-		log.Println("Error:", err)
-	}
 }
 
 func (self *Daemon) Status() {
