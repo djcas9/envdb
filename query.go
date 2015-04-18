@@ -10,14 +10,20 @@ import (
 )
 
 const (
+	// Min OsQueryi Supported Version
 	MinOsQueryVersion = "1.4.4"
 )
 
+// Query wrapper. Holds the raw sql and
+// format options to be passed to osqueryi
 type Query struct {
 	Sql    string
 	Format string
 }
 
+// QueryResults holds all results returned
+// by osqueryi. This struct is used to transport
+// the data from server to UI
 type QueryResults struct {
 	Id       string      `json:"id"`
 	Name     string      `json:"name"`
@@ -26,6 +32,10 @@ type QueryResults struct {
 	Error    string      `json:"error"`
 }
 
+// Response wraps QueryResults.
+// The Response struct also holds more request metadata
+// and is used to paginate results in memory on the
+// server
 type Response struct {
 	Id      string         `json:"id"`
 	Results []QueryResults `json:"results"`
@@ -33,6 +43,7 @@ type Response struct {
 	Error   error          `json:"error"`
 }
 
+// Initialize a new Response
 func NewResponse() *Response {
 	var id string
 
@@ -47,6 +58,7 @@ func NewResponse() *Response {
 	}
 }
 
+// Check that the node has a proper osqueryi version
 func CheckOsQueryVersion(version string) bool {
 	if version == MinOsQueryVersion {
 		return true
@@ -98,6 +110,7 @@ func CheckOsQueryVersion(version string) bool {
 	return true
 }
 
+// Gather information about osqueryi from the node.
 func OsQueryInfo() (bool, string) {
 	var output []byte
 
@@ -120,6 +133,8 @@ func OsQueryInfo() (bool, string) {
 	return true, newData
 }
 
+// Run a query for the node and return its
+// combinded outpout.
 func (self *Query) Run() ([]byte, error) {
 	var output []byte
 

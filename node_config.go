@@ -9,10 +9,14 @@ import (
 )
 
 var (
-	DefaultNodePath  = ""
+	// Default node path
+	DefaultNodePath = ""
+
+	// Default cache file path. Stores the node connection id.
 	DefaultCacheFile = ""
 )
 
+// NodeConfig holds all node configuration values
 type NodeConfig struct {
 	Path      string
 	CacheFile string
@@ -20,10 +24,14 @@ type NodeConfig struct {
 	HasCache  bool
 }
 
+// NodeCache holds the node connection id.
+// This could also hold a lot of other information in
+// the future.
 type NodeCache struct {
 	Id string
 }
 
+// Initialize a new node configuration.
 func NewNodeConfig() (*NodeConfig, error) {
 	config := &NodeConfig{}
 
@@ -61,6 +69,7 @@ func NewNodeConfig() (*NodeConfig, error) {
 	return config, err
 }
 
+// Write node cache to disk.
 func (self NodeConfig) WriteCache() error {
 	var cache bytes.Buffer
 

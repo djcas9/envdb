@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	x       *xorm.Engine
-	tables  []interface{}
-	API_KEY string = ""
+	x      *xorm.Engine
+	tables []interface{}
 )
 
+// Initialize the database and add default values.
 func DBInit(storePath, logPath string) error {
 	tables = append(tables, new(NodeDb), new(QueryDb), new(SettingsDb),
 		new(UserDb))
@@ -69,6 +69,7 @@ func getEngine(DbPath string) (*xorm.Engine, error) {
 	return xorm.NewEngine("sqlite3", cnnstr)
 }
 
+// Setup and connect to the database.
 func SetEngine(DbPath string, LogPath string) (err error) {
 	x, err = getEngine(DbPath)
 

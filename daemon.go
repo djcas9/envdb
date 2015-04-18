@@ -9,10 +9,12 @@ import (
 	"github.com/sevlyar/go-daemon"
 )
 
+// Daemon wrapper for the daemon.Context struct
 type Daemon struct {
 	d *daemon.Context
 }
 
+// Check is the daemon is running
 func (self *Daemon) Running() (bool, *os.Process, error) {
 	d, err := self.d.Search()
 
@@ -27,6 +29,7 @@ func (self *Daemon) Running() (bool, *os.Process, error) {
 	return true, d, nil
 }
 
+// Start the servers as a daemon process.
 func (self *Daemon) StartServer(svr *Server, svrWebPort int) {
 
 	if ok, p, _ := self.Running(); ok {
@@ -72,6 +75,7 @@ func (self *Daemon) StartServer(svr *Server, svrWebPort int) {
 
 }
 
+// Get the current status of the daemon.
 func (self *Daemon) Status() {
 
 	if ok, p, _ := self.Running(); ok {
@@ -82,6 +86,7 @@ func (self *Daemon) Status() {
 	}
 }
 
+// Stop the daemon
 func (self *Daemon) Stop() {
 	if ok, p, _ := self.Running(); ok {
 		fmt.Printf("Attempting to shutdown %s server. PID: %d\n", Name, p.Pid)

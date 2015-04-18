@@ -1,10 +1,12 @@
 package main
 
+// Settings database table
 type SettingsDb struct {
 	Id    int64
 	Setup bool
 }
 
+// Initialize the database settings
 func DbSettings() (*SettingsDb, error) {
 	s := &SettingsDb{Id: 1}
 
@@ -38,6 +40,7 @@ func DbSettings() (*SettingsDb, error) {
 	return s, nil
 }
 
+// Update settings in the database
 func (self *SettingsDb) Update() error {
 	sess := x.NewSession()
 	defer sess.Close()

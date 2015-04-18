@@ -2,6 +2,7 @@ package main
 
 import "errors"
 
+// Query database table.
 type QueryDb struct {
 	Id    int64  `json:"id"`
 	Name  string `xorm:"NOT NULL"`
@@ -9,6 +10,8 @@ type QueryDb struct {
 	Type  string `xorm:"NOT NULL"`
 }
 
+// Load all of the default saved queries. This will
+// only run once on initial database creation.
 func LoadDefaultSavedQueries() error {
 	sess := x.NewSession()
 	defer sess.Close()
@@ -118,6 +121,7 @@ FROM interface_details AS id, interface_addresses AS ia WHERE id.interface = ia.
 	return nil
 }
 
+// Find a saved query by its id.
 func FindSavedQueryById(id int64) (*QueryDb, error) {
 	Log.Debugf("Looking for saved query with id: %d", id)
 
@@ -134,6 +138,7 @@ func FindSavedQueryById(id int64) (*QueryDb, error) {
 	return query, nil
 }
 
+// Delete a saved query
 func (self *QueryDb) Delete() error {
 	sess := x.NewSession()
 	defer sess.Close()
@@ -156,6 +161,7 @@ func (self *QueryDb) Delete() error {
 	return nil
 }
 
+// Find all saved queries in the database.
 func AllSavedQueries() ([]*QueryDb, error) {
 	var data []*QueryDb
 	err := x.Find(&data)
@@ -163,6 +169,7 @@ func AllSavedQueries() ([]*QueryDb, error) {
 	return data, err
 }
 
+// Insert a new saved query to the database.
 func NewSavedQuery(self QueryDb) error {
 	sess := x.NewSession()
 	defer sess.Close()

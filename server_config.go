@@ -9,7 +9,6 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
-	"log"
 	"math/big"
 	"net"
 	"os"
@@ -21,18 +20,28 @@ import (
 )
 
 var (
+	// Default server path
 	DefaultServerPath = ""
-	DefaultStorePath  = ""
-	DefaultLogPath    = ""
 
-	DefaultPublicKeyPath  = ""
+	// Default store path i.e database file
+	DefaultStorePath = ""
+
+	// Default log path.
+	DefaultLogPath = ""
+
+	// Default public key path used for tcp/http servers
+	DefaultPublicKeyPath = ""
+
+	// Default private key path used for tcp/http servers
 	DefaultPrivateKeyPath = ""
 
+	// Default row limit. This is the amount of data
+	// that can be returned to the UI without a `too large`
+	// error
 	DefaultRowLimit = 10000
-
-	SSL = false
 )
 
+// ServerConfig holds all server configurations
 type ServerConfig struct {
 	StorePath  string
 	Path       string
@@ -43,6 +52,10 @@ type ServerConfig struct {
 	Daemon     *Daemon
 }
 
+// Initialize a new ServerConfig
+// This will also create a default key pair and
+// a empty Daemon struct in case the process is to be
+// ran in the background
 func NewServerConfig() (*ServerConfig, error) {
 	config := &ServerConfig{}
 
@@ -88,7 +101,7 @@ func NewServerConfig() (*ServerConfig, error) {
 	cert, err := tls.LoadX509KeyPair(DefaultPublicKeyPath, DefaultPrivateKeyPath)
 
 	if err != nil {
-		log.Fatalf("server: loadkeys: %s", err)
+		Log.Fatalf("server: loadkeys: %s", err)
 	}
 
 	config.Cert = cert
@@ -134,6 +147,8 @@ func pemBlockForKey(priv interface{}) *pem.Block {
 	}
 }
 
+// Generate a new key pair to be used for the
+// http and tcp servers.
 func NewKeyPair() error {
 	var priv interface{}
 	var err error
@@ -154,7 +169,7 @@ func NewKeyPair() error {
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 
 	if err != nil {
-		log.Fatalf("failed to generate serial number: %s", err)
+		Log.Fatalf("failed to generate serial number: %s", err)
 		return err
 	}
 
@@ -184,14 +199,14 @@ func NewKeyPair() error {
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, publicKey(priv), priv)
 
 	if err != nil {
-		log.Fatalf("Failed to create certificate: %s", err)
+		Log.Fatalf("Failed to create certificate: %s", err)
 		return err
 	}
 
 	certOut, err := os.Create(DefaultPublicKeyPath)
 
 	if err != nil {
-		log.Fatalf("failed to open %s for writing: %s", DefaultPublicKeyPath, err)
+		Log.Fatalf("failed to open %s for writing: %s", DefaultPublicKeyPath, err)
 		return err
 	}
 

@@ -13,14 +13,21 @@ import (
 )
 
 const (
-	Name    = "envdb"
+	// Application name
+	Name = "envdb"
+
+	// Application version
 	Version = "0.3.1"
 
-	DefaultServerPort    = 3636
+	// The default tcp server port
+	DefaultServerPort = 3636
+
+	// The default web server port
 	DefaultWebServerPort = 8080
 )
 
 var (
+	// Global time format string
 	TimeFormat = "15:04:05"
 
 	app   = kingpin.New(Name, "The Environment Database - Ask your environment questions")
@@ -50,8 +57,12 @@ var (
 	addUser    = users.Flag("add", "Add a new user.").Short('a').Bool()
 	removeUser = users.Flag("remove", "Remove user by email.").Short('r').PlaceHolder("email").String()
 
+	// Global logger
 	Log *Logger
 
+	// Development mode switch. If true
+	// debug logging and serving assets from disk
+	// is enabled.
 	DEV_MODE bool
 )
 

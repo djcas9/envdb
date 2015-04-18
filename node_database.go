@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Node Database Table
 type NodeDb struct {
 	Id int64
 
@@ -25,6 +26,7 @@ type NodeDb struct {
 	Updated time.Time `xorm:"UPDATED"`
 }
 
+// Find all nodes in the database
 func AllNodes() ([]*NodeDb, error) {
 	var nodes []*NodeDb
 	err := x.Find(&nodes)
@@ -32,6 +34,7 @@ func AllNodes() ([]*NodeDb, error) {
 	return nodes, err
 }
 
+// Update node information in the database
 func (self *NodeDb) Update() error {
 	sess := x.NewSession()
 	defer sess.Close()
@@ -54,6 +57,7 @@ func (self *NodeDb) Update() error {
 	return err
 }
 
+// Update or create a new node if it doesn't exist.
 func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 	sess := x.NewSession()
 	defer sess.Close()
@@ -120,6 +124,7 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 	return a, nil
 }
 
+// Find node by node id which is also the connection id
 func GetNodeByNodeId(nodeId string) (*NodeDb, error) {
 	Log.Debugf("Looking for node with id: %s", nodeId)
 
@@ -136,6 +141,7 @@ func GetNodeByNodeId(nodeId string) (*NodeDb, error) {
 	return node, nil
 }
 
+// Delete node from the database.
 func (self *NodeDb) Delete() error {
 	sess := x.NewSession()
 	defer sess.Close()

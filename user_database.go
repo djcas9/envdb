@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// User database table
 type UserDb struct {
 	Id int64
 
@@ -33,16 +34,19 @@ type UserDb struct {
 	Updated time.Time `xorm:"UPDATED"`
 }
 
+// Users avatar link. Using gravatar
 func (u *UserDb) AvatarLink() string {
 	return "//1.gravatar.com/avatar/" + u.Avatar
 }
 
+// Find all users in the database
 func FindAllUsers() ([]*UserDb, error) {
 	var users []*UserDb
 	err := x.Find(&users)
 	return users, err
 }
 
+// Generate a salt for the user
 func GetUserSalt(n int, alphabets ...byte) string {
 	const alphanum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	var bytes = make([]byte, n)
@@ -57,6 +61,8 @@ func GetUserSalt(n int, alphabets ...byte) string {
 	return string(bytes)
 }
 
+// Hash the users email. This is used to generate the
+// avatar link.
 func hashEmail(email string) string {
 	// https://en.gravatar.com/site/implement/hash/
 	email = strings.TrimSpace(email)
@@ -67,6 +73,8 @@ func hashEmail(email string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+// Check that a given email address is unique in the
+// database
 func IsEmailUsed(email string) (bool, error) {
 	if len(email) == 0 {
 		return false, nil
@@ -123,6 +131,7 @@ func (u *UserDb) ValidatePassword(passwd string) bool {
 	return u.Password == newUser.Password
 }
 
+// Update the users information in the database
 func (self *UserDb) Update() error {
 	sess := x.NewSession()
 	defer sess.Close()
@@ -183,6 +192,7 @@ func PBKDF2(password, salt []byte, iter, keyLen int, h func() hash.Hash) []byte 
 	return dk[:keyLen]
 }
 
+// Find a user in the database by email address
 func FindUserByEmail(email string) (*UserDb, error) {
 	if len(email) == 0 {
 		return nil, errors.New("User not found")
@@ -203,6 +213,7 @@ func FindUserByEmail(email string) (*UserDb, error) {
 	return nil, errors.New("User not found")
 }
 
+// Delete a user from the database
 func (self *UserDb) Delete() error {
 	_, err := x.Delete(self)
 
