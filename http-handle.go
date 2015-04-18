@@ -16,7 +16,7 @@ func newTemplate(filename string) *template.Template {
 
 	var layout []byte
 
-	if DEV_MODE {
+	if DevMode {
 		file, err = ioutil.ReadFile("web/" + filename)
 		layout, err = ioutil.ReadFile("web/layout.html")
 	} else {

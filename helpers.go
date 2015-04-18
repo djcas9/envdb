@@ -16,7 +16,8 @@ var (
 	rxEmail = regexp.MustCompile(Email)
 )
 
-// Check is string is a valid email
+// isEmail checks a string to validate
+// its a proper email address
 func IsEmail(str string) bool {
 	// TODO uppercase letters are not supported
 	return rxEmail.MatchString(str)

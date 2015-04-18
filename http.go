@@ -122,7 +122,7 @@ func NewWebServer(webPort int, server *Server) {
 	ws := gotalk.WebSocketHandler()
 	ws.OnAccept = onAccept
 
-	if DEV_MODE {
+	if DevMode {
 		// dev
 		Log.Debugf("Loading assets from disk.")
 		r.PathPrefix("/public/").Handler(http.FileServer(http.Dir("./web/")))
