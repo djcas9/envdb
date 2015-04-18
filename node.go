@@ -13,12 +13,19 @@ import (
 )
 
 var (
+	// KillClient tells the node if it should disconnect or not
 	KillClient = false
+
+	// Connection is a channel to control
+	// the nodes connection state
 	Connection = make(chan bool, 1)
+
+	// RetryCount holds the current number of
+	// connection retry attempts
 	RetryCount = 0
 )
 
-// The node struct holds the socket, configurations
+// Node struct holds the socket, configurations
 // and other metadata.
 type Node struct {
 	Id         string
@@ -37,7 +44,7 @@ type Message struct {
 	Data  map[string]interface{}
 }
 
-// Register all node hnadlers.
+// Handlers will register all node hnadlers.
 func (self *Node) Handlers() {
 	handlers := gotalk.NewHandlers()
 
@@ -98,8 +105,8 @@ func (self *Node) Handlers() {
 			has = false
 		}
 
-		var hostname string = "n/a"
-		var ip string = self.Socket.Addr()
+		var hostname = "n/a"
+		var ip = self.Socket.Addr()
 
 		if os, err := os.Hostname(); err == nil {
 			hostname = os
@@ -134,7 +141,7 @@ func (self *Node) Handlers() {
 	self.Socket.Handlers = handlers
 }
 
-// Return the server connection string.
+// Server will return the server connection string.
 func (self *Node) Server() string {
 	return fmt.Sprintf("%s:%d", self.Host, self.Port)
 }
@@ -188,7 +195,7 @@ func (self *Node) Reconnect() {
 	time.Sleep(5 * time.Second)
 
 	if err := self.Run(); err != nil {
-		RetryCount -= 1
+		RetryCount--
 		Log.Error(err)
 		self.Reconnect()
 		return
@@ -198,7 +205,7 @@ func (self *Node) Reconnect() {
 	Log.Info("Reconnect successful.")
 }
 
-// Start the node, connect and register all handlers.
+// Run node, connect and register all handlers.
 func (self *Node) Run() error {
 
 	if err := self.Connect(); err != nil {
