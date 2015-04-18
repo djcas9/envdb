@@ -151,7 +151,7 @@ func main() {
 			os.Exit(-1)
 		}
 
-		var clntPort int = DefaultServerPort
+		var clntPort = DefaultServerPort
 
 		if *nodePort != 0 {
 			clntPort = *nodePort

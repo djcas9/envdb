@@ -16,7 +16,7 @@ var (
 	rxEmail = regexp.MustCompile(Email)
 )
 
-// isEmail checks a string to validate
+// IsEmail checks a string to validate
 // its a proper email address
 func IsEmail(str string) bool {
 	// TODO uppercase letters are not supported
@@ -36,7 +36,7 @@ func HomeDir() (home string, err error) {
 	}
 
 	if len(home) == 0 {
-		return "", errors.New("Cannot specify home directory because it's empty")
+		return "", errors.New("cannot specify home directory because it's empty")
 	}
 
 	return home, nil

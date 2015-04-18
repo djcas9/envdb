@@ -11,23 +11,46 @@ import (
 type Level uint8
 
 const (
+	// PanicLevel 0
 	PanicLevel Level = iota
+
+	// FatalLevel 1
 	FatalLevel
+
+	// ErrorLevel 2
 	ErrorLevel
+
+	// WarnLevel 3
 	WarnLevel
+
+	// InfoLevel 4
 	InfoLevel
+
+	// DebugLevel 5
 	DebugLevel
 )
 
 var (
+	// DebugPrefix allows you to change its styling
 	DebugPrefix = "[\033[32mDEBUG\033[0m]"
-	InfoPrefix  = "[\033[34mINFO\033[0m]"
-	WarnPrefix  = "[\033[33mWARN\033[0m]"
+
+	// InfoPrefix allows you to change its styling
+	InfoPrefix = "[\033[34mINFO\033[0m]"
+
+	// WarnPrefix allows you to change its styling
+	WarnPrefix = "[\033[33mWARN\033[0m]"
+
+	// ErrorPrefix allows you to change its styling
 	ErrorPrefix = "[\033[31mERROR\033[0m]"
+
+	// FatalPrefix allows you to change its styling
 	FatalPrefix = "[\033[31mFATAL\033[0m]"
+
+	// PanicPrefix allows you to change its styling
 	PanicPrefix = "[\033[31mPANIC\033[0m]"
 )
 
+// Logger holds logging configurations
 type Logger struct {
 	Level      Level
 	Out        io.Writer
@@ -36,6 +59,7 @@ type Logger struct {
 	TimeFormat string
 }
 
+// NewLogger will initialize a new Logger struct
 func NewLogger() *Logger {
 	return &Logger{
 		Out:        os.Stdout,
@@ -46,110 +70,123 @@ func NewLogger() *Logger {
 	}
 }
 
-func (self *Logger) SetLevel(l Level) {
-	self.Level = l
+// SetLevel allows you to have the current log level
+func (log *Logger) SetLevel(l Level) {
+	log.Level = l
 }
 
-func (self *Logger) write(format string) {
+func (log *Logger) write(format string) {
 	data := bytes.NewBuffer([]byte(format))
 
-	_, err := io.Copy(self.Out, data)
+	_, err := io.Copy(log.Out, data)
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to write to log, %v\n", err)
 	}
 }
 
-func (self *Logger) output(prefix string, args ...interface{}) {
-	self.write(fmt.Sprintf("%s %s %s %s\n",
-		self.Prefix,
-		time.Now().Format(self.TimeFormat),
+func (log *Logger) output(prefix string, args ...interface{}) {
+	log.write(fmt.Sprintf("%s %s %s %s\n",
+		log.Prefix,
+		time.Now().Format(log.TimeFormat),
 		prefix,
 		fmt.Sprint(args...),
 	))
 }
 
-func (self *Logger) outputf(prefix, format string, args ...interface{}) {
-	self.write(fmt.Sprintf("%s %s %s %s\n",
-		self.Prefix,
-		time.Now().Format(self.TimeFormat),
+func (log *Logger) outputf(prefix, format string, args ...interface{}) {
+	log.write(fmt.Sprintf("%s %s %s %s\n",
+		log.Prefix,
+		time.Now().Format(log.TimeFormat),
 		prefix,
 		fmt.Sprintf(format, args...),
 	))
 }
 
-func (self *Logger) Debug(args ...interface{}) {
-	if self.Level >= DebugLevel {
-		self.output(DebugPrefix, args...)
+// Debug output
+func (log *Logger) Debug(args ...interface{}) {
+	if log.Level >= DebugLevel {
+		log.output(DebugPrefix, args...)
 	}
 }
 
-func (self *Logger) Debugf(format string, args ...interface{}) {
-	if self.Level >= DebugLevel {
-		self.outputf(DebugPrefix, format, args...)
+// Debugf output
+func (log *Logger) Debugf(format string, args ...interface{}) {
+	if log.Level >= DebugLevel {
+		log.outputf(DebugPrefix, format, args...)
 	}
 }
 
-func (self *Logger) Info(args ...interface{}) {
-	if self.Level >= InfoLevel {
-		self.output(InfoPrefix, args...)
+// Info output
+func (log *Logger) Info(args ...interface{}) {
+	if log.Level >= InfoLevel {
+		log.output(InfoPrefix, args...)
 	}
 }
 
-func (self *Logger) Infof(format string, args ...interface{}) {
-	if self.Level >= InfoLevel {
-		self.outputf(InfoPrefix, format, args...)
+// Infof output
+func (log *Logger) Infof(format string, args ...interface{}) {
+	if log.Level >= InfoLevel {
+		log.outputf(InfoPrefix, format, args...)
 	}
 }
 
-func (self *Logger) Warn(args ...interface{}) {
-	if self.Level >= WarnLevel {
-		self.output(WarnPrefix, args...)
+// Warn output
+func (log *Logger) Warn(args ...interface{}) {
+	if log.Level >= WarnLevel {
+		log.output(WarnPrefix, args...)
 	}
 }
 
-func (self *Logger) Warnf(format string, args ...interface{}) {
-	if self.Level >= WarnLevel {
-		self.outputf(WarnPrefix, format, args...)
+// Warnf output
+func (log *Logger) Warnf(format string, args ...interface{}) {
+	if log.Level >= WarnLevel {
+		log.outputf(WarnPrefix, format, args...)
 	}
 }
 
-func (self *Logger) Error(args ...interface{}) {
-	if self.Level >= ErrorLevel {
-		self.output(ErrorPrefix, args...)
+// Error output
+func (log *Logger) Error(args ...interface{}) {
+	if log.Level >= ErrorLevel {
+		log.output(ErrorPrefix, args...)
 	}
 }
 
-func (self *Logger) Errorf(format string, args ...interface{}) {
-	if self.Level >= ErrorLevel {
-		self.outputf(ErrorPrefix, format, args...)
+// Errorf output
+func (log *Logger) Errorf(format string, args ...interface{}) {
+	if log.Level >= ErrorLevel {
+		log.outputf(ErrorPrefix, format, args...)
 	}
 }
 
-func (self *Logger) Fatal(args ...interface{}) {
-	if self.Level >= FatalLevel {
-		self.output(FatalPrefix, args...)
+// Fatal output
+func (log *Logger) Fatal(args ...interface{}) {
+	if log.Level >= FatalLevel {
+		log.output(FatalPrefix, args...)
 		os.Exit(-1)
 	}
 }
 
-func (self *Logger) Fatalf(format string, args ...interface{}) {
-	if self.Level >= FatalLevel {
-		self.outputf(FatalPrefix, format, args...)
+// Fatalf output
+func (log *Logger) Fatalf(format string, args ...interface{}) {
+	if log.Level >= FatalLevel {
+		log.outputf(FatalPrefix, format, args...)
 		os.Exit(-1)
 	}
 }
 
-func (self *Logger) Panic(args ...interface{}) {
-	if self.Level >= PanicLevel {
-		self.output(PanicPrefix, args...)
+// Panic output
+func (log *Logger) Panic(args ...interface{}) {
+	if log.Level >= PanicLevel {
+		log.output(PanicPrefix, args...)
 		os.Exit(-1)
 	}
 }
 
-func (self *Logger) Panicf(format string, args ...interface{}) {
-	if self.Level >= PanicLevel {
-		self.outputf(PanicPrefix, format, args...)
+// Panicf output
+func (log *Logger) Panicf(format string, args ...interface{}) {
+	if log.Level >= PanicLevel {
+		log.outputf(PanicPrefix, format, args...)
 		os.Exit(-1)
 	}
 }
