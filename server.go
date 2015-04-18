@@ -13,6 +13,8 @@ import (
 	"github.com/mephux/gotalk"
 )
 
+// Holds node metadata. This struct is used by the server
+// to find and send command to individual nodes.
 type NodeData struct {
 	Id             string       `json:"id"`
 	Name           string       `json:"name"`
@@ -26,6 +28,8 @@ type NodeData struct {
 	Os             string `json:"os"`
 }
 
+// Server holds the tcp server socket, connected nodes
+// and configurations.
 type Server struct {
 	Config *ServerConfig
 	Port   int
@@ -34,6 +38,7 @@ type Server struct {
 	mu     sync.RWMutex
 }
 
+// Create a new server.
 func NewServer(port int) (*Server, error) {
 	server := &Server{
 		Port: port,
@@ -74,6 +79,8 @@ func NewServer(port int) (*Server, error) {
 	return server, nil
 }
 
+// Shutdow the server and tell all connected nodes to
+// mark themselves as offline.
 func (self *Server) Shutdown() {
 	Log.Infof("%s shutting down.", Name)
 
@@ -89,6 +96,8 @@ func (self *Server) Shutdown() {
 	}
 }
 
+// When a new node connects add said node to the Server struct Nodes
+// and process the node checkin.
 func (self *Server) onAccept(s *gotalk.Sock) {
 	self.mu.Lock()
 	defer self.mu.Unlock()
@@ -96,7 +105,7 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 	go func() {
 		var resp Message
 
-		err := s.Request("checkin", Message{}, &resp)
+		err := s.Request("checkin", nil, &resp)
 
 		if err != nil {
 			Log.Fatalf("%s", err)
@@ -154,6 +163,7 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 
 }
 
+// Send data to all connected nodes.
 func (self *Server) Broadcast(name string, in interface{}) {
 	self.mu.RLock()
 	defer self.mu.RUnlock()
@@ -163,6 +173,7 @@ func (self *Server) Broadcast(name string, in interface{}) {
 	}
 }
 
+// Return true if the node is connected and working properly.
 func (self *Server) Alive(id string) bool {
 	node, err := self.GetNodeById(id)
 
@@ -184,6 +195,7 @@ func (self *Server) Alive(id string) bool {
 	return true
 }
 
+// Disconnect a node from the server.
 func (self *Server) Disconnect(id string) error {
 	node, err := self.GetNodeById(id)
 
@@ -198,7 +210,9 @@ func (self *Server) Disconnect(id string) error {
 	return nil
 }
 
-// this is hacky because xorm has an issue with
+// Disconnect and delete a node from the database.
+//
+// * NOTE: This is hacky because xorm has an issue with
 // sqlite and table locking. Need to move this to a
 // channel for node db writes and queue them.
 func (self *Server) Delete(id string) error {
@@ -233,6 +247,8 @@ func (self *Server) Delete(id string) error {
 	return nil
 }
 
+// Convert the bytes returned to json and do some basic counting
+// to make sure we never send more than the DefaultRowRow to the UI.
 func ProcessResults(data []byte) (bool, []map[string]interface{}, []byte) {
 	var all = []map[string]interface{}{}
 	var returnData = []map[string]interface{}{}
@@ -265,6 +281,8 @@ func ProcessResults(data []byte) (bool, []map[string]interface{}, []byte) {
 	return false, all, data
 }
 
+// Send a query request to all connected nodes and return
+// a Response struct
 func (self *Server) sendAll(in interface{}) *Response {
 	self.mu.RLock()
 	defer self.mu.RUnlock()
@@ -325,6 +343,7 @@ func (self *Server) sendAll(in interface{}) *Response {
 	return resp
 }
 
+// Send a query request to just one node and return a Response struct
 func (self *Server) sendTo(id string, in interface{}) *Response {
 	self.mu.RLock()
 	defer self.mu.RUnlock()
@@ -374,6 +393,8 @@ func (self *Server) sendTo(id string, in interface{}) *Response {
 	return resp
 }
 
+// Send wraps the sendTo and sendAll functions and returns the Response
+// struct from the requested send type.
 func (self *Server) Send(id string, in interface{}) *Response {
 
 	if id == "all" {
@@ -383,6 +404,7 @@ func (self *Server) Send(id string, in interface{}) *Response {
 	return self.sendTo(id, in)
 }
 
+// Fetch a node by id from the Server.Nodes map
 func (self *Server) GetNodeById(id string) (*NodeData, error) {
 
 	for _, node := range self.Nodes {
@@ -394,6 +416,7 @@ func (self *Server) GetNodeById(id string) (*NodeData, error) {
 	return nil, errors.New("No node found for that id.")
 }
 
+// Start the tcp server and register all handlers.
 func (self *Server) Run(webPort int) error {
 	Log.Infof("Starting Server on port %d.", self.Port)
 

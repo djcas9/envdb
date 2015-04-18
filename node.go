@@ -18,6 +18,8 @@ var (
 	RetryCount = 0
 )
 
+// The node struct holds the socket, configurations
+// and other metadata.
 type Node struct {
 	Id         string
 	Config     *NodeConfig
@@ -28,11 +30,14 @@ type Node struct {
 	RetryCount int
 }
 
+// Message struct is used to pass data
+// during the node checkin process.
 type Message struct {
 	Error error
 	Data  map[string]interface{}
 }
 
+// Register all node hnadlers.
 func (self *Node) Handlers() {
 	handlers := gotalk.NewHandlers()
 
@@ -54,7 +59,7 @@ func (self *Node) Handlers() {
 		return query.Run()
 	})
 
-	handlers.Handle("checkin", func(_ Message) (Message, error) {
+	handlers.Handle("checkin", func() (Message, error) {
 		var err error
 
 		if self.Config.HasCache {
@@ -129,10 +134,12 @@ func (self *Node) Handlers() {
 	self.Socket.Handlers = handlers
 }
 
+// Return the server connection string.
 func (self *Node) Server() string {
 	return fmt.Sprintf("%s:%d", self.Host, self.Port)
 }
 
+// Connect a node to the server.
 func (self *Node) Connect() error {
 	Log.Infof("Connecting to %s", self.Server())
 
@@ -167,6 +174,7 @@ func (self *Node) Connect() error {
 	return nil
 }
 
+// Reconnect to the server if connection is lost.
 func (self *Node) Reconnect() {
 	self.Socket.Close()
 
@@ -190,6 +198,7 @@ func (self *Node) Reconnect() {
 	Log.Info("Reconnect successful.")
 }
 
+// Start the node, connect and register all handlers.
 func (self *Node) Run() error {
 
 	if err := self.Connect(); err != nil {
