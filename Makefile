@@ -47,7 +47,7 @@ bindata:
 
 test:
 	@$(ECHO) "$(OK_COLOR)==> Testing $(NAME)...$(NO_COLOR)"
-	godep go test ./...
+	godep go test ./... -v
 
 goxBuild:
 	@CGO_ENABLED=1 gox -os="$(CCOS)" -arch="$(CCARCH)" -build-toolchain
@@ -59,7 +59,7 @@ gox:
 	@CGO_ENABLED=1 GOPATH=$(shell godep path) gox -ldflags "-s" -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
 	@rm -rf Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
 
-release: clean all test gox setup package
+release: clean test gox setup package
 	@for os in $(CCOS); do \
 		for arch in $(CCARCH); do \
 			cd pkg/$$os-$$arch/; \
