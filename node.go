@@ -58,6 +58,10 @@ func (self *Node) Handlers() {
 		return []byte("pong"), nil
 	})
 
+	handlers.Handle("system-information", func() (map[string]interface{}, error) {
+		return SystemInformation()
+	})
+
 	handlers.Handle("query", func(query Query) ([]byte, error) {
 		return query.Run()
 	})

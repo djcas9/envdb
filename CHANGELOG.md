@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0 2015-04-18
+
+  + Add system information window for node.
+    Right click node and select `system information`.
+  + bug fixes
+
 ## 0.3.1 2015-04-18
 
   + Fix table sort - respect query order by first.

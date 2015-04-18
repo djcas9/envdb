@@ -266,6 +266,9 @@
   <script id="node-context-menu-template" type="text/x-handlebars-template">
     <ul class="custom-menu">
     <li>
+    <a href="#" class="system-information-node">System Information</a>
+    </li>
+    <li>
     <a href="#" class="disconnect-node">Disconnect Node</a>
     </li>
     <li>
@@ -290,6 +293,70 @@
     <div class='form-actions'>
     <a class='button warning warning limp-action'>{{buttonTitle}}</a>
     <a class='button' onClick='$.limpClose();return false;'>Cancel</a>
+    </div>
+    </div>
+
+    </div>
+  </script>
+
+  <script id="system-information-template" type="text/x-handlebars-template">
+    <div class="lbox">
+
+    <div class='lbox-title'>
+    <div class='fa fa-info'></div>
+    System Information
+    </div>
+
+    <div class="lbox-content grid-container">
+
+      <div class="system-information-section grid-50">
+        <h1>Network</h1>
+        {{#each network}}
+        <div class="system-information-row">
+          <span class="system-information-key">{{@key}}:</span>
+          <span class="system-information-value">{{this}}</span>
+        </div>
+        {{/each}}
+      </div>
+
+      <div class="system-information-section grid-50">
+        <h1>Memory</h1>
+        {{#each memory}}
+        <div class="system-information-row">
+          <span class="system-information-key">{{@key}}:</span>
+          <span class="system-information-value">{{this}}</span>
+        </div>
+        {{/each}}
+      </div>
+
+      <div class="clearfix"></div>
+      <br />
+      
+      <div class="system-information-section">
+        <h1>Platform Information</h1>
+        {{#each platform}}
+        <div class="system-information-row">
+          <span class="system-information-key">{{@key}}:</span>
+          <span class="system-information-value">{{this}}</span>
+        </div>
+        {{/each}}
+      </div>
+
+      <div class="system-information-section">
+        <h1>CPU</h1>
+        {{#each cpu}}
+        <div class="system-information-row">
+          <span class="system-information-key">{{@key}}:</span>
+          <span class="system-information-value">{{this}}</span>
+        </div>
+        {{/each}}
+      </div>
+
+    </div>
+
+    <div class="lbox-footer">
+    <div class='form-actions'>
+    <a class='button save' onClick='$.limpClose();return false;'>Close</a>
     </div>
     </div>
 

@@ -95,6 +95,16 @@ var Envdb = {
     current: null,
     tables: [],
 
+    Ask: function(id, question, callback) {
+      var json = {}
+
+      Envdb.Socket.request(question, id, function(err, data) {
+        if (typeof callback === "function") {
+          return callback(data, err);
+        }
+      });
+    },
+
     commands: {
       confirm: function(data, callback) {
         var box = Envdb.lbox.open(Envdb.Templates.confirm(data), {}, {
@@ -221,6 +231,11 @@ var Envdb = {
       this.clean();
       this.current = id;
 
+      // TODO
+      Envdb.Node.Ask(this.current, "system-information", function(data, err) {
+        console.log(data, err);
+      });
+
       Envdb.Loading.start();
       this.fetchTables(function(data, err) {
         Envdb.Loading.done();
@@ -319,6 +334,7 @@ var Envdb = {
       this.loadQuery = Handlebars.compile($("#load-query-template").html());
       this.nodeContextMenu = Handlebars.compile($("#node-context-menu-template").html());
       this.confirm = Handlebars.compile($("#confirm-template").html());
+      this.systemInformation = Handlebars.compile($("#system-information-template").html());
 
       Handlebars.registerHelper ('truncate', function(str, len) {
         if (str.length > len) {
@@ -541,6 +557,7 @@ var Envdb = {
           return;
         }
       } else {
+        
         Envdb.Flash.error("Error: " + err)
 
         Envdb.Editor.self.focus();
@@ -857,7 +874,31 @@ jQuery(document).ready(function($) {
       } else {
         Envdb.Flash.error("This node is already offline.");
       }
+    });
 
+    $("a.system-information-node").on("click", function(e) {
+      e.preventDefault();
+
+      if (parent.hasClass("online")) {
+        Envdb.Node.Ask(id, "system-information", function(data, err) {
+          if (err) {
+            Envdb.Flash.error(err);
+            return
+          }
+
+          var box = Envdb.lbox.open(Envdb.Templates.systemInformation(data), {}, {
+            disableDefaultAction: true,
+            afterClose: function() {},
+            afterOpen: function() {},
+            onAction: function() {
+            }
+          });
+
+          box.open();
+        });
+      } else {
+        Envdb.Flash.error("This node is offline.");
+      }
     });
 
     $("a.delete-node").on("click", function(e) {

@@ -17,7 +17,7 @@ const (
 	Name = "envdb"
 
 	// Version application version number
-	Version = "0.3.1"
+	Version = "0.4.0"
 
 	// DefaultServerPort the default tcp server port
 	DefaultServerPort = 3636

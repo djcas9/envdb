@@ -8,6 +8,26 @@
 			"Rev": "443a628bc233f634a75bcbdd71fe5350789f1afa"
 		},
 		{
+			"ImportPath": "github.com/DataDog/gohai/cpu",
+			"Rev": "3ff65ebc68558a69876dda7fee3dcd1de557babf"
+		},
+		{
+			"ImportPath": "github.com/DataDog/gohai/filesystem",
+			"Rev": "3ff65ebc68558a69876dda7fee3dcd1de557babf"
+		},
+		{
+			"ImportPath": "github.com/DataDog/gohai/memory",
+			"Rev": "3ff65ebc68558a69876dda7fee3dcd1de557babf"
+		},
+		{
+			"ImportPath": "github.com/DataDog/gohai/network",
+			"Rev": "3ff65ebc68558a69876dda7fee3dcd1de557babf"
+		},
+		{
+			"ImportPath": "github.com/DataDog/gohai/platform",
+			"Rev": "3ff65ebc68558a69876dda7fee3dcd1de557babf"
+		},
+		{
 			"ImportPath": "github.com/alecthomas/units",
 			"Rev": "6b4e7dc5e3143b85ea77909c72caf89416fc2915"
 		},

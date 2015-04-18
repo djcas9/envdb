@@ -1273,3 +1273,28 @@ div.show-sidebar {
 div.show-sidebar:hover {
   opacity: 1;
 }
+
+.system-information-section {
+  margin-bottom: 10px;
+}
+
+.system-information-section h1 {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+div.system-information-row {
+   padding: 2px; 
+}
+
+div.system-information-row span.system-information-key {
+  width: 130px;
+  display: inline-block;
+  font-weight: 400;
+  text-align: right;
+  margin-right: 10px;
+}
+div.system-information-row span.system-information-value {
+  
+}

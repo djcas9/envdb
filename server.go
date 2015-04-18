@@ -404,6 +404,21 @@ func (self *Server) Send(id string, in interface{}) *Response {
 	return self.sendTo(id, in)
 }
 
+// Ask for information from a node by id
+func (self *Server) Ask(id, question string) (map[string]interface{}, error) {
+	var data map[string]interface{}
+
+	node, err := self.GetNodeById(id)
+
+	if err != nil {
+		return data, err
+	}
+
+	err = node.Socket.Request(question, nil, &data)
+
+	return data, err
+}
+
 // Fetch a node by id from the Server.Nodes map
 func (self *Server) GetNodeById(id string) (*NodeData, error) {
 

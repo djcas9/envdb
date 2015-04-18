@@ -58,6 +58,10 @@ func NewWebServer(webPort int, server *Server) {
 	r := mux.NewRouter()
 	r.StrictSlash(true)
 
+	gotalk.Handle("system-information", func(id string) (map[string]interface{}, error) {
+		return server.Ask(id, "system-information")
+	})
+
 	gotalk.Handle("tables", func(sql SqlRequest) (QueryResults, error) {
 		var tables []string
 
