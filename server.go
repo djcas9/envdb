@@ -336,7 +336,7 @@ func (self *Server) sendAll(in interface{}) *Response {
 	resp.Total = count
 
 	if resp.Total > DefaultRowLimit {
-		resp.Error = errors.New(fmt.Sprintf("Results too large. (Limit: %d got %d)", DefaultRowLimit, resp.Total))
+		resp.Error = fmt.Errorf("Results too large. (Limit: %d got %d)", DefaultRowLimit, resp.Total)
 	}
 
 	Log.Debug("Sending results back to requester.")

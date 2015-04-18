@@ -14,9 +14,9 @@ type Daemon struct {
 	d *daemon.Context
 }
 
-// Check is the daemon is running
-func (self *Daemon) Running() (bool, *os.Process, error) {
-	d, err := self.d.Search()
+// Running will check if the daemon is running or not
+func (daemon *Daemon) Running() (bool, *os.Process, error) {
+	d, err := daemon.d.Search()
 
 	if err != nil {
 		return false, d, err
@@ -29,10 +29,10 @@ func (self *Daemon) Running() (bool, *os.Process, error) {
 	return true, d, nil
 }
 
-// Start the servers as a daemon process.
-func (self *Daemon) StartServer(svr *Server, svrWebPort int) {
+// StartServer starts the servers (http/tcp) as a daemon process.
+func (daemon *Daemon) StartServer(svr *Server, svrWebPort int) {
 
-	if ok, p, _ := self.Running(); ok {
+	if ok, p, _ := daemon.Running(); ok {
 		fmt.Printf("%s server is already running. PID: %d\n", Name, p.Pid)
 		return
 	}
@@ -40,7 +40,7 @@ func (self *Daemon) StartServer(svr *Server, svrWebPort int) {
 	fmt.Printf("Starting %s server in daemon mode\n", Name)
 	Log.SetLevel(DebugLevel)
 
-	d, err := self.d.Reborn()
+	d, err := daemon.d.Reborn()
 
 	if err != nil {
 		Log.Fatal(err)
@@ -50,7 +50,7 @@ func (self *Daemon) StartServer(svr *Server, svrWebPort int) {
 		return
 	}
 
-	defer self.d.Release()
+	defer daemon.d.Release()
 
 	go func() {
 		if err := svr.Run(svrWebPort); err != nil {
@@ -75,26 +75,26 @@ func (self *Daemon) StartServer(svr *Server, svrWebPort int) {
 
 }
 
-// Get the current status of the daemon.
-func (self *Daemon) Status() {
+// Status will get the current status of the daemon.
+func (daemon *Daemon) Status() {
 
-	if ok, p, _ := self.Running(); ok {
+	if ok, p, _ := daemon.Running(); ok {
 		fmt.Printf("%s server is running. PID: %d\n", Name, p.Pid)
 	} else {
-		self.d.Release()
+		daemon.d.Release()
 		fmt.Printf("%s server is NOT running.\n", Name)
 	}
 }
 
-// Stop the daemon
-func (self *Daemon) Stop() {
-	if ok, p, _ := self.Running(); ok {
+// Stop will shutdown and stop the daemon process
+func (daemon *Daemon) Stop() {
+	if ok, p, _ := daemon.Running(); ok {
 		fmt.Printf("Attempting to shutdown %s server. PID: %d\n", Name, p.Pid)
 		if err := p.Signal(syscall.Signal(syscall.SIGQUIT)); err != nil {
 			Log.Fatal(err)
 		}
 	} else {
-		self.d.Release()
+		daemon.d.Release()
 		fmt.Printf("%s server is not running.\n", Name)
 	}
 }
