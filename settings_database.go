@@ -41,7 +41,7 @@ func DbSettings() (*SettingsDb, error) {
 }
 
 // Update settings in the database
-func (self *SettingsDb) Update() error {
+func (s *SettingsDb) Update() error {
 	sess := x.NewSession()
 	defer sess.Close()
 
@@ -49,7 +49,7 @@ func (self *SettingsDb) Update() error {
 		return err
 	}
 
-	if _, err := sess.Id(self.Id).AllCols().Update(self); err != nil {
+	if _, err := sess.Id(s.Id).AllCols().Update(s); err != nil {
 		sess.Rollback()
 		return err
 	}

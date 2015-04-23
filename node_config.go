@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	// Default node path
+	// DefaultNodePath node path
 	DefaultNodePath = ""
 
-	// Default cache file path. Stores the node connection id.
+	// DefaultCacheFile stores the node connection id.
 	DefaultCacheFile = ""
 )
 
@@ -31,7 +31,7 @@ type NodeCache struct {
 	Id string
 }
 
-// Initialize a new node configuration.
+// NewNodeConfig new node configuration.
 func NewNodeConfig() (*NodeConfig, error) {
 	config := &NodeConfig{}
 
@@ -69,17 +69,17 @@ func NewNodeConfig() (*NodeConfig, error) {
 	return config, err
 }
 
-// Write node cache to disk.
-func (self NodeConfig) WriteCache() error {
+// WriteCache Write node cache to disk.
+func (config NodeConfig) WriteCache() error {
 	var cache bytes.Buffer
 
 	e := toml.NewEncoder(&cache)
 
-	if err := e.Encode(self.Cache); err != nil {
+	if err := e.Encode(config.Cache); err != nil {
 		return err
 	}
 
-	f, err := os.Create(self.CacheFile)
+	f, err := os.Create(config.CacheFile)
 	defer f.Close()
 
 	if err != nil {

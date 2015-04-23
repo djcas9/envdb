@@ -45,12 +45,12 @@ type Message struct {
 }
 
 // Handlers will register all node hnadlers.
-func (self *Node) Handlers() {
+func (node *Node) Handlers() {
 	handlers := gotalk.NewHandlers()
 
 	handlers.HandleBufferNotification("die", func(s *gotalk.Sock, name string, b []byte) {
 		KillClient = true
-		self.Socket.Close()
+		node.Socket.Close()
 		Connection <- true
 	})
 
@@ -73,11 +73,11 @@ func (self *Node) Handlers() {
 	handlers.Handle("checkin", func() (Message, error) {
 		var err error
 
-		if self.Config.HasCache {
-			Log.Debugf("Node has cache file. Using cached id %s", self.Config.Cache.Id)
+		if node.Config.HasCache {
+			Log.Debugf("Node has cache file. Using cached id %s", node.Config.Cache.Id)
 
-			Log.Infof("Connection successful. Id: %s", self.Config.Cache.Id)
-			self.Id = self.Config.Cache.Id
+			Log.Infof("Connection successful. Id: %s", node.Config.Cache.Id)
+			node.Id = node.Config.Cache.Id
 		} else {
 
 			id, uuerr := uuid.NewV4()
@@ -90,10 +90,10 @@ func (self *Node) Handlers() {
 			Log.Debugf("No cache file found. Creating cache file and new id %s", id)
 
 			Log.Infof("Connection successful. Id: %s", id.String())
-			self.Config.Cache.Id = id.String()
-			self.Id = self.Config.Cache.Id
+			node.Config.Cache.Id = id.String()
+			node.Id = node.Config.Cache.Id
 
-			self.Config.WriteCache()
+			node.Config.WriteCache()
 		}
 
 		has, version := OsQueryInfo()
@@ -110,7 +110,7 @@ func (self *Node) Handlers() {
 		}
 
 		var hostname = "n/a"
-		var ip = self.Socket.Addr()
+		var ip = node.Socket.Addr()
 
 		if os, err := os.Hostname(); err == nil {
 			hostname = os
@@ -129,8 +129,8 @@ func (self *Node) Handlers() {
 		rmsg := Message{
 			Error: err,
 			Data: map[string]interface{}{
-				"name":            self.Name,
-				"id":              self.Id,
+				"name":            node.Name,
+				"id":              node.Id,
 				"osquery":         has,
 				"osquery-version": version,
 				"ip":              ip,
@@ -142,19 +142,19 @@ func (self *Node) Handlers() {
 		return rmsg, nil
 	})
 
-	self.Socket.Handlers = handlers
+	node.Socket.Handlers = handlers
 }
 
 // Server will return the server connection string.
-func (self *Node) Server() string {
-	return fmt.Sprintf("%s:%d", self.Host, self.Port)
+func (node *Node) Server() string {
+	return fmt.Sprintf("%s:%d", node.Host, node.Port)
 }
 
 // Connect a node to the server.
-func (self *Node) Connect() error {
-	Log.Infof("Connecting to %s", self.Server())
+func (node *Node) Connect() error {
+	Log.Infof("Connecting to %s", node.Server())
 
-	s, err := gotalk.Connect("tcp", self.Server(), &tls.Config{
+	s, err := gotalk.Connect("tcp", node.Server(), &tls.Config{
 		InsecureSkipVerify: true,
 	})
 
@@ -162,23 +162,23 @@ func (self *Node) Connect() error {
 		return err
 	}
 
-	self.Socket = s
+	node.Socket = s
 
-	self.Socket.HeartbeatInterval = 20 * time.Second
+	node.Socket.HeartbeatInterval = 20 * time.Second
 
-	self.Socket.OnHeartbeat = func(load int, t time.Time) {
+	node.Socket.OnHeartbeat = func(load int, t time.Time) {
 		Log.Debugf("Got heartbeat: Load (%d), Time: (%s)", load, t.Format(TimeFormat))
 	}
 
-	self.Socket.CloseHandler = func(s *gotalk.Sock, code int) {
+	node.Socket.CloseHandler = func(s *gotalk.Sock, code int) {
 		if KillClient {
 			KillClient = false
 			Connection <- true
 		} else {
 			Log.Warnf("Lost connection to server. (Error Code: %d)", code)
 
-			RetryCount = self.RetryCount
-			self.Reconnect()
+			RetryCount = node.RetryCount
+			node.Reconnect()
 		}
 	}
 
@@ -186,8 +186,8 @@ func (self *Node) Connect() error {
 }
 
 // Reconnect to the server if connection is lost.
-func (self *Node) Reconnect() {
-	self.Socket.Close()
+func (node *Node) Reconnect() {
+	node.Socket.Close()
 
 	Log.Warnf("Attempting to reconnect. (Retry Count: %d)", RetryCount)
 
@@ -198,25 +198,25 @@ func (self *Node) Reconnect() {
 
 	time.Sleep(5 * time.Second)
 
-	if err := self.Run(); err != nil {
+	if err := node.Run(); err != nil {
 		RetryCount--
 		Log.Error(err)
-		self.Reconnect()
+		node.Reconnect()
 		return
 	}
 
-	RetryCount = self.RetryCount
+	RetryCount = node.RetryCount
 	Log.Info("Reconnect successful.")
 }
 
 // Run node, connect and register all handlers.
-func (self *Node) Run() error {
+func (node *Node) Run() error {
 
-	if err := self.Connect(); err != nil {
+	if err := node.Connect(); err != nil {
 		return err
 	}
 
-	self.Handlers()
+	node.Handlers()
 
 	<-Connection
 

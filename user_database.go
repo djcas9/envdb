@@ -132,7 +132,7 @@ func (u *UserDb) ValidatePassword(passwd string) bool {
 }
 
 // Update the users information in the database
-func (self *UserDb) Update() error {
+func (u *UserDb) Update() error {
 	sess := x.NewSession()
 	defer sess.Close()
 
@@ -140,7 +140,7 @@ func (self *UserDb) Update() error {
 		return err
 	}
 
-	if _, err := sess.Id(self.Id).AllCols().Update(self); err != nil {
+	if _, err := sess.Id(u.Id).AllCols().Update(u); err != nil {
 		sess.Rollback()
 		return err
 	}
@@ -214,8 +214,8 @@ func FindUserByEmail(email string) (*UserDb, error) {
 }
 
 // Delete a user from the database
-func (self *UserDb) Delete() error {
-	_, err := x.Delete(self)
+func (u *UserDb) Delete() error {
+	_, err := x.Delete(u)
 
 	if err != nil {
 		return err

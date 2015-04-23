@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	// Min OsQueryi Supported Version
+	// MinOsQueryVersion Supported osqueryi version
 	MinOsQueryVersion = "1.4.4"
 )
 
-// Query wrapper. Holds the raw sql and
+// Query Holds the raw sql and
 // format options to be passed to osqueryi
 type Query struct {
 	Sql    string
@@ -135,7 +135,7 @@ func OsQueryInfo() (bool, string) {
 
 // Run a query for the node and return its
 // combinded outpout.
-func (self *Query) Run() ([]byte, error) {
+func (q *Query) Run() ([]byte, error) {
 	var output []byte
 
 	binary, lookErr := exec.LookPath("osqueryi")
@@ -144,7 +144,7 @@ func (self *Query) Run() ([]byte, error) {
 		return output, lookErr
 	}
 
-	items := []string{binary, "--" + self.Format, self.Sql}
+	items := []string{binary, "--" + q.Format, q.Sql}
 
 	output, err := exec.Command("/usr/bin/sudo", items...).CombinedOutput()
 

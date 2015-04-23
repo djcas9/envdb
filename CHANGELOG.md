@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 2015-04-18
+
+  + Add loading indicator for system information 
+    request
+  + bug fixes
+
 ## 0.4.0 2015-04-18
 
   + Add system information window for node.

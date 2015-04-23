@@ -880,7 +880,13 @@ jQuery(document).ready(function($) {
       e.preventDefault();
 
       if (parent.hasClass("online")) {
+
+        Envdb.Loading.start();
+
         Envdb.Node.Ask(id, "system-information", function(data, err) {
+
+          Envdb.Loading.done();
+
           if (err) {
             Envdb.Flash.error(err);
             return

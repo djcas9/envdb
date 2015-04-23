@@ -70,7 +70,7 @@ func NewServer(port int) (*Server, error) {
 				if sig.String() == "interrupt" {
 					Log.Info("Received Interrupt.")
 					server.Shutdown()
-					os.Exit(1)
+					os.Exit(0)
 				}
 			}
 		}
@@ -81,7 +81,7 @@ func NewServer(port int) (*Server, error) {
 
 // Shutdow the server and tell all connected nodes to
 // mark themselves as offline.
-func (self *Server) Shutdown() {
+func (server *Server) Shutdown() {
 	Log.Infof("%s shutting down.", Name)
 
 	nodes, _ := AllNodes()
@@ -98,9 +98,9 @@ func (self *Server) Shutdown() {
 
 // When a new node connects add said node to the Server struct Nodes
 // and process the node checkin.
-func (self *Server) onAccept(s *gotalk.Sock) {
-	self.mu.Lock()
-	defer self.mu.Unlock()
+func (server *Server) onAccept(s *gotalk.Sock) {
+	server.mu.Lock()
+	defer server.mu.Unlock()
 
 	go func() {
 		var resp Message
@@ -126,7 +126,7 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 			Os:             resp.Data["os"].(string),
 		}
 
-		self.Nodes[s] = node
+		server.Nodes[s] = node
 
 		if _, err := NodeUpdateOrCreate(node); err != nil {
 			Log.Error("unable to create or update node record")
@@ -136,10 +136,10 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 		WebSocketSend("node-update", node)
 
 		s.CloseHandler = func(s *gotalk.Sock, _ int) {
-			self.mu.Lock()
-			defer self.mu.Unlock()
+			server.mu.Lock()
+			defer server.mu.Unlock()
 
-			node := self.Nodes[s]
+			node := server.Nodes[s]
 			node.Online = false
 
 			Log.Infof("Node disconnected. (%s / %s)", node.Name, node.Id)
@@ -157,25 +157,25 @@ func (self *Server) onAccept(s *gotalk.Sock) {
 				WebSocketSend("node-update", node)
 			}
 
-			delete(self.Nodes, s)
+			delete(server.Nodes, s)
 		}
 	}()
 
 }
 
 // Send data to all connected nodes.
-func (self *Server) Broadcast(name string, in interface{}) {
-	self.mu.RLock()
-	defer self.mu.RUnlock()
+func (server *Server) Broadcast(name string, in interface{}) {
+	server.mu.RLock()
+	defer server.mu.RUnlock()
 
-	for s, _ := range self.Nodes {
+	for s, _ := range server.Nodes {
 		s.Notify(name, in)
 	}
 }
 
 // Return true if the node is connected and working properly.
-func (self *Server) Alive(id string) bool {
-	node, err := self.GetNodeById(id)
+func (server *Server) Alive(id string) bool {
+	node, err := server.GetNodeById(id)
 
 	if err != nil {
 		return false
@@ -196,8 +196,8 @@ func (self *Server) Alive(id string) bool {
 }
 
 // Disconnect a node from the server.
-func (self *Server) Disconnect(id string) error {
-	node, err := self.GetNodeById(id)
+func (server *Server) Disconnect(id string) error {
+	node, err := server.GetNodeById(id)
 
 	if err != nil {
 		return err
@@ -215,11 +215,11 @@ func (self *Server) Disconnect(id string) error {
 // * NOTE: This is hacky because xorm has an issue with
 // sqlite and table locking. Need to move this to a
 // channel for node db writes and queue them.
-func (self *Server) Delete(id string) error {
+func (server *Server) Delete(id string) error {
 
 	Log.Debugf("Deleting node: %s", id)
 
-	node, err := self.GetNodeById(id)
+	node, err := server.GetNodeById(id)
 
 	if err != nil {
 
@@ -237,7 +237,7 @@ func (self *Server) Delete(id string) error {
 			return err
 		}
 
-		err = self.Disconnect(id)
+		err = server.Disconnect(id)
 
 		if err != nil {
 			return err
@@ -283,9 +283,9 @@ func ProcessResults(data []byte) (bool, []map[string]interface{}, []byte) {
 
 // Send a query request to all connected nodes and return
 // a Response struct
-func (self *Server) sendAll(in interface{}) *Response {
-	self.mu.RLock()
-	defer self.mu.RUnlock()
+func (server *Server) sendAll(in interface{}) *Response {
+	server.mu.RLock()
+	defer server.mu.RUnlock()
 
 	var wg sync.WaitGroup
 
@@ -296,7 +296,7 @@ func (self *Server) sendAll(in interface{}) *Response {
 
 	var count int
 
-	for s, node := range self.Nodes {
+	for s, node := range server.Nodes {
 		wg.Add(1)
 
 		go func(s *gotalk.Sock, node *NodeData) {
@@ -344,13 +344,13 @@ func (self *Server) sendAll(in interface{}) *Response {
 }
 
 // Send a query request to just one node and return a Response struct
-func (self *Server) sendTo(id string, in interface{}) *Response {
-	self.mu.RLock()
-	defer self.mu.RUnlock()
+func (server *Server) sendTo(id string, in interface{}) *Response {
+	server.mu.RLock()
+	defer server.mu.RUnlock()
 
 	resp := NewResponse()
 
-	node, err := self.GetNodeById(id)
+	node, err := server.GetNodeById(id)
 
 	if err != nil {
 		resp.Total = 0
@@ -395,20 +395,20 @@ func (self *Server) sendTo(id string, in interface{}) *Response {
 
 // Send wraps the sendTo and sendAll functions and returns the Response
 // struct from the requested send type.
-func (self *Server) Send(id string, in interface{}) *Response {
+func (server *Server) Send(id string, in interface{}) *Response {
 
 	if id == "all" {
-		return self.sendAll(in)
+		return server.sendAll(in)
 	}
 
-	return self.sendTo(id, in)
+	return server.sendTo(id, in)
 }
 
 // Ask for information from a node by id
-func (self *Server) Ask(id, question string) (map[string]interface{}, error) {
+func (server *Server) Ask(id, question string) (map[string]interface{}, error) {
 	var data map[string]interface{}
 
-	node, err := self.GetNodeById(id)
+	node, err := server.GetNodeById(id)
 
 	if err != nil {
 		return data, err
@@ -420,9 +420,9 @@ func (self *Server) Ask(id, question string) (map[string]interface{}, error) {
 }
 
 // Fetch a node by id from the Server.Nodes map
-func (self *Server) GetNodeById(id string) (*NodeData, error) {
+func (server *Server) GetNodeById(id string) (*NodeData, error) {
 
-	for _, node := range self.Nodes {
+	for _, node := range server.Nodes {
 		if node.Id == id {
 			return node, nil
 		}
@@ -432,10 +432,10 @@ func (self *Server) GetNodeById(id string) (*NodeData, error) {
 }
 
 // Start the tcp server and register all handlers.
-func (self *Server) Run(webPort int) error {
-	Log.Infof("Starting Server on port %d.", self.Port)
+func (server *Server) Run(webPort int) error {
+	Log.Infof("Starting Server on port %d.", server.Port)
 
-	self.Nodes = make(map[*gotalk.Sock]*NodeData)
+	server.Nodes = make(map[*gotalk.Sock]*NodeData)
 
 	handlers := gotalk.NewHandlers()
 
@@ -447,8 +447,8 @@ func (self *Server) Run(webPort int) error {
 		Log.Infof("Output %s: %s", name, string(b))
 	})
 
-	s, err := gotalk.Listen("tcp", fmt.Sprintf(":%d", self.Port), &tls.Config{
-		Certificates: []tls.Certificate{self.Config.Cert},
+	s, err := gotalk.Listen("tcp", fmt.Sprintf(":%d", server.Port), &tls.Config{
+		Certificates: []tls.Certificate{server.Config.Cert},
 		ClientAuth:   tls.NoClientCert,
 	})
 
@@ -456,19 +456,19 @@ func (self *Server) Run(webPort int) error {
 		return err
 	}
 
-	self.Socket = s
-	self.Socket.HeartbeatInterval = 20 * time.Second
+	server.Socket = s
+	server.Socket.HeartbeatInterval = 20 * time.Second
 
-	self.Socket.OnHeartbeat = func(load int, t time.Time) {
+	server.Socket.OnHeartbeat = func(load int, t time.Time) {
 		// Log.Debugf("Got heartbeat: Load (%d), Time: (%s)", load, t.Format(TimeFormat))
 	}
 
-	self.Socket.AcceptHandler = self.onAccept
-	self.Socket.Handlers = handlers
+	server.Socket.AcceptHandler = server.onAccept
+	server.Socket.Handlers = handlers
 
-	go NewWebServer(webPort, self)
+	go NewWebServer(webPort, server)
 
-	self.Socket.Accept()
+	server.Socket.Accept()
 
 	return nil
 }
