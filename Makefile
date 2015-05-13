@@ -27,7 +27,7 @@ endif
 all: bindata
 	@mkdir -p bin/
 	@$(ECHO) "$(OK_COLOR)==> Building $(NAME) $(VERSION) $(NO_COLOR)"
-	@godep go build -ldflags "-s" -o bin/$(NAME)
+	@godep go build -o bin/$(NAME)
 	@chmod +x bin/$(NAME)
 	@$(ECHO) "$(OK_COLOR)==> Done building$(NO_COLOR)"
 
