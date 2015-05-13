@@ -119,6 +119,10 @@ func NewWebServer(webPort int, server *Server) {
 		return server.Disconnect(id)
 	})
 
+	gotalk.Handle("disconnect-dead", func(id string) error {
+		return server.DisconnectDead(id)
+	})
+
 	gotalk.Handle("delete", func(id string) error {
 		return server.Delete(id)
 	})

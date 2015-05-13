@@ -9,21 +9,45 @@ import (
 type NodeDb struct {
 	Id int64
 
-	NodeId   string
-	Name     string
-	Ip       string
-	Hostname string
-	Os       string
+	NodeId       string
+	EnvdbVersion string
+	Name         string
+	Ip           string
+	Hostname     string
+	Os           string
 
 	Online bool
 
-	OsQuery        bool
-	OsQueryVersion string
+	OsQuery           bool
+	OsQueryVersion    string
+	OsQueryConfigPath string
 
 	PendingDelete bool
 
 	Created time.Time `xorm:"CREATED"`
 	Updated time.Time `xorm:"UPDATED"`
+}
+
+// NodeUpdateOnlineStatus will update a nodes connection
+// state on server start to clean up nodes that didn't properly disconnect
+// if the server is killed without running cleanup.
+func NodeUpdateOnlineStatus() error {
+	nodes, err := AllNodes()
+
+	if err != nil {
+		return err
+	}
+
+	for _, node := range nodes {
+		if node.Online {
+			node.Online = false
+			if err := node.Update(); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 // AllNodes Return all nodes in the database
@@ -72,11 +96,13 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 		Log.Debug("Found existing node record.")
 
 		find.Name = node.Name
+		find.EnvdbVersion = node.EnvdbVersion
 		find.Ip = node.Ip
 		find.Hostname = node.Hostname
 		find.Os = node.Os
 		find.OsQuery = node.OsQuery
 		find.OsQueryVersion = node.OsQueryVersion
+		find.OsQueryConfigPath = node.OsQueryConfigPath
 		find.Online = node.Online
 		find.PendingDelete = node.PendingDelete
 
@@ -99,15 +125,17 @@ func NodeUpdateOrCreate(node *NodeData) (*NodeDb, error) {
 	Log.Debugf("Creating a new record.")
 
 	a := &NodeDb{
-		NodeId:         node.Id,
-		Name:           node.Name,
-		Ip:             node.Ip,
-		Hostname:       node.Hostname,
-		Os:             node.Os,
-		Online:         node.Online,
-		OsQuery:        node.OsQuery,
-		OsQueryVersion: node.OsQueryVersion,
-		PendingDelete:  false,
+		NodeId:            node.Id,
+		Name:              node.Name,
+		EnvdbVersion:      node.EnvdbVersion,
+		Ip:                node.Ip,
+		Hostname:          node.Hostname,
+		Os:                node.Os,
+		Online:            node.Online,
+		OsQuery:           node.OsQuery,
+		OsQueryVersion:    node.OsQueryVersion,
+		OsQueryConfigPath: node.OsQueryConfigPath,
+		PendingDelete:     false,
 	}
 
 	if _, err := sess.Insert(a); err != nil {

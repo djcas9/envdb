@@ -173,8 +173,8 @@ body.login #wrapper {
   bottom: 0;
   right: 0;
   left: 0;
-  height: 35px;
-  line-height: 35px;
+  height: 15px;
+  line-height: 15px;
   font-size: 0.7em;
   opacity:0.2;
   color: #fff;
@@ -259,26 +259,32 @@ border-radius: 100px;
 }
 
 #nodes{
-  margin: 7px;
+  margin: 2px;
   color: #fff;
+  position: absolute;
+  top: 75px;
+  right: 0;
+  left: 0;
+  bottom: 25px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #nodes li{
+  margin: 5px 5px 5px 5px;
   cursor: pointer;
   height: 45px;
   display: block;
   position: relative;
-
   background: rgba(88, 99, 108, 0.29);
   padding: 10px;
   /* border: 1px solid rgba(56, 62, 68, 1); */
   border: 1px solid rgba(32, 35, 39, 1);
-  margin-bottom: 7px;
+  /* margin-bottom: 7px; */
   box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
-
-  border-radius: 3px; 
-  -moz-border-radius: 3px; 
-  -webkit-border-radius: 3px; 
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
 }
 
 #nodes li:hover{
@@ -1180,7 +1186,7 @@ body.login #login{
   position:absolute;
   left:50%;
   top:50%;
-  margin:-16px 0 0 -16px;
+  margin:-32px 0 0 -32px;
   z-index: 99999999999999;
 }
 
@@ -1298,3 +1304,60 @@ div.system-information-row span.system-information-key {
 div.system-information-row span.system-information-value {
   
 }
+
+/* @group Scroll Bar */
+
+.scrollbar,
+.scrollbar-hide {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: overlay !important;
+    overflow-x: hidden !important;
+}
+
+.scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    opacity: 0 !important;
+    display: none !important;
+    width: 5px;
+}
+
+.scrollbar-hide:hover::-webkit-scrollbar {
+    opacity: 1 !important;
+    display: block !important;
+    width: 5px;
+}
+
+.scrollbar::-webkit-scrollbar-track,
+.scrollbar-hide::-webkit-scrollbar-track {
+    background-color: #30333c;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb,
+.scrollbar-hide::-webkit-scrollbar-thumb {
+    background-color: #83888c;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover,
+.scrollbar-hide::-webkit-scrollbar-thumb:hover {
+    background-color: #93989c;
+}
+
+.scrollbar::-webkit-resizer,
+.scrollbar::-webkit-scrollbar-corner,
+.scrollbar::-webkit-scrollbar-button,
+.scrollbar::-webkit-scrollbar-track-piece,
+.scrollbar-hide::-webkit-resizer,
+.scrollbar-hide::-webkit-scrollbar-corner,
+.scrollbar-hide::-webkit-scrollbar-button,
+.scrollbar-hide::-webkit-scrollbar-track-piece {
+    display: none;
+}
+
+/* @end */

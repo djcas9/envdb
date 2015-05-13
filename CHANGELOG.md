@@ -1,10 +1,14 @@
 # Changelog
 
-## 0.4.1 2015-04-18
+## 0.4.1 2015-05-13
 
   + Add loading indicator for system information 
     request
   + bug fixes
+  + store envdb version for nodes
+  + Allow nodes list to scroll if needed.
+  + Update MakeFile version parsing logic.
+  + Revert removing debug symbols from build
 
 ## 0.4.0 2015-04-18
 

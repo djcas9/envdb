@@ -25,7 +25,7 @@
         <input placeholder="Filter Nodes" id="nodes-filter" class="search" type="text">
       </div>
 
-      <ul id="nodes" class="list">
+      <ul id="nodes" class="list scrollbar">
         <% range .Nodes %>
         <li data-os="<% .Os %>" class="node <% if .Online %>online<% else %>offline<% end %>" data-id="<% .Id %>" data-node-id="<% .NodeId %>">
 

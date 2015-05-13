@@ -51,6 +51,7 @@ func (node *Node) Handlers() {
 	handlers.HandleBufferNotification("die", func(s *gotalk.Sock, name string, b []byte) {
 		KillClient = true
 		node.Socket.Close()
+		Log.Warn(string(b))
 		Connection <- true
 	})
 
@@ -96,17 +97,17 @@ func (node *Node) Handlers() {
 			node.Config.WriteCache()
 		}
 
-		has, version := OsQueryInfo()
+		info := OsQueryInfo()
 
-		Log.Infof("osquery enabled: %t", has)
+		Log.Infof("osquery enabled: %t", info.Enabled)
 
-		if has {
-			Log.Infof("osquery version: %s", version)
+		if info.Enabled {
+			Log.Infof("osquery version: %s", info.Version)
 		}
 
-		if !CheckOsQueryVersion(version) {
+		if !VersionCheck(MinOsQueryVersion, info.Version) {
 			Log.Errorf("%s requires osqueryi version %s or later.", Name, MinOsQueryVersion)
-			has = false
+			info.Enabled = false
 		}
 
 		var hostname = "n/a"
@@ -129,13 +130,15 @@ func (node *Node) Handlers() {
 		rmsg := Message{
 			Error: err,
 			Data: map[string]interface{}{
-				"name":            node.Name,
-				"id":              node.Id,
-				"osquery":         has,
-				"osquery-version": version,
-				"ip":              ip,
-				"hostname":        hostname,
-				"os":              os,
+				"envdb-version":       Version,
+				"name":                node.Name,
+				"id":                  node.Id,
+				"osquery":             info.Enabled,
+				"osquery-version":     info.Version,
+				"osquery-config-path": info.ConfigPath,
+				"ip":       ip,
+				"hostname": hostname,
+				"os":       os,
 			},
 		}
 

@@ -5,6 +5,8 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -47,4 +49,56 @@ func HomeDir() (home string, err error) {
 func IsExist(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil || os.IsExist(err)
+}
+
+// VersionCheck
+func VersionCheck(base, version string) bool {
+	if version == base {
+		return true
+	}
+
+	sv := strings.Split(version, ".")
+	cv := strings.Split(base, ".")
+
+	if len(sv) != 3 {
+		return false
+	}
+
+	svi, err := strconv.Atoi(sv[0])
+
+	cvi, err := strconv.Atoi(cv[0])
+
+	if err != nil {
+		return false
+	}
+
+	if svi < cvi {
+		return false
+	}
+
+	svi2, err := strconv.Atoi(sv[1])
+
+	cvi2, err := strconv.Atoi(cv[1])
+
+	if err != nil {
+		return false
+	}
+
+	if svi2 < cvi2 {
+		return false
+	}
+
+	svi3, err := strconv.Atoi(sv[1])
+
+	cvi3, err := strconv.Atoi(cv[1])
+
+	if err != nil {
+		return false
+	}
+
+	if svi3 < cvi3 {
+		return false
+	}
+
+	return true
 }

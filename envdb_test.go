@@ -18,6 +18,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
+	TestMode = true
 	*quiet = true
 	initLogger()
 

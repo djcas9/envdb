@@ -16,16 +16,18 @@ import (
 // Holds node metadata. This struct is used by the server
 // to find and send command to individual nodes.
 type NodeData struct {
-	Id             string       `json:"id"`
-	Name           string       `json:"name"`
-	Ip             string       `json:"ip"`
-	Hostname       string       `json:"hostname"`
-	Socket         *gotalk.Sock `json:"-"`
-	OsQuery        bool
-	OsQueryVersion string
-	Online         bool   `json:"online"`
-	PendingDelete  bool   `json:"-"`
-	Os             string `json:"os"`
+	Id                string       `json:"id"`
+	EnvdbVersion      string       `json:"envdb-version"`
+	Name              string       `json:"name"`
+	Ip                string       `json:"ip"`
+	Hostname          string       `json:"hostname"`
+	Socket            *gotalk.Sock `json:"-"`
+	OsQuery           bool
+	OsQueryVersion    string
+	OsQueryConfigPath string
+	Online            bool   `json:"online"`
+	PendingDelete     bool   `json:"-"`
+	Os                string `json:"os"`
 }
 
 // Server holds the tcp server socket, connected nodes
@@ -57,6 +59,10 @@ func NewServer(port int) (*Server, error) {
 
 	if err := DBInit(config.StorePath, config.LogPath); err != nil {
 		Log.Error("Unable to setup sqlite database.")
+		Log.Fatalf("Error: %s", err)
+	}
+
+	if err := NodeUpdateOnlineStatus(); err != nil {
 		Log.Fatalf("Error: %s", err)
 	}
 
@@ -113,17 +119,29 @@ func (server *Server) onAccept(s *gotalk.Sock) {
 
 		Log.Infof("New node connected. (%s / %s)", resp.Data["name"], resp.Data["id"])
 
+		if _, ok := resp.Data["envdb-version"]; !ok {
+			s.BufferNotify("die", []byte("This version of Envdb is out of date. Please upgrade."))
+			return
+		}
+
+		if !VersionCheck(Version, resp.Data["envdb-version"].(string)) {
+			s.BufferNotify("die", []byte("Envdb version mismatch"))
+			return
+		}
+
 		node := &NodeData{
-			Id:             resp.Data["id"].(string),
-			Name:           resp.Data["name"].(string),
-			Online:         true,
-			Socket:         s,
-			OsQuery:        resp.Data["osquery"].(bool),
-			OsQueryVersion: resp.Data["osquery-version"].(string),
-			Ip:             resp.Data["ip"].(string),
-			Hostname:       resp.Data["hostname"].(string),
-			PendingDelete:  false,
-			Os:             resp.Data["os"].(string),
+			Id:                resp.Data["id"].(string),
+			Name:              resp.Data["name"].(string),
+			EnvdbVersion:      resp.Data["envdb-version"].(string),
+			Online:            true,
+			Socket:            s,
+			OsQuery:           resp.Data["osquery"].(bool),
+			OsQueryVersion:    resp.Data["osquery-version"].(string),
+			OsQueryConfigPath: resp.Data["osquery-config-path"].(string),
+			Ip:                resp.Data["ip"].(string),
+			Hostname:          resp.Data["hostname"].(string),
+			PendingDelete:     false,
+			Os:                resp.Data["os"].(string),
 		}
 
 		server.Nodes[s] = node
@@ -206,6 +224,29 @@ func (server *Server) Disconnect(id string) error {
 	Log.Debugf("Disconnect node: %s (%s)", node.Name, node.Id)
 
 	node.Socket.BufferNotify("die", []byte("good-bye!"))
+
+	return nil
+}
+
+// DisconnectDead with disconnect a dead agent.
+//
+// This is useful when the server is killed for some reason without
+// cleaning up the node connection state.
+func (server *Server) DisconnectDead(id string) error {
+	node, err := GetNodeByNodeId(id)
+
+	if err != nil {
+		return err
+	}
+
+	node.Online = false
+
+	if err := node.Update(); err != nil {
+		Log.Error("unable to update node record")
+		Log.Error("Error: ", err)
+
+		return err
+	}
 
 	return nil
 }
@@ -396,7 +437,6 @@ func (server *Server) sendTo(id string, in interface{}) *Response {
 // Send wraps the sendTo and sendAll functions and returns the Response
 // struct from the requested send type.
 func (server *Server) Send(id string, in interface{}) *Response {
-
 	if id == "all" {
 		return server.sendAll(in)
 	}
@@ -421,7 +461,6 @@ func (server *Server) Ask(id, question string) (map[string]interface{}, error) {
 
 // Fetch a node by id from the Server.Nodes map
 func (server *Server) GetNodeById(id string) (*NodeData, error) {
-
 	for _, node := range server.Nodes {
 		if node.Id == id {
 			return node, nil

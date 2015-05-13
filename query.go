@@ -1,9 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/nu7hatch/gouuid"
@@ -11,7 +11,8 @@ import (
 
 const (
 	// MinOsQueryVersion Supported osqueryi version
-	MinOsQueryVersion = "1.4.4"
+	MinOsQueryVersion        = "1.4.4"
+	DefaultOsQueryConfigPath = "/etc/osquery/osquery.conf"
 )
 
 // Query Holds the raw sql and
@@ -43,6 +44,13 @@ type Response struct {
 	Error   error          `json:"error"`
 }
 
+// OsQueryInfo holds information about osquery
+type OsQueryMetadata struct {
+	Enabled    bool
+	Version    string
+	ConfigPath string
+}
+
 // Initialize a new Response
 func NewResponse() *Response {
 	var id string
@@ -58,66 +66,20 @@ func NewResponse() *Response {
 	}
 }
 
-// Check that the node has a proper osqueryi version
-func CheckOsQueryVersion(version string) bool {
-	if version == MinOsQueryVersion {
-		return true
+// OsQueryInfo ather information about osqueryi from the node.
+func OsQueryInfo() *OsQueryMetadata {
+	var info = &OsQueryMetadata{
+		Enabled:    false,
+		Version:    "",
+		ConfigPath: "",
 	}
 
-	sv := strings.Split(version, ".")
-	cv := strings.Split(MinOsQueryVersion, ".")
-
-	if len(sv) != 3 {
-		return false
-	}
-
-	svi, err := strconv.Atoi(sv[0])
-
-	cvi, err := strconv.Atoi(cv[0])
-
-	if err != nil {
-		return false
-	}
-
-	if svi < cvi {
-		return false
-	}
-
-	svi2, err := strconv.Atoi(sv[1])
-
-	cvi2, err := strconv.Atoi(cv[1])
-
-	if err != nil {
-		return false
-	}
-
-	if svi2 < cvi2 {
-		return false
-	}
-
-	svi3, err := strconv.Atoi(sv[1])
-
-	cvi3, err := strconv.Atoi(cv[1])
-
-	if err != nil {
-		return false
-	}
-
-	if svi3 < cvi3 {
-		return false
-	}
-
-	return true
-}
-
-// Gather information about osqueryi from the node.
-func OsQueryInfo() (bool, string) {
 	var output []byte
 
 	binary, lookErr := exec.LookPath("osqueryi")
 
 	if lookErr != nil {
-		return false, string(output)
+		return info
 	}
 
 	output, err := exec.Command(binary, "--version").CombinedOutput()
@@ -125,12 +87,40 @@ func OsQueryInfo() (bool, string) {
 	data := string(output)
 
 	if err != nil {
-		return false, data
+		info.Version = data
+
+		return info
 	}
 
 	newData := strings.Trim(strings.Replace(data, "osqueryi version ", "", -1), "\n")
 
-	return true, newData
+	info.Enabled = true
+	info.Version = newData
+
+	// Return before query exec
+	if TestMode {
+		return info
+	}
+
+	items := []string{binary, "--json", "select * from osquery_info;"}
+	if output, err := exec.Command("/usr/bin/sudo", items...).CombinedOutput(); err != nil {
+		return info
+	} else {
+
+		var jdata []map[string]interface{}
+
+		if err := json.Unmarshal(output, &jdata); err != nil {
+			return info
+		}
+
+		if data, ok := jdata[0]["config_path"]; ok {
+			info.ConfigPath = data.(string)
+		}
+
+		return info
+	}
+
+	return info
 }
 
 // Run a query for the node and return its

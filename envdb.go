@@ -17,7 +17,7 @@ const (
 	Name = "envdb"
 
 	// Version application version number
-	Version = "0.4.0"
+	Version = "0.4.1"
 
 	// DefaultServerPort the default tcp server port
 	DefaultServerPort = 3636
@@ -64,6 +64,9 @@ var (
 	// debug logging and serving assets from disk
 	// is enabled.
 	DevMode bool
+
+	// TestMode
+	TestMode bool
 )
 
 func initLogger() {

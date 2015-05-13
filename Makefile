@@ -2,7 +2,7 @@ NAME="envdb"
 DESCRIPTION="Ask your environment questions"
 WEBSITE="http://envdb.io"
 
-VERSION=$(shell cat $(NAME).go | grep -oP "Version\s+?\=\s?\"\K.*?(?=\"$|$\)")
+VERSION=$(shell cat $(NAME).go | grep "Version =" | sed 's/Version\ \=//' | sed 's/"//g' | tr -d '[[:space:]]')
 CWD=$(shell pwd)
 
 GITHUB_USER=mephux
@@ -29,7 +29,7 @@ all: bindata
 	@$(ECHO) "$(OK_COLOR)==> Building $(NAME) $(VERSION) $(NO_COLOR)"
 	@godep go build -ldflags "-s" -o bin/$(NAME)
 	@chmod +x bin/$(NAME)
-	@$(ECHO) "$(OK_COLOR)==> Done$(NO_COLOR)"
+	@$(ECHO) "$(OK_COLOR)==> Done building$(NO_COLOR)"
 
 build: bindata all
 	@$(ECHO) "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
@@ -42,7 +42,7 @@ updatedeps:
 	@godep update ...
 
 bindata:
-	@$(ECHO) "$(OK_COLOR)==> Embedding Assets$(NO_COLOR)"
+	@$(ECHO) "$(OK_COLOR)==> Embedding assets$(NO_COLOR)"
 	@go-bindata web/...
 
 test:
@@ -53,13 +53,13 @@ goxBuild:
 	@CGO_ENABLED=1 gox -os="$(CCOS)" -arch="$(CCARCH)" -build-toolchain
 
 gox: 
-	@$(ECHO) "$(OK_COLOR)==> Cross Compiling $(NAME)$(NO_COLOR)"
+	@$(ECHO) "$(OK_COLOR)==> Cross compiling $(NAME)$(NO_COLOR)"
 	@mkdir -p Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
 	@cp -R *.go Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
 	@CGO_ENABLED=1 GOPATH=$(shell godep path) gox -ldflags "-s" -os="$(CCOS)" -arch="$(CCARCH)" -output=$(CCOUTPUT)
 	@rm -rf Godeps/_workspace/src/github.com/$(GITHUB_USER)/$(NAME)
 
-release: clean bindata test gox setup package
+release: clean all test gox setup package
 	@for os in $(CCOS); do \
 		for arch in $(CCARCH); do \
 			cd pkg/$$os-$$arch/; \
@@ -67,7 +67,7 @@ release: clean bindata test gox setup package
 			cd ../../; \
 		done \
 	done
-	@$(ECHO) "$(OK_COLOR)==> Done Cross Compiling $(NAME)$(NO_COLOR)"
+	@$(ECHO) "$(OK_COLOR)==> Done cross compiling $(NAME)$(NO_COLOR)"
 
 clean:
 	@$(ECHO) "$(OK_COLOR)==> Cleaning$(NO_COLOR)"
@@ -80,7 +80,7 @@ clean:
 	@rm -rf package/
 
 setup:
-	@$(ECHO) "$(OK_COLOR)==> Building Packages $(NAME)$(NO_COLOR)"
+	@$(ECHO) "$(OK_COLOR)==> Building packages $(NAME)$(NO_COLOR)"
 	@echo $(VERSION) > .Version
 	@mkdir -p package/root/usr/bin
 	@cp -R pkg/linux-amd64/$(NAME) package/root/usr/bin

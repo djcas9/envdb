@@ -231,14 +231,21 @@ var Envdb = {
       this.clean();
       this.current = id;
 
-      // TODO
-      Envdb.Node.Ask(this.current, "system-information", function(data, err) {
-        console.log(data, err);
-      });
-
       Envdb.Loading.start();
       this.fetchTables(function(data, err) {
         Envdb.Loading.done();
+
+        if (err) {
+          Envdb.Flash.error(err);
+
+          Envdb.Socket.request('disconnect-dead', id, function(err) {
+            if (err) {
+              console.log("word?")
+              Envdb.Flash.error(err);
+            }
+          });
+          return;
+        }
 
         $("a.run-query").text("Query Node");
         $("#header .title").text("Query Node: " + data.name + " (" + data.hostname + ")");
