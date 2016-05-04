@@ -11,6 +11,10 @@ var (
 
 	// TimeFormat global time format string
 	TimeFormat = "15:04:05"
+
+	// Build holds the git commit that was compiled.
+	// This will be filled in by the compiler.
+	Build string
 )
 
 const (

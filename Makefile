@@ -12,7 +12,7 @@ GO_VERSION=$(shell go version)
 SHA=$(shell git rev-parse --short HEAD)
 BUILD_COUNT=$(shell git rev-list --count HEAD)
 
-BUILD_TAG="-${BUILD_COUNT}.${SHA}"
+BUILD_TAG="${BUILD_COUNT}.${SHA}"
 
 build: lint generate
 	@echo "Building..."
@@ -68,7 +68,7 @@ clean:
 	rm -rf doc/
 	rm -rf package/
 	rm -rf bin/
-	rm -rf bindata.go
+	rm -rf envdb/bindata.go
 	rm -rf VERSION
 
 .PHONY: build

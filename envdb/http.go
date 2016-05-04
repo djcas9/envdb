@@ -18,6 +18,9 @@ import (
 var (
 	Clients = make(map[*gotalk.Sock]int)
 	socksmu sync.RWMutex
+
+	BasePrefix = "envdb/web/"
+	WebPrefix  = ""
 )
 
 type SqlRequest struct {
@@ -135,14 +138,15 @@ func NewWebServer(webPort int, server *Server) {
 	if DevMode {
 		// dev
 		Log.Debugf("Loading assets from disk.")
-		r.PathPrefix("/public/").Handler(http.FileServer(http.Dir("./web/")))
+		r.PathPrefix("/public/").Handler(http.FileServer(http.Dir(BasePrefix)))
 	} else {
 		Log.Debugf("Loading assets from memory.")
 		r.PathPrefix("/public/").Handler(http.FileServer(
 			&assetfs.AssetFS{
-				Asset:    Asset,
-				AssetDir: AssetDir,
-				Prefix:   "web",
+				Asset:     Asset,
+				AssetDir:  AssetDir,
+				AssetInfo: AssetInfo,
+				Prefix:    "",
 			},
 		))
 	}

@@ -5,7 +5,6 @@
 *.pid
 *.log
 bin/
-bindata.go
 
 log/
 pkg/

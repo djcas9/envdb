@@ -11,7 +11,7 @@ import (
 	"github.com/mephux/envdb/envdb"
 
 	"github.com/howeyc/gopass"
-	"gopkg.in/alecthomas/kingpin.v1"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
@@ -44,6 +44,10 @@ var (
 
 	// Log Global logger
 	Log *envdb.Logger
+
+	// Build holds the git commit that was compiled.
+	// This will be filled in by the compiler.
+	Build string
 )
 
 func initLogger() {
@@ -75,7 +79,8 @@ func initLogger() {
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	app.Version(envdb.Version)
+	app.Version(fmt.Sprintf("%s-%s", envdb.Version, Build))
+
 	args, err := app.Parse(os.Args[1:])
 
 	initLogger()
@@ -158,7 +163,7 @@ func main() {
 		}
 
 	default:
-		app.Usage(os.Stdout)
+		app.Usage([]string{})
 	}
 
 }

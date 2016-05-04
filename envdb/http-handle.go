@@ -8,9 +8,11 @@ import (
 	"text/template"
 )
 
-//go:generate go-bindata -prefix "../web/" -ignore "\\.go" -pkg envdb -o bindata.go ../web/...
+//go:generate go-bindata-assetfs -prefix "web/" -ignore "\\.go" -pkg envdb -o bindata.go web/...
 
-var funcs = template.FuncMap{}
+var (
+	funcs = template.FuncMap{}
+)
 
 func newTemplate(filename string) *template.Template {
 	var file []byte
@@ -19,11 +21,11 @@ func newTemplate(filename string) *template.Template {
 	var layout []byte
 
 	if DevMode {
-		file, err = ioutil.ReadFile("web/" + filename)
-		layout, err = ioutil.ReadFile("web/layout.html")
+		file, err = ioutil.ReadFile(BasePrefix + filename)
+		layout, err = ioutil.ReadFile(BasePrefix + "layout.html")
 	} else {
-		file, err = Asset("web/" + filename)
-		layout, err = Asset("web/layout.html")
+		file, err = Asset(filename)
+		layout, err = Asset("layout.html")
 	}
 
 	if err != nil {
@@ -65,6 +67,7 @@ func RouteIndex(w http.ResponseWriter, r *http.Request) error {
 		"Version": Version,
 		"Nodes":   nodes,
 		"User":    user,
+		"Prefix":  WebPrefix,
 	})
 
 }
@@ -181,6 +184,7 @@ func RouteLogin(w http.ResponseWriter, r *http.Request) error {
 			"Section": "login",
 			"Name":    Name,
 			"Version": Version,
+			"Prefix":  WebPrefix,
 		})
 	} else if r.Method == "POST" {
 		r.ParseForm()
