@@ -5,6 +5,8 @@ branches:
 git:
   path: github.com/mephux/envdb
 script:
+  - go get github.com/jteeuwen/go-bindata/...
+  - go get github.com/elazarl/go-bindata-assetfs/...
   - make
   - ./bin/envdb --version
   - make package

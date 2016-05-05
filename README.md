@@ -41,7 +41,6 @@ Building on macosx is easy tho, checkout the section below.
 
   * `go get github.com/jteeuwen/go-bindata/...`
   * `go get github.com/elazarl/go-bindata-assetfs`
-  * `go get github.com/tools/godep`
 
 #### make
 
