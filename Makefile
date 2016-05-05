@@ -51,11 +51,22 @@ test:
 	go list ./... | xargs -n1 go test
 
 strip:
-	strip bin/csos-server
+	strip bin/envdb
 
 rpm64:
-	fpm -s dir -t rpm -n $(NAME) -v $(BUILDVERSION) -p package/output/csos-server-$(BUILDVERSION)-amd64.rpm \
+	fpm -s dir -t rpm -n $(NAME) -v $(BUILDVERSION) -p package/output/envdb-$(BUILDVERSION)-amd64.rpm \
 		--rpm-compression bzip2 --rpm-os linux \
+		--force \
+		--url $(WEBSITE) \
+		--description $(DESCRIPTION) \
+		-m "Dustin Willis Webber <dustin.webber@gmail.com>" \
+		--vendor "Dustin Willis Webber" -a amd64 \
+		--exclude */**.gitkeep \
+		package/root/=/
+
+deb64:
+	fpm -s dir -t deb -n $(NAME) -v $(BUILDVERSION) -p package/output/envdb-$(BUILDVERSION)-amd64.deb \
+		--deb-compression bzip2 --deb-os linux \
 		--force \
 		--url $(WEBSITE) \
 		--description $(DESCRIPTION) \
