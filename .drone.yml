@@ -5,7 +5,9 @@ branches:
 git:
   path: github.com/mephux/envdb
 script:
-  - make release
+  - make
+  - ./bin/envdb --version
+  - make package
 notify:
   email:
     recipients:
