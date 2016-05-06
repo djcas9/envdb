@@ -4,7 +4,7 @@
 
 * NOTE: envdb is still beta software.
 
-<img style="float:left;" height="244px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb.gif">
+<img style="float:left;" height="244px" src="https://raw.githubusercontent.com/mephux/envdb-old/master/data/envdb.gif">
 
 Envdb turns your production, dev, cloud, etc environments into a database 
 cluster you can search using [osquery](https://github.com/facebook/osquery) as the foundation.
@@ -138,11 +138,11 @@ $ envdb help node
 
 ## More UI
 
-<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-1.png">
+<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb-old/master/data/envdb-1.png">
 
-<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-2.png">
+<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb-old/master/data/envdb-2.png">
 
-<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb/master/data/envdb-3.png">
+<img style="float:left;" height="300px" src="https://raw.githubusercontent.com/mephux/envdb-old/master/data/envdb-3.png">
 
 ## Self-Promotion
 
