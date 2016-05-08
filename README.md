@@ -1,4 +1,5 @@
-[![Build Status](http://komanda.io:8080/api/badge/github.com/mephux/envdb/status.svg?branch=master)](http://komanda.io:8080/github.com/mephux/envdb)
+
+!!!!!!!!!!!!!!!!!! LEGACY use https://github.com/mephux/kolide
 
 # Envdb - Environment Database
 
